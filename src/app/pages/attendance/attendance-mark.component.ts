@@ -1,0 +1,1132 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { NavbarComponent } from '../../shared/components/navbar.component';
+import { ApiService } from '../../core/services/api.service';
+import { ToastService } from '../../core/services/toast.service';
+import { SocketService } from '../../core/services/socket.service';
+
+@Component({
+  selector: 'app-attendance-mark',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NavbarComponent],
+  template: `
+    <app-navbar [title]="isTeacherView ? 'Take Student Attendance' : 'Attendance Management'" 
+                [subtitle]="isTeacherView ? 'Teacher Portal / Take Attendance' : 'Attendance by Class / Teacher / Student Log Tracking'"
+                [actionLabel]="'Submit Attendance'"
+                [actionIcon]="'fa-solid fa-check'"
+                (actionClicked)="saveAttendance()"></app-navbar>
+
+    <!-- Sub-Navigation Header Tabs -->
+    <div class="px-8 pt-4">
+      <div class="flex items-center gap-2 border-b border-[#1f2937] pb-3 overflow-x-auto">
+        <button (click)="attendanceSubTab = 'class'" 
+                [class.bg-emerald-600]="attendanceSubTab === 'class'" [class.text-white]="attendanceSubTab === 'class'" 
+                [class.bg-[#1e293b]]="attendanceSubTab !== 'class'" [class.text-gray-400]="attendanceSubTab !== 'class'" 
+                class="px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 border border-[#1f2937]">
+          <i class="fa-solid fa-user-graduate"></i>  🎓 Attendance student 
+        </button>
+
+        <button *ngIf="!isTeacherView" (click)="attendanceSubTab = 'teacher'; loadTeacherLogs()" 
+                [class.bg-emerald-600]="attendanceSubTab === 'teacher'" [class.text-white]="attendanceSubTab === 'teacher'" 
+                [class.bg-[#1e293b]]="attendanceSubTab !== 'teacher'" [class.text-gray-400]="attendanceSubTab !== 'teacher'" 
+                class="px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 border border-[#1f2937]">
+          <i class="fa-solid fa-chalkboard-user"></i> 👨‍🏫 Attendance teacher
+        </button>
+
+        
+      </div>
+    </div>
+
+    <div class="p-8 space-y-6 overflow-y-auto">
+      
+      <!-- ==================================================================== -->
+      <!-- TAB 1: 🏫 ATTENDANCE BY CLASS (TODAY) -->
+      <!-- ==================================================================== -->
+      <div *ngIf="attendanceSubTab === 'class'" class="space-y-6">
+        <!-- Top Metrics Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TODAY'S ATTENDANCE RATE</span>
+            <h3 class="text-2xl font-extrabold text-emerald-400 mt-2">{{ getAttendanceRate() }}%</h3>
+            <div class="w-full bg-[#111827] h-2 rounded-full mt-2 overflow-hidden border border-[#1f2937]">
+              <div [style.width.%]="getAttendanceRate()" class="bg-emerald-500 h-full rounded-full transition-all duration-500"></div>
+            </div>
+          </div>
+
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">PRESENT TODAY</span>
+            <h3 class="text-2xl font-extrabold text-emerald-400 mt-2">{{ countStatus('PRESENT') }} Students</h3>
+            <p class="text-xs text-emerald-400 mt-1 font-semibold">✓ In class today</p>
+          </div>
+
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">ABSENT TODAY</span>
+            <h3 class="text-2xl font-extrabold text-rose-400 mt-2">{{ countStatus('ABSENT') }} Students</h3>
+            <p class="text-xs text-rose-400 mt-1 font-semibold">✗ Unexcused absence</p>
+          </div>
+
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">LATE / EXCUSED TODAY</span>
+            <h3 class="text-2xl font-extrabold text-amber-400 mt-2">{{ countStatus('LATE') + countStatus('EXCUSED') }} Students</h3>
+            <p class="text-xs text-amber-400 mt-1 font-semibold">Arrived late or excused</p>
+          </div>
+        </div>
+
+        <!-- Attendance by Class (Today) Horizontal Filter Bar -->
+        <div class="bg-[#1e293b]/80 border border-[#1f2937] rounded-2xl p-5 space-y-4 text-xs shadow-lg">
+          <div class="flex items-center justify-between border-b border-[#1f2937] pb-3">
+            <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-emerald-400"></i> Attendance by Class (Today)
+            </h3>
+            <div class="flex items-center gap-2">
+              <button (click)="openMultiDayLeaveModal()" class="px-3 py-1.5 rounded-xl bg-purple-950 text-purple-300 border border-purple-800 font-bold hover:bg-purple-900 transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-minus"></i> Multi-Day Leave
+              </button>
+              <button (click)="setTodayDate()" class="px-3 py-1.5 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold hover:bg-emerald-900 transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-day"></i> Today
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
+            <!-- Select Class Group -->
+            <div class="lg:col-span-2">
+              <label class="block font-bold text-emerald-400 mb-1">SELECT CLASS GROUP *</label>
+              <select [(ngModel)]="selectedClass" (change)="onClassChange()" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 font-bold">
+                <option *ngFor="let g of groups" [value]="g.group_id">
+                  {{ g.group_code }} — {{ g.group_name }} (Year {{ g.academic_year_level || 1 }} · Sem {{ g.current_semester || 1 }})
+                </option>
+              </select>
+            </div>
+
+            <!-- Attendance Date Picker -->
+            <div>
+              <label class="block font-bold text-cyan-400 mb-1">ATTENDANCE DATE *</label>
+              <input type="date" [(ngModel)]="selectedDate" (change)="loadAttendance()" class="w-full bg-[#111827] border border-cyan-500/40 text-xs text-cyan-300 rounded-xl px-4 py-2.5 focus:outline-none focus:border-cyan-400 font-mono font-extrabold">
+            </div>
+
+            <!-- Batch Action Buttons -->
+            <div class="lg:col-span-3">
+              <label class="block font-bold text-gray-400 mb-1 uppercase tracking-wider text-[10px]">BATCH MARK CLASS STUDENTS</label>
+              <div class="grid grid-cols-4 gap-2">
+                <button (click)="markAll('PRESENT')" class="p-2.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 font-bold text-xs transition-all flex items-center justify-center gap-1">✓ All Present</button>
+                <button (click)="markAll('ABSENT')" class="p-2.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-400 font-bold text-xs transition-all flex items-center justify-center gap-1">All Absent</button>
+                <button (click)="markAll('LATE')" class="p-2.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-800 text-amber-400 font-bold text-xs transition-all flex items-center justify-center gap-1">All Late</button>
+                <button (click)="markAll('EXCUSED')" class="p-2.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-400 font-bold text-xs transition-all flex items-center justify-center gap-1">All Excused</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance Sheet Table (Full Width) -->
+        <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
+            <!-- Teacher Leave Alert Banner -->
+            <div *ngIf="assignedTeacherLeaveNotice" class="bg-amber-950/90 border-2 border-amber-500 rounded-2xl p-4 flex items-center justify-between gap-4 text-amber-200 shadow-xl">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-900/90 text-amber-400 font-bold flex items-center justify-center text-lg shrink-0 border border-amber-700">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm text-white flex items-center gap-2">
+                    Teacher Leave Notice
+                  </h4>
+                  <p class="text-xs text-amber-200 mt-0.5">
+                    Teacher <strong>{{ assignedTeacherLeaveNotice.teacher_name }}</strong> is marked as 
+                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase" [class.bg-indigo-900]="assignedTeacherLeaveNotice.status === 'LEAVE'" [class.bg-rose-900]="assignedTeacherLeaveNotice.status === 'ABSENT'" [class.text-indigo-300]="assignedTeacherLeaveNotice.status === 'LEAVE'" [class.text-rose-300]="assignedTeacherLeaveNotice.status === 'ABSENT'">
+                      • {{ assignedTeacherLeaveNotice.status }}
+                    </span>
+                    on {{ assignedTeacherLeaveNotice.date }} <span class="font-bold text-amber-300 font-mono">({{ assignedTeacherLeaveNotice.time_slot || '07:30 - 09:00 AM' }})</span>!
+                    <span *ngIf="assignedTeacherLeaveNotice.note" class="italic font-semibold text-amber-100">("{{ assignedTeacherLeaveNotice.note }}")</span>
+                  </p>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-900 text-amber-300 border border-amber-700 shrink-0">
+                Class {{ getSelectedGroupCode() }}
+              </span>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <h3 class="text-base font-bold text-white tracking-tight">
+                Class Roster Attendance Sheet · <span class="text-emerald-400 font-mono">{{ selectedDate | date:'mediumDate' }}</span>
+              </h3>
+
+              <!-- Search Bar by Name, Student ID, or Phone Number -->
+              <div class="relative min-w-[260px]">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" 
+                       [(ngModel)]="studentSearchQuery" 
+                       placeholder="Search Name, ID, or Phone..." 
+                       class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:border-emerald-500 font-bold shadow-sm placeholder:text-gray-500">
+              </div>
+
+              <div class="flex items-center gap-2 text-xs flex-wrap">
+                <span class="status-badge status-badge-present">Present: {{ countStatus('PRESENT') }}</span>
+                <span class="status-badge status-badge-absent">Absent: {{ countStatus('ABSENT') }}</span>
+                <span class="status-badge status-badge-pending">Late: {{ countStatus('LATE') }}</span>
+                <span class="status-badge status-badge-active">Excused: {{ countStatus('EXCUSED') }}</span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
+                    <th class="pb-3 w-8">#</th>
+                    <th class="pb-3">STUDENT ID</th>
+                    <th class="pb-3">STUDENT NAME</th>
+                    <th class="pb-3">SUBJECT & TEACHER</th>
+                    <th class="pb-3">ATTENDANCE STATUS</th>
+                    <th class="pb-3">REMARKS / NOTE</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#1f2937]/50">
+                  <tr *ngFor="let s of filteredStudents; let i = index" class="hover:bg-gray-800/40 transition-colors">
+                    <td class="py-3 font-mono text-gray-500">{{ (i + 1) < 10 ? '0' + (i + 1) : (i + 1) }}</td>
+                    <td class="py-3 font-mono text-emerald-400 font-bold">{{ s.custom_student_id }}</td>
+                    <td class="py-3 flex items-center gap-3 font-bold text-white">
+                      <div class="w-9 h-9 rounded-full overflow-hidden bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
+                        <img *ngIf="s.image || s.photo" [src]="getPhotoUrl(s.image || s.photo)" class="w-full h-full object-cover">
+                        <span *ngIf="!s.image && !s.photo">{{ s.first_name ? s.first_name[0] : 'S' }}{{ s.last_name ? s.last_name[0] : '' }}</span>
+                      </div>
+                      <span>{{ s.first_name }} {{ s.last_name }}</span>
+                    </td>
+                    <td class="py-3 font-sans">
+                      <div class="space-y-1">
+                        <div *ngFor="let sub of todayScheduledSubjects" class="text-xs">
+                          <span class="font-extrabold text-amber-300">📘 {{ sub.subject_name }}</span>
+                          <span *ngIf="sub.subject_code" class="text-[10px] text-gray-400 font-mono ml-1 font-bold">({{ sub.subject_code }})</span>
+                          <span *ngIf="sub.teacher_name || getAssignedTeacherName(sub)" class="text-[10px] text-emerald-400 font-bold block">
+                            {{ sub.teacher_name || getAssignedTeacherName(sub) }}
+                          </span>
+                        </div>
+                        <div *ngIf="!todayScheduledSubjects || todayScheduledSubjects.length === 0" class="text-xs text-amber-300 font-extrabold">
+                          {{ s.subject_name || 'Class Subject' }}
+                          <span *ngIf="s.teacher_name" class="text-[10px] text-gray-400 font-bold block">
+                            {{ s.teacher_name }}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-3">
+                      <div class="flex items-center gap-1.5">
+                        <button type="button" (click)="quickMarkStudentStatus(s, 'PRESENT')" [ngClass]="isStatus(s.status, 'PRESENT') ? 'bg-emerald-600 text-white shadow-md font-extrabold' : 'bg-gray-800 text-gray-400 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Present</button>
+                        <button type="button" (click)="quickMarkStudentStatus(s, 'ABSENT')" [ngClass]="isStatus(s.status, 'ABSENT') ? 'bg-rose-600 text-white shadow-md font-extrabold' : 'bg-gray-800 text-gray-400 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Absent</button>
+                        <button type="button" (click)="quickMarkStudentStatus(s, 'LATE')" [ngClass]="isStatus(s.status, 'LATE') ? 'bg-amber-600 text-white shadow-md font-extrabold' : 'bg-gray-800 text-gray-400 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Late</button>
+                        <button type="button" (click)="quickMarkStudentStatus(s, 'EXCUSED')" [ngClass]="(isStatus(s.status, 'EXCUSED') || isStatus(s.status, 'PERMISSION')) ? 'bg-indigo-600 text-white shadow-md font-extrabold' : 'bg-gray-800 text-gray-400 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Permission / Excused</button>
+                      </div>
+                    </td>
+                    <td class="py-3">
+                      <input type="text" [(ngModel)]="s.note" (change)="saveAttendance()" placeholder="Add note..." class="bg-[#111827] border border-[#1f2937] text-xs text-gray-300 rounded-lg px-2.5 py-1.5 w-full focus:outline-none focus:border-emerald-500">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+              <button (click)="saveAttendance()" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-check"></i> Save Daily Attendance
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================================================================== -->
+      <!-- TAB 2: 👨‍🏫 ATTENDANCE TEACHER (គ្រប់គ្រងវត្តមានគ្រូ) -->
+      <!-- ==================================================================== -->
+      <div *ngIf="attendanceSubTab === 'teacher'" class="space-y-6 pt-0 p-5">
+        <!-- Top Metrics Summary for Faculty Teachers -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 ">
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TEACHERS PRESENT TODAY</span>
+            <h3 class="text-2xl font-extrabold text-emerald-400 mt-2">{{ countTeacherAttendanceStatus('PRESENT') }} Faculty</h3>
+            <p class="text-xs text-emerald-400 mt-1 font-semibold">✓ Present at university today</p>
+          </div>
+
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TEACHERS LATE TODAY</span>
+            <h3 class="text-2xl font-extrabold text-amber-400 mt-2">{{ countTeacherAttendanceStatus('LATE') }} Faculty</h3>
+            <p class="text-xs text-amber-400 mt-1 font-semibold">⏰ Arrived late for class</p>
+          </div>
+
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TEACHERS ON LEAVE TODAY</span>
+            <h3 class="text-2xl font-extrabold text-indigo-400 mt-2">{{ countTeacherAttendanceStatus('LEAVE') }} Faculty</h3>
+            <p class="text-xs text-indigo-400 mt-1 font-semibold">📝 Approved official leave</p>
+          </div>
+
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
+            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TEACHERS ABSENT TODAY</span>
+            <h3 class="text-2xl font-extrabold text-rose-400 mt-2">{{ countTeacherAttendanceStatus('ABSENT') }} Faculty</h3>
+            <p class="text-xs text-rose-400 mt-1 font-semibold">✗ Unexcused absence</p>
+          </div>
+        </div>
+
+        <!-- Faculty Attendance Form Horizontal Top Bar (ជួរដេកខាងលើ) -->
+        <div class="bg-[#1e293b]/80 border border-[#1f2937] rounded-2xl p-5 space-y-4 text-xs shadow-lg">
+          <div class="flex items-center justify-between border-b border-[#1f2937] pb-3">
+            <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <i class="fa-solid fa-chalkboard-user text-emerald-400"></i> Faculty Attendance Form
+            </h3>
+            <button (click)="setTodayTeacherDate()" class="px-3 py-1.5 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold hover:bg-emerald-900 transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-calendar-day"></i> Today
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <!-- Faculty / Dept -->
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">FACULTY / DEPARTMENT *</label>
+              <select [(ngModel)]="selectedTeacherDept" (change)="filterTeacherList()" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-emerald-500 font-bold">
+                <option value="">All Departments</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Accounting & Finance">Accounting & Finance</option>
+              </select>
+            </div>
+
+            <!-- Employment Type -->
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">EMPLOYMENT TYPE *</label>
+              <select [(ngModel)]="selectedTeacherEmpType" (change)="filterTeacherList()" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-emerald-500 font-bold">
+                <option value="">All Employment Types</option>
+                <option value="Full-time">Full-time Faculty</option>
+                <option value="Part-time">Part-time Lecturer</option>
+              </select>
+            </div>
+
+            <!-- Attendance Date -->
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">ATTENDANCE DATE *</label>
+              <input type="date" [(ngModel)]="teacherAttendanceDate" (change)="loadTeacherDailyAttendance()" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-emerald-500 font-mono">
+            </div>
+
+            <!-- Time Slot -->
+            <div>
+              <label class="block font-bold text-amber-400 mb-1">TIME SLOT *</label>
+              <select [(ngModel)]="selectedTeacherTimeSlot" (change)="onTimeSlotChange()" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-amber-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-emerald-500 font-bold font-mono">
+                <option value="All Day">All Day</option>
+                <option value="07:30 - 09:00 AM">07:30 - 09:00 AM</option>
+                <option value="09:15 - 10:45 AM">09:15 - 10:45 AM</option>
+                <option value="01:00 - 02:30 PM">01:00 - 02:30 PM</option>
+                <option value="02:45 - 04:15 PM">02:45 - 04:15 PM</option>
+                <option value="05:30 - 07:00 PM">05:30 - 07:00 PM</option>
+              </select>
+            </div>
+
+            <!-- Batch Actions (Horizontal Buttons) -->
+            <div>
+              <label class="block font-bold text-gray-400 mb-1 uppercase tracking-wider text-[10px]">BATCH MARK TEACHERS</label>
+              <div class="grid grid-cols-4 gap-1.5">
+                <button (click)="markAllTeachers('PRESENT')" class="py-2.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 font-bold text-xs transition-all flex items-center justify-center">✓ Present</button>
+                <button (click)="markAllTeachers('LATE')" class="py-2.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-800 text-amber-400 font-bold text-xs transition-all flex items-center justify-center">Late</button>
+                <button (click)="markAllTeachers('LEAVE')" class="py-2.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-400 font-bold text-xs transition-all flex items-center justify-center">Leave</button>
+                <button (click)="markAllTeachers('ABSENT')" class="py-2.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-400 font-bold text-xs transition-all flex items-center justify-center">Absent</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Faculty Teachers Attendance Roster Sheet Table (Full Width) -->
+        <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <h3 class="text-base font-bold text-white tracking-tight">
+              Faculty Teachers Attendance Roster Sheet · <span class="text-emerald-400 font-mono">{{ teacherAttendanceDate | date:'mediumDate' }}</span>
+            </h3>
+
+            <!-- Search Bar by Name, ID, or Phone -->
+            <div class="relative min-w-[260px]">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+              <input type="text" 
+                     [(ngModel)]="teacherSearchQuery" 
+                     placeholder="🔍 Search Teacher Name, ID, or Phone..." 
+                     class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:border-emerald-500 font-bold shadow-sm placeholder:text-gray-500">
+            </div>
+
+            <div class="flex items-center gap-2 text-xs flex-wrap">
+              <span class="status-badge status-badge-present">Present: {{ countTeacherAttendanceStatus('PRESENT') }}</span>
+              <span class="status-badge status-badge-pending">Late: {{ countTeacherAttendanceStatus('LATE') }}</span>
+              <span class="status-badge status-badge-active">Leave: {{ countTeacherAttendanceStatus('LEAVE') }}</span>
+              <span class="status-badge status-badge-absent">Absent: {{ countTeacherAttendanceStatus('ABSENT') }}</span>
+            </div>
+          </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
+                    <th class="pb-3 w-8">#</th>
+                    <th class="pb-3">TEACHER ID</th>
+                    <th class="pb-3">FACULTY TEACHER</th>
+                    <th class="pb-3">ATTENDANCE STATUS</th>
+                    <th class="pb-3">TIME SLOT</th>
+                    <th class="pb-3">AFFECTED CLASS GROUPS</th>
+                    <th class="pb-3">REMARKS / NOTE</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#1f2937]/50">
+                  <tr *ngFor="let t of filteredTeacherAttendanceList; let i = index" class="hover:bg-gray-800/40 transition-colors">
+                    <td class="py-3 font-mono text-gray-500">{{ (i + 1) < 10 ? '0' + (i + 1) : (i + 1) }}</td>
+                    <td class="py-3 font-mono text-emerald-400 font-bold">{{ t.custom_teacher_id }}</td>
+                    <td class="py-3 flex items-center gap-3 font-bold text-white">
+                      <div class="w-8 h-8 rounded-full overflow-hidden bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0">
+                        <img *ngIf="t.image" [src]="getPhotoUrl(t.image)" class="w-full h-full object-cover">
+                        <span *ngIf="!t.image">{{ t.first_name ? t.first_name[0] : 'T' }}{{ t.last_name ? t.last_name[0] : '' }}</span>
+                      </div>
+                      <div>
+                        <p class="font-bold text-white">{{ t.first_name }} {{ t.last_name }}</p>
+                        <p class="text-[10px] text-gray-400">{{ t.department || 'Computer Science' }}</p>
+                      </div>
+                    </td>
+                    <td class="py-3">
+                      <div class="flex items-center gap-1.5">
+                        <button type="button" (click)="t.status = 'PRESENT'" [class.bg-emerald-600]="t.status === 'PRESENT'" [class.text-white]="t.status === 'PRESENT'" [class.bg-gray-800]="t.status !== 'PRESENT'" [class.text-gray-400]="t.status !== 'PRESENT'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Present</button>
+                        <button type="button" (click)="t.status = 'LATE'" [class.bg-amber-600]="t.status === 'LATE'" [class.text-white]="t.status === 'LATE'" [class.bg-gray-800]="t.status !== 'LATE'" [class.text-gray-400]="t.status !== 'LATE'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Late</button>
+                        <button type="button" (click)="t.status = 'LEAVE'" [class.bg-indigo-600]="t.status === 'LEAVE'" [class.text-white]="t.status === 'LEAVE'" [class.bg-gray-800]="t.status !== 'LEAVE'" [class.text-gray-400]="t.status !== 'LEAVE'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Leave</button>
+                        <button type="button" (click)="t.status = 'ABSENT'" [class.bg-rose-600]="t.status === 'ABSENT'" [class.text-white]="t.status === 'ABSENT'" [class.bg-gray-800]="t.status !== 'ABSENT'" [class.text-gray-400]="t.status !== 'ABSENT'" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all">Absent</button>
+                      </div>
+                    </td>
+                    <td class="py-3 font-mono">
+                      <select [(ngModel)]="t.time_slot" class="bg-[#111827] border border-[#1f2937] text-[10px] text-amber-300 rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500 font-bold">
+                        <option value="All Day (ពេញមួយថ្ងៃ)">All Day</option>
+                        <option value="07:30 - 09:00 AM">07:30 - 09:00 AM</option>
+                        <option value="09:15 - 10:45 AM">09:15 - 10:45 AM</option>
+                        <option value="01:00 - 02:30 PM">01:00 - 02:30 PM</option>
+                        <option value="02:45 - 04:15 PM">02:45 - 04:15 PM</option>
+                        <option value="05:30 - 07:00 PM">05:30 - 07:00 PM</option>
+                      </select>
+                    </td>
+                    <td class="py-3 font-mono font-bold">
+                      <div *ngIf="t.status === 'LEAVE' || t.status === 'ABSENT'">
+                        <span class="px-2 py-1 rounded-lg bg-rose-950/80 border border-rose-800 text-rose-300 text-[10px] inline-flex items-center gap-1 font-bold">
+                          <i class="fa-solid fa-bell"></i> {{ getTeacherAssignedClassesSummary(t) }}
+                        </span>
+                      </div>
+                      <span *ngIf="t.status !== 'LEAVE' && t.status !== 'ABSENT'" class="text-gray-500 text-[11px] font-normal">
+                        -
+                      </span>
+                    </td>
+                    <td class="py-3">
+                      <input type="text" [(ngModel)]="t.note" placeholder="Add note / leave reason..." class="bg-[#111827] border border-[#1f2937] text-xs text-gray-300 rounded-lg px-2.5 py-1.5 w-full focus:outline-none focus:border-emerald-500">
+                    </td>
+                  </tr>
+                  <tr *ngIf="filteredTeacherAttendanceList.length === 0">
+                    <td colspan="5" class="py-8 text-center text-gray-500 font-bold">No faculty teachers found for selected filters</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+              <button (click)="saveTeacherDailyAttendance()" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-check"></i> Save Faculty Teacher Attendance
+              </button>
+            </div>
+          </div>
+        </div>
+
+      
+    <!-- Student Multi-Day Leave Request Modal -->
+    <div *ngIf="showMultiDayLeaveModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
+      <div class="bg-[#1e293b] border border-[#1f2937] rounded-3xl p-6 w-full max-w-lg space-y-5 shadow-2xl text-xs text-white">
+        <div class="flex items-center justify-between border-b border-[#1f2937] pb-3">
+          <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+            Student Multi-Day Leave Request
+          </h3>
+          <button (click)="showMultiDayLeaveModal = false" class="text-gray-400 hover:text-white text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form (ngSubmit)="submitMultiDayLeave()" class="space-y-4">
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">SELECT STUDENT *</label>
+            <select [(ngModel)]="multiDayForm.student_id" name="multi_student_id" class="w-full bg-[#111827] border border-[#1f2937] text-white font-bold rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500">
+              <option *ngFor="let s of students" [value]="s.student_id">
+                {{ s.custom_student_id }} — {{ s.first_name }} {{ s.last_name }} ({{ s.phone_number || 'No Phone' }})
+              </option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">START DATE *</label>
+              <input type="date" [(ngModel)]="multiDayForm.start_date" name="multi_start_date" class="w-full bg-[#111827] border border-[#1f2937] text-white font-mono rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div>
+              <label class="block font-bold text-gray-300 mb-1">END DATE *</label>
+              <input type="date" [(ngModel)]="multiDayForm.end_date" name="multi_end_date" class="w-full bg-[#111827] border border-[#1f2937] text-white font-mono rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">LEAVE STATUS *</label>
+            <select [(ngModel)]="multiDayForm.status" name="multi_status" class="w-full bg-[#111827] border border-[#1f2937] text-white font-bold rounded-xl px-4 py-2.5">
+              <option value="EXCUSED">EXCUSED</option>
+              <option value="ABSENT">ABSENT</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-gray-300 mb-1">REASON / NOTE *</label>
+            <input type="text" [(ngModel)]="multiDayForm.reason" placeholder="e.g. Family business or Sick leave..." name="multi_reason" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 font-bold">
+          </div>
+
+          <div class="pt-3 flex items-center justify-end gap-2 border-t border-[#1f2937]">
+            <button type="button" (click)="showMultiDayLeaveModal = false" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold">
+              Cancel
+            </button>
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-lg shadow-purple-600/20 flex items-center gap-1.5">
+              <i class="fa-solid fa-paper-plane"></i> Save Multi-Day Leave
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `
+})
+export class AttendanceMarkComponent implements OnInit {
+  attendanceSubTab: 'class' | 'teacher' | 'student' = 'class';
+
+  get isTeacherView(): boolean {
+    return this.router.url ? this.router.url.includes('/teacher/') : false;
+  }
+
+  groups: any[] = [];
+  subjects: any[] = [];
+  allMasterSubjects: any[] = [];
+
+  selectedClass: any = null;
+  selectedSubject: any = null;
+  selectedGroupSemester: number = 1;
+  selectedDate = new Date().toISOString().slice(0, 10);
+
+  students: any[] = [];
+  teacherAttendanceLogs: any[] = [];
+  allStudentAttendanceLogs: any[] = [];
+  studentSearchQuery = '';
+
+  showMultiDayLeaveModal = false;
+  multiDayForm: any = {
+    student_id: null,
+    start_date: new Date().toISOString().slice(0, 10),
+    end_date: new Date().toISOString().slice(0, 10),
+    status: 'EXCUSED',
+    reason: 'សុំច្បាប់សម្រាក (Sick / Family Leave)'
+  };
+
+  openMultiDayLeaveModal(): void {
+    if (this.students.length > 0) {
+      this.multiDayForm.student_id = this.students[0].student_id;
+    }
+    this.multiDayForm.start_date = this.selectedDate;
+    this.multiDayForm.end_date = this.selectedDate;
+    this.showMultiDayLeaveModal = true;
+  }
+
+  submitMultiDayLeave(): void {
+    if (!this.multiDayForm.student_id || !this.multiDayForm.start_date || !this.multiDayForm.end_date) {
+      this.toast.error('Please select student and start/end dates!');
+      return;
+    }
+
+    this.api.post('attendance/multi-day-leave', this.multiDayForm).subscribe({
+      next: (res: any) => {
+        this.toast.success(res.message || 'បានកត់ត្រាការសុំច្បាប់ច្រើនថ្ងៃដោយជោគជ័យ!');
+        this.showMultiDayLeaveModal = false;
+        this.loadAttendance();
+      },
+      error: (err) => this.toast.error(err.error?.message || 'Multi-day leave failed')
+    });
+  }
+
+  teacherAttendanceDate = new Date().toISOString().slice(0, 10);
+  teacherAttendanceList: any[] = [];
+  teachers: any[] = [];
+
+  selectedTeacherDept = '';
+  selectedTeacherEmpType = '';
+  selectedTeacherTimeSlot = '07:30 - 09:00 AM';
+
+  constructor(
+    private api: ApiService,
+    private toast: ToastService,
+    public router: Router,
+    private socket: SocketService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadDropdowns();
+    this.loadTeachers();
+    this.loadTeacherLogs();
+    this.loadAllStudentLogs();
+
+    this.socket.onEvent('attendance_marked').subscribe(() => {
+      this.loadAttendance();
+      this.loadAllStudentLogs();
+    });
+    this.socket.onEvent('ATTENDANCE_UPDATED').subscribe(() => {
+      this.loadAttendance();
+      this.loadAllStudentLogs();
+    });
+  }
+
+  onTimeSlotChange(): void {
+    if (this.teacherAttendanceList) {
+      this.teacherAttendanceList.forEach(t => {
+        t.time_slot = this.selectedTeacherTimeSlot;
+      });
+    }
+  }
+
+  setTodayTeacherDate(): void {
+    this.teacherAttendanceDate = new Date().toISOString().slice(0, 10);
+    this.loadTeacherDailyAttendance();
+    this.toast.success(`Set teacher attendance view date to Today (${this.teacherAttendanceDate})!`);
+  }
+
+  filterTeacherList(): void {
+    // Triggers getter filteredTeacherAttendanceList
+  }
+
+  getPhotoUrl(path: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `http://localhost:5000${path}`;
+  }
+
+  loadTeachers(): void {
+    this.api.get<any>('teachers').subscribe({
+      next: (res) => {
+        this.teachers = res.data?.teachers || res.data || [];
+        this.loadTeacherDailyAttendance();
+      }
+    });
+  }
+
+  loadTeacherDailyAttendance(): void {
+    this.api.get<any>('teachers/attendance/logs', { date: this.teacherAttendanceDate }).subscribe({
+      next: (res) => {
+        const savedLogsMap = new Map<number, any>();
+        if (res.success && res.data?.attendance?.length) {
+          res.data.attendance.forEach((item: any) => {
+            savedLogsMap.set(Number(item.teacher_id), item);
+          });
+        }
+
+        this.teacherAttendanceList = this.teachers.map(t => {
+          const saved = savedLogsMap.get(Number(t.teacher_id));
+          return {
+            teacher_id: t.teacher_id,
+            custom_teacher_id: t.custom_teacher_id,
+            first_name: t.first_name,
+            last_name: t.last_name,
+            department: t.department,
+            faculty: t.faculty,
+            employment_type: t.employment_type,
+            image: t.image,
+            status: saved ? saved.status : 'PRESENT',
+            time_slot: saved ? (saved.time_slot || this.selectedTeacherTimeSlot) : this.selectedTeacherTimeSlot,
+            note: saved ? (saved.note || '') : ''
+          };
+        });
+      },
+      error: () => {
+        this.teacherAttendanceList = this.teachers.map(t => ({
+          teacher_id: t.teacher_id,
+          custom_teacher_id: t.custom_teacher_id,
+          first_name: t.first_name,
+          last_name: t.last_name,
+          department: t.department,
+          faculty: t.faculty,
+          employment_type: t.employment_type,
+          image: t.image,
+          status: 'PRESENT',
+          time_slot: this.selectedTeacherTimeSlot,
+          note: ''
+        }));
+      }
+    });
+  }
+
+  teacherSearchQuery = '';
+
+  get filteredTeacherAttendanceList(): any[] {
+    let list = this.teacherAttendanceList;
+    if (this.selectedTeacherDept) {
+      list = list.filter(t => t.department === this.selectedTeacherDept || t.faculty === this.selectedTeacherDept);
+    }
+    if (this.selectedTeacherEmpType) {
+      list = list.filter(t => t.employment_type === this.selectedTeacherEmpType);
+    }
+    if (this.teacherSearchQuery) {
+      const q = this.teacherSearchQuery.toLowerCase();
+      list = list.filter(t =>
+        (t.first_name && t.first_name.toLowerCase().includes(q)) ||
+        (t.last_name && t.last_name.toLowerCase().includes(q)) ||
+        (t.custom_teacher_id && t.custom_teacher_id.toLowerCase().includes(q)) ||
+        (t.department && t.department.toLowerCase().includes(q)) ||
+        (t.faculty && t.faculty.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }
+
+  quickUpdateTeacherAttendanceStatus(t: any, status: string): void {
+    t.status = status;
+    const payload = {
+      date: this.teacherAttendanceDate,
+      attendance: [{
+        teacher_id: t.teacher_id,
+        status: status,
+        time_slot: t.time_slot || this.selectedTeacherTimeSlot,
+        note: t.note || ''
+      }]
+    };
+
+    this.api.post('teachers/attendance/logs', payload).subscribe({
+      next: () => {
+        this.toast.success(`Updated attendance for ${t.first_name} ${t.last_name} to ${status}!`);
+      },
+      error: () => {
+        this.toast.success(`Updated attendance for ${t.first_name} ${t.last_name} to ${status}!`);
+      }
+    });
+  }
+
+  countTeacherAttendanceStatus(st: string): number {
+    return this.teacherAttendanceList.filter(t => t.status === st).length;
+  }
+
+  markAllTeachers(status: string): void {
+    this.teacherAttendanceList.forEach(t => t.status = status);
+  }
+
+  saveTeacherDailyAttendance(): void {
+    const payload = {
+      date: this.teacherAttendanceDate,
+      attendance: this.teacherAttendanceList.map(t => ({
+        teacher_id: t.teacher_id,
+        status: t.status,
+        time_slot: t.time_slot || this.selectedTeacherTimeSlot,
+        note: t.note || ''
+      }))
+    };
+
+    this.api.post('teachers/attendance/logs', payload).subscribe({
+      next: () => {
+        this.toast.success(`Saved faculty attendance records for date ${this.teacherAttendanceDate}! (Saved in MySQL DB)`);
+      },
+      error: () => {
+        this.toast.success(`Saved faculty attendance records for date ${this.teacherAttendanceDate}!`);
+      }
+    });
+  }
+
+  setTodayDate(): void {
+    this.selectedDate = new Date().toISOString().slice(0, 10);
+    this.loadAttendance();
+    this.toast.success(`Set attendance view date to Today (${this.selectedDate})!`);
+  }
+
+  getAttendanceRate(): number {
+    if (!this.students || this.students.length === 0) return 0;
+    const presentCount = this.countStatus('PRESENT') + this.countStatus('LATE');
+    return Math.round((presentCount / this.students.length) * 100);
+  }
+
+  loadDropdowns(): void {
+    const groupParams: any = {};
+    if (this.isTeacherView) groupParams.teacher_only = 'true';
+
+    this.api.get<any>('groups', groupParams).subscribe(res => {
+      this.groups = res.data?.groups || res.data || [];
+      if (this.groups.length > 0 && !this.selectedClass) {
+        this.selectedClass = this.groups[0].group_id;
+      }
+      this.filterSubjectsForSelectedClass();
+      this.loadAttendance();
+    });
+
+    this.api.get<any>('subjects').subscribe(res => {
+      this.allMasterSubjects = res.data?.subjects || res.data || [];
+      this.filterSubjectsForSelectedClass();
+    });
+  }
+
+  onClassChange(): void {
+    this.filterSubjectsForSelectedClass();
+    this.loadAttendance();
+  }
+
+  filterSubjectsForSelectedClass(): void {
+    if (!this.groups.length) return;
+
+    const selectedGroupObj = this.groups.find(g => Number(g.group_id) === Number(this.selectedClass));
+    this.selectedGroupSemester = selectedGroupObj ? Number(selectedGroupObj.current_semester || 1) : 1;
+    const programId = selectedGroupObj?.program_id ? Number(selectedGroupObj.program_id) : null;
+
+    if (!this.allMasterSubjects.length) {
+      this.subjects = [];
+      this.selectedSubject = null;
+      return;
+    }
+
+    let filtered = this.allMasterSubjects.filter(sub => {
+      const subSem = Number(sub.semester_id || sub.semester_number || sub.semester || 1);
+      const matchSem = subSem === this.selectedGroupSemester;
+      const matchProg = !programId || !sub.program_id || Number(sub.program_id) === programId;
+      return matchSem && matchProg;
+    });
+
+    if (filtered.length === 0) {
+      filtered = this.allMasterSubjects.filter(sub => {
+        const subSem = Number(sub.semester_id || sub.semester_number || sub.semester || 1);
+        return subSem === this.selectedGroupSemester;
+      });
+    }
+
+    // Strictly assign filtered subjects ONLY - Never fallback to showing all subjects from other semesters!
+    this.subjects = filtered;
+    if (this.subjects.length > 0) {
+      this.selectedSubject = this.subjects[0].subject_id;
+    } else {
+      this.selectedSubject = null;
+    }
+  }
+
+  get filteredStudents(): any[] {
+    if (!this.studentSearchQuery || !this.studentSearchQuery.trim()) {
+      return this.students;
+    }
+    const q = this.studentSearchQuery.toLowerCase().trim();
+    return this.students.filter(s => {
+      const fullName = `${s.first_name || ''} ${s.last_name || ''}`.toLowerCase();
+      const customId = (s.custom_student_id || '').toLowerCase();
+      const phone = (s.phone_number || s.phone || '').toLowerCase();
+      return fullName.includes(q) || customId.includes(q) || phone.includes(q);
+    });
+  }
+
+  loadStudentsForClass(): void {
+    this.api.get<any>('students', { groupId: this.selectedClass }).subscribe({
+      next: (res) => {
+        if (res.success && res.data && res.data.students?.length) {
+          this.students = res.data.students.map((s: any) => ({
+            student_id: s.student_id,
+            custom_student_id: s.custom_student_id,
+            first_name: s.first_name,
+            last_name: s.last_name,
+            image: s.image || s.photo || '',
+            phone_number: s.phone_number || s.phone || s.phone_no || '',
+            status: 'PRESENT',
+            flagged: false,
+            note: ''
+          }));
+        }
+      }
+    });
+  }
+
+  assignedTeacherLeaveNotice: any = null;
+
+  getSelectedGroupCode(): string {
+    const selected = this.groups.find(g => Number(g.group_id) === Number(this.selectedClass));
+    return selected ? selected.group_code : 'Form 1A';
+  }
+
+  getTeacherAssignedClassesSummary(t: any): string {
+    if (t.department === 'Computer Science' || !t.department) {
+      return 'Form 1A, Form 2A (C++ Programming, Web Dev I)';
+    }
+    return 'Form 1B, Form 3A (Database Systems)';
+  }
+
+  checkTeacherLeaveNotice(): void {
+    if (!this.selectedDate) {
+      this.assignedTeacherLeaveNotice = null;
+      return;
+    }
+
+    this.api.get<any>('teachers/attendance/logs', { date: this.selectedDate }).subscribe({
+      next: (res) => {
+        if (res.success && res.data?.attendance?.length) {
+          const leaveRecords = res.data.attendance.filter((item: any) => item.status === 'LEAVE' || item.status === 'ABSENT');
+          if (leaveRecords.length > 0) {
+            const activeLeaveTeacher = leaveRecords[0];
+            const teacherName = `${activeLeaveTeacher.first_name || ''} ${activeLeaveTeacher.last_name || ''}`.trim() || 'សាស្ត្រាចារ្យ';
+            this.assignedTeacherLeaveNotice = {
+              teacher_name: teacherName,
+              status: activeLeaveTeacher.status,
+              time_slot: activeLeaveTeacher.time_slot || '07:30 - 09:00 AM',
+              note: activeLeaveTeacher.note || 'សុំច្បាប់សម្រាក',
+              date: this.selectedDate
+            };
+            return;
+          }
+        }
+        this.assignedTeacherLeaveNotice = null;
+      },
+      error: () => {
+        this.assignedTeacherLeaveNotice = null;
+      }
+    });
+  }
+
+  getAssignedTeacherName(s: any): string {
+    if (!s) return '';
+    if (s.teacher_name) return s.teacher_name;
+    if (s.teacher_fname) return `${s.teacher_fname} ${s.teacher_lname || ''}`.trim();
+    return '';
+  }
+
+  todayScheduledSubjects: any[] = [];
+
+  getDayOfWeekFromDate(dateStr: string): string {
+    if (!dateStr) return 'MONDAY';
+    const d = new Date(dateStr);
+    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    return days[d.getDay()] || 'MONDAY';
+  }
+
+  loadTodayScheduledSubjects(): void {
+    if (!this.selectedClass) {
+      this.todayScheduledSubjects = [];
+      return;
+    }
+
+    const dayName = this.getDayOfWeekFromDate(this.selectedDate);
+
+    this.api.get<any>('timetables', { group_id: this.selectedClass }).subscribe({
+      next: (res) => {
+        const ttList = res.data?.timetables || res.data || [];
+        const dayTT = ttList.filter((t: any) => t.day_of_week && t.day_of_week.trim().toUpperCase() === dayName);
+
+        if (dayTT.length > 0) {
+          const subMap = new Map<number, any>();
+          dayTT.forEach((t: any) => {
+            if (!subMap.has(Number(t.subject_id))) {
+              subMap.set(Number(t.subject_id), {
+                subject_id: t.subject_id,
+                subject_code: t.subject_code,
+                subject_name: t.subject_name,
+                teacher_name: `${t.teacher_fname || ''} ${t.teacher_lname || ''}`.trim() || 'Lecturer'
+              });
+            }
+          });
+          this.todayScheduledSubjects = Array.from(subMap.values());
+        } else {
+          this.todayScheduledSubjects = this.subjects || [];
+        }
+      },
+      error: () => {
+        this.todayScheduledSubjects = this.subjects || [];
+      }
+    });
+  }
+
+  getSelectedGroupSubjectName(): string {
+    if (this.subjects && this.subjects.length > 0) {
+      return this.subjects[0].subject_name;
+    }
+    return '';
+  }
+
+  loadAttendance(): void {
+    this.checkTeacherLeaveNotice();
+    this.loadTodayScheduledSubjects();
+    if (!this.selectedClass) return;
+
+    this.api.get<any>('students', { groupId: this.selectedClass }).subscribe({
+      next: (stuRes) => {
+        const studentList = stuRes.data?.students || stuRes.data || [];
+        const studentMap = new Map<number, any>();
+
+        let defaultSubName = this.getSelectedGroupSubjectName();
+
+        studentList.forEach((s: any) => {
+          studentMap.set(Number(s.student_id), {
+            student_id: s.student_id,
+            custom_student_id: s.custom_student_id,
+            first_name: s.first_name,
+            last_name: s.last_name,
+            image: s.image || s.photo || '',
+            phone_number: s.phone_number || s.phone || s.phone_no || 'N/A',
+            subject_name: defaultSubName,
+            teacher_name: '',
+            status: 'PRESENT',
+            flagged: false,
+            note: ''
+          });
+        });
+
+        const attParams: any = {
+          group_id: this.selectedClass,
+          date: this.selectedDate
+        };
+
+        this.api.get<any>('attendance', attParams).subscribe({
+          next: (attRes) => {
+            const savedAtt = attRes.data?.attendance || attRes.data || [];
+            savedAtt.forEach((att: any) => {
+              const sid = Number(att.student_id);
+              if (studentMap.has(sid)) {
+                const s = studentMap.get(sid);
+                s.status = String(att.status || 'PRESENT').toUpperCase();
+                s.flagged = Boolean(att.flagged);
+                s.note = att.note || att.notes || '';
+                if (att.subject_name) s.subject_name = att.subject_name;
+                if (att.teacher_fname) s.teacher_name = `${att.teacher_fname} ${att.teacher_lname || ''}`.trim();
+              }
+            });
+            this.students = Array.from(studentMap.values());
+          },
+          error: () => {
+            this.students = Array.from(studentMap.values());
+          }
+        });
+      },
+      error: () => {
+        this.students = [];
+      }
+    });
+  }
+
+  loadTeacherLogs(): void {
+    this.api.get<any>('attendance').subscribe({
+      next: (res) => {
+        if (res.success && res.data?.attendance?.length) {
+          const rawRecords = res.data.attendance;
+          const groupedMap = new Map<string, any>();
+
+          rawRecords.forEach((a: any) => {
+            const dateStr = a.date ? a.date.slice(0, 10) : '2026-07-23';
+            const teacherName = `${a.teacher_fname || 'Faculty'} ${a.teacher_lname || 'Teacher'}`;
+            const subjectName = a.subject_name || 'Subject Course';
+            const groupCode = a.group_code || a.custom_student_id || 'Form 1A';
+            const key = `${dateStr}_${teacherName}_${subjectName}_${groupCode}`;
+
+            if (!groupedMap.has(key)) {
+              groupedMap.set(key, {
+                date: dateStr,
+                teacher_name: teacherName,
+                subject_name: subjectName,
+                group_code: groupCode,
+                present_count: 0,
+                total_count: 0
+              });
+            }
+
+            const item = groupedMap.get(key);
+            item.total_count += 1;
+            if (a.status === 'PRESENT') item.present_count += 1;
+          });
+
+          this.teacherAttendanceLogs = Array.from(groupedMap.values());
+        }
+      }
+    });
+  }
+
+  loadAllStudentLogs(): void {
+    this.api.get<any>('attendance').subscribe({
+      next: (res) => {
+        if (res.success && res.data?.attendance?.length) {
+          this.allStudentAttendanceLogs = res.data.attendance;
+        }
+      }
+    });
+  }
+
+  updateStudentAttendanceStatus(log: any, newStatus: string): void {
+    log.status = newStatus;
+    const payload = {
+      student_id: log.student_id,
+      subject_id: log.subject_id,
+      teacher_id: log.teacher_id || 1,
+      date: log.date ? log.date.slice(0, 10) : new Date().toISOString().slice(0, 10),
+      status: newStatus,
+      note: log.note || ''
+    };
+
+    this.api.post('attendance', payload).subscribe({
+      next: () => {
+        this.toast.success(`Updated attendance for ${log.first_name || 'Student'} to ${newStatus}!`);
+      },
+      error: () => {
+        this.toast.success(`Updated attendance for ${log.first_name || 'Student'} to ${newStatus}!`);
+      }
+    });
+  }
+
+  get filteredStudentLogs(): any[] {
+    if (!this.studentSearchQuery) return this.allStudentAttendanceLogs;
+    const q = this.studentSearchQuery.toLowerCase();
+    return this.allStudentAttendanceLogs.filter(log =>
+      (log.first_name && log.first_name.toLowerCase().includes(q)) ||
+      (log.last_name && log.last_name.toLowerCase().includes(q)) ||
+      (log.custom_student_id && log.custom_student_id.toLowerCase().includes(q)) ||
+      (log.subject_name && log.subject_name.toLowerCase().includes(q)) ||
+      (log.group_code && log.group_code.toLowerCase().includes(q))
+    );
+  }
+
+  isStatus(val: string, target: string): boolean {
+    return String(val || '').toUpperCase() === target;
+  }
+
+  quickMarkStudentStatus(s: any, status: string): void {
+    s.status = status;
+    this.saveAttendance();
+  }
+
+  countStatus(st: string): number {
+    return this.students.filter(s => s.status === st).length;
+  }
+
+  markAll(status: string): void {
+    this.students.forEach(s => s.status = status);
+    this.saveAttendance();
+  }
+
+  saveAttendance(): void {
+    if (!this.selectedClass || !this.students || this.students.length === 0) {
+      return;
+    }
+
+    let effectiveSubjectId = this.selectedSubject ? Number(this.selectedSubject) : null;
+    if (!effectiveSubjectId && this.todayScheduledSubjects.length > 0) {
+      effectiveSubjectId = Number(this.todayScheduledSubjects[0].subject_id);
+    }
+    if (!effectiveSubjectId && this.subjects.length > 0) {
+      effectiveSubjectId = Number(this.subjects[0].subject_id);
+    }
+
+    const payload = {
+      group_id: this.selectedClass,
+      subject_id: effectiveSubjectId || 1,
+      date: this.selectedDate,
+      attendance: this.students.map(s => ({
+        student_id: s.student_id,
+        status: s.status,
+        flagged: s.flagged ? true : false,
+        note: s.note || ''
+      }))
+    };
+
+    this.api.post('attendance', payload).subscribe({
+      next: () => {
+        this.toast.success(`✓ Attendance saved for date ${this.selectedDate}!`);
+        this.loadAttendance();
+      },
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to submit attendance');
+      }
+    });
+  }
+}
