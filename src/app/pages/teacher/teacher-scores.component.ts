@@ -64,34 +64,49 @@ import { ToastService } from '../../core/services/toast.service';
       </div>
 
       <!-- Student Score Entry Table (Max 50 Marks - Real Data) -->
-      <div *ngIf="groups.length > 0" class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
-        <div class="flex items-center justify-between border-b border-[#1f2937] pb-4">
-          <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-emerald-400"></i> Grade Sheet ({{ students.length }} Enrolled Students)
-          </h3>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-mono font-bold text-amber-300 bg-amber-950/80 px-3 py-1 rounded-lg border border-amber-800">
-              Exam Weight: 50 Max Marks
+      <div *ngIf="groups.length > 0" class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1f2937] pb-4">
+          <div>
+            <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-emerald-400"></i> Grade Sheet ({{ filteredStudents.length }} Enrolled Students)
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5">Enter grades and feedback for students enrolled in this group</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Search Bar by Name, Student ID -->
+            <div class="relative min-w-[240px]">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+              <input type="text" 
+                     [(ngModel)]="studentSearchQuery" 
+                     (ngModelChange)="currentPage = 1"
+                     placeholder="Search student name or ID..." 
+                     class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:border-emerald-500 font-bold shadow-sm placeholder:text-gray-500">
+            </div>
+
+            <span class="text-xs font-mono font-bold text-amber-300 bg-amber-950/80 px-3 py-1.5 rounded-xl border border-amber-800 shadow">
+              Weight: 50 Max Marks
             </span>
-            <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-lg border border-emerald-800">
+            <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/80 px-3 py-1.5 rounded-xl border border-emerald-800 shadow">
               Pass Grade: ≥ 20/50
             </span>
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Scrollable Student Roster Container with Sticky Header -->
+        <div class="max-h-[620px] overflow-y-auto relative rounded-xl border border-[#1f2937] bg-[#111827]/40 shadow-inner">
           <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
-                <th class="pb-3">STUDENT ID & NAME</th>
-                <th class="pb-3">SCORE (0 - 50 MARKS)</th>
-                <th class="pb-3">LETTER GRADE</th>
-                <th class="pb-3">REMARKS / FEEDBACK</th>
+            <thead class="bg-[#1e293b] text-gray-400 font-bold border-b border-[#1f2937] sticky top-0 z-10 shadow">
+              <tr class="uppercase tracking-wider">
+                <th class="p-3">STUDENT ID & NAME</th>
+                <th class="p-3">SCORE (0 - 50 MARKS)</th>
+                <th class="p-3">LETTER GRADE</th>
+                <th class="p-3">REMARKS / FEEDBACK</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]/50">
-              <tr *ngFor="let s of students" class="hover:bg-gray-800/40 transition-colors">
-                <td class="py-3 flex items-center gap-3 font-bold text-white">
+              <tr *ngFor="let s of paginatedStudents" class="hover:bg-gray-800/40 transition-colors">
+                <td class="p-3 flex items-center gap-3 font-bold text-white">
                   <div class="w-9 h-9 rounded-full bg-cyan-600/30 border border-cyan-500/30 flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-sm">
                     <img *ngIf="s.image && !s.imageError" 
                          [src]="getPhotoUrl(s.image)" 
@@ -107,14 +122,14 @@ import { ToastService } from '../../core/services/toast.service';
                   </div>
                 </td>
 
-                <td class="py-3 font-mono">
+                <td class="p-3 font-mono">
                   <div class="flex items-center gap-1.5">
                     <input type="number" min="0" max="50" [(ngModel)]="s.score" (ngModelChange)="computeGrade(s)" placeholder="0 - 50" class="w-28 bg-[#111827] border border-[#1f2937] text-white font-bold text-sm rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500">
                     <span class="text-gray-400 text-xs font-bold">/ 50</span>
                   </div>
                 </td>
 
-                <td class="py-3 font-mono">
+                <td class="p-3 font-mono">
                   <span [ngClass]="{
                     'bg-emerald-950 text-emerald-400 border-emerald-800': s.grade === 'A' || s.grade === 'B+',
                     'bg-cyan-950 text-cyan-400 border-cyan-800': s.grade === 'B' || s.grade === 'C+',
@@ -125,18 +140,51 @@ import { ToastService } from '../../core/services/toast.service';
                   </span>
                 </td>
 
-                <td class="py-3">
+                <td class="p-3">
                   <input type="text" [(ngModel)]="s.remarks" placeholder="Optional teacher feedback..." class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500 font-medium">
                 </td>
               </tr>
 
-              <tr *ngIf="students.length === 0">
+              <tr *ngIf="filteredStudents.length === 0">
                 <td colspan="4" class="py-8 text-center text-gray-500 italic">
-                  No students found for this class group.
+                  No students found for this search or class group.
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Interactive Pagination Controls Bar -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#1f2937] text-xs">
+          <div class="flex items-center gap-3 text-gray-400 font-medium">
+            <span>Showing {{ filteredStudents.length > 0 ? startIndex + 1 : 0 }} to {{ endIndex }} of {{ filteredStudents.length }} students</span>
+            <div class="flex items-center gap-1.5 ml-2">
+              <label class="text-gray-400">Per page:</label>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#111827] border border-[#1f2937] text-white rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500 font-bold cursor-pointer">
+                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div *ngIf="totalPages > 1" class="flex items-center gap-1">
+            <button (click)="setPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-angles-left"></i>
+            </button>
+            <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <button *ngFor="let p of pageRange" (click)="setPage(p)" [class]="p === currentPage ? 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-extrabold shadow-md cursor-pointer' : 'px-3 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 border border-[#1f2937] text-gray-300 font-bold cursor-pointer'">
+              {{ p }}
+            </button>
+
+            <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button (click)="setPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-angles-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -149,6 +197,68 @@ export class TeacherScoresComponent implements OnInit {
   selectedSemester: number = 1;
   students: any[] = [];
   autoDetectedExam: any = null;
+  studentSearchQuery: string = '';
+
+  // Interactive Pagination Controls State
+  currentPage: number = 1;
+  pageSize: number = 10;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
+
+  get filteredStudents(): any[] {
+    if (!this.studentSearchQuery || !this.studentSearchQuery.trim()) {
+      return this.students;
+    }
+    const q = this.studentSearchQuery.toLowerCase().trim();
+    return this.students.filter(s => {
+      const fn = (s.first_name || '').toLowerCase();
+      const ln = (s.last_name || '').toLowerCase();
+      const cid = (s.custom_student_id || '').toLowerCase();
+      return fn.includes(q) || ln.includes(q) || cid.includes(q);
+    });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredStudents.length / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return (this.currentPage - 1) * this.pageSize;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.startIndex + this.pageSize, this.filteredStudents.length);
+  }
+
+  get paginatedStudents(): any[] {
+    return this.filteredStudents.slice(this.startIndex, this.endIndex);
+  }
+
+  get pageRange(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range: number[] = [];
+
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    if (end - start < 4) {
+      start = Math.max(1, end - 4);
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
 
   availableExamTypes: any[] = [
     { value: 'MIDTERM', label: 'Midterm Exam (Max 50)' },

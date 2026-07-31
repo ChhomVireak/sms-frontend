@@ -54,33 +54,58 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             </div>
           </div>
 
-          <!-- Users Table -->
-          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-base font-bold text-white tracking-tight">System Users</h3>
+          <!-- Top Toolbar with Search & Role Filter -->
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="relative w-full md:w-80">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+              <input type="text" 
+                     [(ngModel)]="searchQuery" 
+                     (input)="onFilterChange()" 
+                     placeholder="Search username or email..." 
+                     class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white placeholder-gray-400 rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-all">
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="flex items-center gap-2 bg-[#111827] px-3.5 py-2 rounded-xl border border-[#1f2937] text-xs font-bold text-white shadow-sm w-full md:w-auto">
+              <i class="fa-solid fa-user-shield text-emerald-400 text-xs"></i>
+              <span>Role:</span>
+              <select [(ngModel)]="selectedRole" (change)="onFilterChange()" class="bg-transparent text-emerald-400 font-bold focus:outline-none cursor-pointer">
+                <option value="" class="bg-[#111827] text-white">All Roles</option>
+                <option value="ADMIN" class="bg-[#111827] text-emerald-400">ADMIN</option>
+                <option value="TEACHER" class="bg-[#111827] text-blue-400">TEACHER</option>
+                <option value="STUDENT" class="bg-[#111827] text-amber-400">STUDENT</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Users Table Card -->
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-bold text-white tracking-tight">
+                System Users <span class="text-xs font-normal text-gray-400 ml-2">{{ filteredUsers.length }} of {{ users.length }} total</span>
+              </h3>
+            </div>
+
+            <div class="overflow-x-auto overflow-y-auto max-h-[420px] rounded-xl border border-[#1f2937] shadow-inner">
               <table class="w-full text-left border-collapse text-xs">
-                <thead>
+                <thead class="sticky top-0 z-10 bg-[#111827] shadow-md">
                   <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
-                    <th class="pb-3">USERNAME</th>
-                    <th class="pb-3">EMAIL</th>
-                    <th class="pb-3">ROLE</th>
-                    <th class="pb-3">STATUS</th>
-                    <th class="pb-3 text-right">ACTIONS</th>
+                    <th class="py-3 px-3">USERNAME</th>
+                    <th class="py-3 px-3">EMAIL</th>
+                    <th class="py-3 px-3">ROLE</th>
+                    <th class="py-3 px-3">STATUS</th>
+                    <th class="py-3 px-3 text-right">ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-[#1f2937]/50">
-                  <tr *ngFor="let u of users" class="hover:bg-gray-800/40">
-                    <td class="py-3 flex items-center gap-2.5 font-bold text-white">
+                  <tr *ngFor="let u of paginatedUsers" class="hover:bg-gray-800/40">
+                    <td class="py-3 px-3 flex items-center gap-2.5 font-bold text-white">
                       <div class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-[10px]">
-                        {{ u.username[0].toUpperCase() }}
+                        {{ u.username ? u.username[0].toUpperCase() : 'U' }}
                       </div>
                       <span>{{ u.username }}</span>
                     </td>
-                    <td class="py-3 text-gray-300">{{ u.email }}</td>
-                    <td class="py-3">
+                    <td class="py-3 px-3 text-gray-300">{{ u.email }}</td>
+                    <td class="py-3 px-3">
                       <span [ngClass]="{
                         'bg-emerald-950 text-emerald-400 border-emerald-800': u.role === 'ADMIN',
                         'bg-blue-950 text-blue-400 border-blue-800': u.role === 'TEACHER',
@@ -89,17 +114,64 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
                         {{ u.role }}
                       </span>
                     </td>
-                    <td class="py-3">
+                    <td class="py-3 px-3">
                       <button (click)="toggleStatus(u)" class="status-badge status-badge-active">
                         • {{ u.status }}
                       </button>
                     </td>
-                    <td class="py-3 text-right space-x-2">
+                    <td class="py-3 px-3 text-right space-x-2">
                       <button (click)="deleteUser(u)" class="text-gray-400 hover:text-rose-400 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                   </tr>
+
+                  <tr *ngIf="filteredUsers.length === 0">
+                    <td colspan="5" class="py-8 text-center text-gray-500 italic">No user accounts found matching your search or role filter.</td>
+                  </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Interactive Pagination Footer Bar -->
+            <div class="mt-4 pt-4 border-t border-[#1f2937] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+              <div class="flex items-center gap-3">
+                <span>
+                  Showing <strong class="text-white font-mono">{{ filteredUsers.length > 0 ? startIndex + 1 : 0 }}</strong> to <strong class="text-white font-mono">{{ endIndex }}</strong> of <strong class="text-emerald-400 font-mono">{{ filteredUsers.length }}</strong> users
+                </span>
+                <div class="flex items-center gap-1.5 ml-2 border-l border-[#1f2937] pl-3">
+                  <span>Per page:</span>
+                  <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#111827] border border-[#1f2937] text-emerald-400 font-bold rounded-lg px-2 py-1 focus:outline-none cursor-pointer">
+                    <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <!-- First Page -->
+                <button (click)="setPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all">
+                  <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <!-- Prev Page -->
+                <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all flex items-center gap-1">
+                  <i class="fa-solid fa-angle-left"></i> Prev
+                </button>
+
+                <!-- Page Number Buttons -->
+                <button *ngFor="let p of pageRange" 
+                        (click)="setPage(p)" 
+                        [ngClass]="p === currentPage ? 'bg-emerald-600 border-emerald-500 text-white font-extrabold shadow-md shadow-emerald-600/30' : 'bg-[#111827] border-[#1f2937] text-gray-300 hover:text-white hover:border-emerald-500/40'"
+                        class="w-8 h-8 rounded-lg border font-mono text-xs flex items-center justify-center transition-all cursor-pointer">
+                  {{ p }}
+                </button>
+
+                <!-- Next Page -->
+                <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all flex items-center gap-1">
+                  Next <i class="fa-solid fa-angle-right"></i>
+                </button>
+                <!-- Last Page -->
+                <button (click)="setPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all">
+                  <i class="fa-solid fa-angles-right"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -109,6 +181,14 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
 })
 export class UserManagementComponent implements OnInit {
   users: any[] = [];
+
+  searchQuery = '';
+  selectedRole = '';
+
+  currentPage: number = 1;
+  pageSize: number = 10;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
+
   form: any = {
     username: '',
     email: '',
@@ -149,6 +229,66 @@ export class UserManagementComponent implements OnInit {
 
   get studentCount(): number {
     return this.users.filter(u => u.role === 'STUDENT').length;
+  }
+
+  get filteredUsers(): any[] {
+    const q = this.searchQuery ? this.searchQuery.trim().toLowerCase() : '';
+    const r = this.selectedRole ? this.selectedRole.trim().toUpperCase() : '';
+
+    return this.users.filter(u => {
+      const matchSearch = !q ||
+        (u.username && u.username.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q));
+      const matchRole = !r || u.role === r;
+      return matchSearch && matchRole;
+    });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredUsers.length / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return (this.currentPage - 1) * this.pageSize;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.startIndex + this.pageSize, this.filteredUsers.length);
+  }
+
+  get paginatedUsers(): any[] {
+    return this.filteredUsers.slice(this.startIndex, this.endIndex);
+  }
+
+  get pageRange(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range: number[] = [];
+
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    if (end - start < 4) {
+      start = Math.max(1, end - 4);
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
   }
 
   loadUsers(): void {

@@ -28,9 +28,6 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
               <i class="fa-solid fa-calendar-plus text-emerald-400"></i> Assign Timetable Class Slot
             </h3>
-            <span class="px-2.5 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-800 text-emerald-300 text-[10px] font-extrabold flex items-center gap-1">
-              <i class="fa-solid fa-repeat"></i> 1 Full Semester Recurrence
-            </span>
           </div>
           <span class="text-xs text-gray-400 font-semibold">• Weekly schedule applies for the full semester</span>
         </div>
@@ -51,7 +48,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             <label class="block font-bold text-gray-300 mb-1">TEACHER *</label>
             <select [(ngModel)]="form.teacher_id" (change)="onTeacherChange()" name="teacher_id" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-3 py-2 font-bold focus:outline-none focus:border-emerald-500">
               <option *ngFor="let t of filteredTeachers" [value]="t.teacher_id">
-                {{ t.first_name }} {{ t.last_name }}
+                {{ isTeacherBusy(t.teacher_id, form.day_of_week, form.slot_id) ? '[Busy] ' : '[Free] ' }}{{ t.first_name }} {{ t.last_name }}
               </option>
             </select>
           </div>
@@ -94,7 +91,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             <label class="block font-bold text-gray-300 mb-1">ROOM *</label>
             <select [(ngModel)]="form.room_id" name="room_id" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-3 py-2 font-bold">
               <option *ngFor="let r of rooms" [value]="r.room_id">
-                {{ r.room_number }} ({{ r.building || 'Main' }})
+                {{ isRoomOccupied(r.room_id, form.day_of_week, form.slot_id) ? '[Occupied] ' : '[Free] ' }}{{ r.room_number }} ({{ r.building || 'Main' }})
               </option>
             </select>
           </div>
@@ -104,6 +101,31 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             <button type="submit" class="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-1">
               <i class="fa-solid fa-plus"></i> Assign Slot
             </button>
+          </div>
+
+          <!-- Real-time Availability & Anti-Collision Check Status -->
+          <div *ngIf="form.day_of_week && form.slot_id" class="lg:col-span-7 bg-[#111827] border border-[#1f2937] p-3 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs font-mono mt-1">
+            <!-- Teacher Status -->
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-gray-400"><i class="fa-solid fa-user-check text-emerald-400 mr-1"></i>Teacher Availability:</span>
+              <span *ngIf="!getTeacherConflict(form.teacher_id, form.day_of_week, form.slot_id)" class="px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-800 text-emerald-300 font-extrabold text-[11px] flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Available
+              </span>
+              <span *ngIf="getTeacherConflict(form.teacher_id, form.day_of_week, form.slot_id) as tc" class="px-2.5 py-0.5 rounded-lg bg-rose-950/90 border border-rose-800 text-rose-300 font-extrabold text-[11px] flex items-center gap-1 shadow animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> BUSY: Teaching {{ tc.group_code }} ({{ tc.subject_name }}) in Rm {{ tc.room_number }}
+              </span>
+            </div>
+
+            <!-- Room Status -->
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-gray-400"><i class="fa-solid fa-door-open text-blue-400 mr-1"></i>Room Availability:</span>
+              <span *ngIf="!getRoomConflict(form.room_id, form.day_of_week, form.slot_id)" class="px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-800 text-emerald-300 font-extrabold text-[11px] flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Free
+              </span>
+              <span *ngIf="getRoomConflict(form.room_id, form.day_of_week, form.slot_id) as rc" class="px-2.5 py-0.5 rounded-lg bg-rose-950/90 border border-rose-800 text-rose-300 font-extrabold text-[11px] flex items-center gap-1 shadow animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> OCCUPIED: {{ rc.group_code }} ({{ rc.subject_name }})
+              </span>
+            </div>
           </div>
         </form>
       </div>
@@ -117,14 +139,30 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
           <p class="text-xs text-gray-400 mt-1">Consolidated weekly schedule across all your assigned class groups</p>
         </div>
 
-        <div class="flex items-center gap-3">
-          <label class="text-xs font-bold text-gray-300">Class Filter:</label>
-          <select [(ngModel)]="selectedTeacherGroupId" (change)="loadTimetables()" class="bg-[#111827] border border-emerald-500/50 text-xs text-white rounded-xl px-3.5 py-2 font-bold focus:outline-none focus:border-emerald-400">
-            <option value="ALL">All My Taught Class Groups</option>
-            <option *ngFor="let g of groups" [value]="g.group_id">
-              {{ g.group_code }} — {{ g.group_name }}
-            </option>
-          </select>
+        <div class="flex items-center gap-4 flex-wrap">
+          <!-- 1. Shift Filter Dropdown -->
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-amber-400">Shift Filter:</label>
+            <select [(ngModel)]="selectedTeacherShift" (change)="loadTimetables()" class="bg-[#111827] border border-amber-500/50 text-xs text-white rounded-xl px-3.5 py-2 font-bold focus:outline-none focus:border-amber-400 cursor-pointer shadow-md">
+              <option value="ALL" class="bg-[#111827] text-white font-bold">All Shifts</option>
+              <option value="MORNING" class="bg-[#111827] text-white font-bold">Morning Shift</option>
+              <option value="AFTERNOON" class="bg-[#111827] text-white font-bold">Afternoon Shift</option>
+              <option value="EVENING" class="bg-[#111827] text-white font-bold">Evening Shift</option>
+            </select>
+          </div>
+
+          <!-- 2. Class Filter Dropdown -->
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+              <i class="fa-solid fa-users-rectangle"></i> Class Filter:
+            </label>
+            <select [(ngModel)]="selectedTeacherGroupId" (change)="loadTimetables()" class="bg-[#111827] border border-emerald-500/50 text-xs text-white rounded-xl px-3.5 py-2 font-bold focus:outline-none focus:border-emerald-400 cursor-pointer">
+              <option value="ALL">All My Taught Class Groups</option>
+              <option *ngFor="let g of groups" [value]="g.group_id">
+                {{ g.group_code }} — {{ g.group_name }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -156,68 +194,115 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             </div>
             
             <div class="flex items-center gap-2.5 flex-wrap">
-             
-
               <span class="status-badge status-badge-active">• {{ timetables.length }} Slots Scheduled</span>
+
+              <!-- Toggle Dropdown Button (Hidden by default) -->
+              <button *ngIf="!isTeacherView && timetables.length > 0" 
+                      (click)="showScheduledSubjectsSummary = !showScheduledSubjectsSummary" 
+                      class="px-3 py-1.5 rounded-xl bg-[#111827] hover:bg-[#1e293b] border border-[#1f2937] hover:border-emerald-500/50 text-emerald-300 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
+                <i class="fa-solid fa-list-check text-emerald-400"></i>
+                <span>Subject Summary ({{ uniqueScheduledSubjectsCount }}/{{ allClassSubjects.length }})</span>
+                <i class="fa-solid" [ngClass]="showScheduledSubjectsSummary ? 'fa-chevron-up text-emerald-400' : 'fa-chevron-down text-gray-400'"></i>
+              </button>
               
-              <button *ngIf="!isTeacherView && timetables.length > 0" (click)="clearClassTimetable()" class="px-3 py-2 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 font-bold text-xs flex items-center gap-1.5 transition-all shadow-md">
+              <button *ngIf="!isTeacherView && timetables.length > 0" (click)="clearClassTimetable()" class="px-3 py-1.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 font-bold text-xs flex items-center gap-1.5 transition-all shadow-md">
                 <i class="fa-solid fa-trash-can"></i> Clear Class Schedule
               </button>
             </div>
           </div>
 
-          <!-- Days Header with + Add Button Per Day -->
-          <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-400 border-b border-[#1f2937] pb-2 items-center">
-            <div class="py-1">TIME</div>
-            <div *ngFor="let dayObj of [
-              { code: 'MONDAY', label: 'MON' },
-              { code: 'TUESDAY', label: 'TUE' },
-              { code: 'WEDNESDAY', label: 'WED' },
-              { code: 'THURSDAY', label: 'THU' },
-              { code: 'FRIDAY', label: 'FRI' },
-              { code: 'SATURDAY', label: 'SAT' }
-            ]" class="flex items-center justify-center gap-1.5 py-1">
-              <span>{{ dayObj.label }}</span>
-              <button *ngIf="!isTeacherView" (click)="openAssignSlotModalForDay(dayObj.code)" [title]="'Add Schedule Slot for ' + dayObj.label" class="px-1.5 py-0.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 text-[10px] font-bold transition-all hover:scale-105 flex items-center gap-0.5 shadow-sm">
-                <i class="fa-solid fa-plus text-[9px]"></i> Add
-              </button>
+        <!-- Class Timetable Summary & Assigned Teachers Bar (Dropdown Show/Hide, Default Hidden) -->
+        <div *ngIf="!isTeacherView && showScheduledSubjectsSummary" class="bg-[#111827] border border-[#1f2937] p-3.5 rounded-xl space-y-2.5 text-xs font-mono animate-fadeIn shadow-lg">
+          <div class="flex items-center justify-between border-b border-[#1f2937] pb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-bold text-white uppercase font-sans flex items-center gap-1.5 text-xs">
+                <i class="fa-solid fa-list-check text-emerald-400"></i> Scheduled Subjects & Teachers Summary:
+              </span>
+              <span class="px-2.5 py-0.5 rounded-md bg-emerald-950 border border-emerald-800 text-emerald-300 font-extrabold text-[11px]">
+                {{ uniqueScheduledSubjectsCount }} / {{ allClassSubjects.length }} Subjects Scheduled
+              </span>
+              <span class="px-2.5 py-0.5 rounded-md bg-blue-950 border border-blue-800 text-blue-300 font-extrabold text-[11px]">
+                {{ timetables.length }} Total Weekly Slots
+              </span>
+            </div>
+            <button (click)="showScheduledSubjectsSummary = false" class="text-gray-400 hover:text-white text-xs font-sans flex items-center gap-1">
+              <i class="fa-solid fa-xmark"></i> Close
+            </button>
+          </div>
+
+          <!-- Subject & Teacher Badges Grid -->
+          <div *ngIf="scheduledSubjectsSummary.length > 0" class="flex flex-wrap gap-2 pt-0.5">
+            <div *ngFor="let item of scheduledSubjectsSummary" class="px-3 py-1.5 rounded-xl bg-[#1e293b] border border-[#1f2937] text-xs flex items-center gap-2 shadow-sm hover:border-emerald-500/50 transition-all">
+              <div class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
+              <div>
+                <span class="font-bold text-white block leading-tight">{{ item.subject_name }} <span class="text-gray-400 font-mono text-[10px]">({{ item.subject_code }})</span></span>
+                <span class="text-[10px] text-emerald-400 font-bold block leading-tight mt-0.5">
+                  <i class="fa-solid fa-user-tie text-[9px] mr-1"></i>{{ item.teacher_name }} · <span class="text-amber-300">{{ item.session_count }} slot{{ item.session_count > 1 ? 's' : '' }}/wk</span>
+                </span>
+              </div>
             </div>
           </div>
 
-          <!-- Dynamic Slots Grid -->
-          <div *ngFor="let slot of filteredSlots" class="grid grid-cols-7 gap-2 text-xs items-center">
-            <div class="font-mono text-gray-400 text-center text-[11px] font-bold bg-[#111827] p-2 rounded-xl border border-[#1f2937] relative group">
-              <button *ngIf="!isTeacherView" (click)="deleteTimeSlotDefinition(slot)" title="Delete Time Slot (លុបម៉ោងសរុបដែលបង្កើតខុស)" class="absolute -top-1.5 -left-1.5 w-5 h-5 bg-rose-600 hover:bg-rose-500 text-white rounded-full flex items-center justify-center text-[9px] shadow-md opacity-80 group-hover:opacity-100 transition-all">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-              <div class="text-emerald-300 font-extrabold">{{ slot.slot_name }}</div>
-              <div class="text-gray-300 font-bold text-[10px] mt-0.5">{{ slot.start_time.slice(0,5) }} – {{ slot.end_time.slice(0,5) }}</div>
+          <div *ngIf="scheduledSubjectsSummary.length === 0" class="text-gray-400 italic text-[11px] py-1">
+            No subjects scheduled for this class group yet. Use the form above to assign timetable slots.
+          </div>
+        </div>
+
+          <!-- Scrollable Timetable Table Wrapper -->
+        <div class="overflow-x-auto rounded-xl border border-[#1f2937] bg-[#111827]/40 p-4">
+          <div class="min-w-[850px] space-y-3">
+            <!-- Days Header with + Add Button Per Day -->
+            <div class="grid grid-cols-7 gap-3 text-center text-xs font-bold text-gray-400 border-b border-[#1f2937] pb-3 items-center">
+              <div class="py-1 uppercase tracking-wider text-gray-400 font-extrabold">TIME</div>
+              <div *ngFor="let dayObj of [
+                { code: 'MONDAY', label: 'MON' },
+                { code: 'TUESDAY', label: 'TUE' },
+                { code: 'WEDNESDAY', label: 'WED' },
+                { code: 'THURSDAY', label: 'THU' },
+                { code: 'FRIDAY', label: 'FRI' },
+                { code: 'SATURDAY', label: 'SAT' }
+              ]" class="flex items-center justify-center gap-1.5 py-1">
+                <span class="font-extrabold text-gray-300">{{ dayObj.label }}</span>
+                <button *ngIf="!isTeacherView" (click)="openAssignSlotModalForDay(dayObj.code)" [title]="'Add Schedule Slot for ' + dayObj.label" class="px-1.5 py-0.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 text-[10px] font-bold transition-all hover:scale-105 flex items-center gap-0.5 shadow-sm cursor-pointer">
+                  <i class="fa-solid fa-plus text-[9px]"></i> Add
+                </button>
+              </div>
             </div>
 
-            <div *ngFor="let day of ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']">
-              <!-- Assigned Slot (Click to Edit / Delete for Admin) -->
-              <div *ngIf="getSlotForDay(slot.slot_id, day) as item; else emptySlot" 
-                   (click)="!isTeacherView ? openEditSlotModal(item) : null"
-                   class="bg-emerald-950/80 hover:bg-emerald-900/90 border border-emerald-700/80 hover:border-emerald-500 p-2.5 rounded-xl space-y-1 relative shadow-sm cursor-pointer transition-all group">
-                <div [title]="item.subject_name + ' (' + (item.subject_code || 'CODE') + ')'">
-                  <p class="font-extrabold text-emerald-300 truncate text-xs font-mono tracking-wide group-hover:text-emerald-200">📘 {{ item.subject_code }}</p>
-                  <p class="text-[10px] text-white truncate font-bold">{{ item.subject_name }}</p>
-                </div>
-                <p class="text-[10px] text-amber-400 truncate font-semibold font-mono">👥 {{ item.group_code || item.group_name }}</p>
-                <div class="flex items-center justify-between text-[9px] pt-0.5">
-                  <span class="bg-emerald-900/60 text-emerald-200 px-1.5 py-0.5 rounded font-mono font-bold">🚪 Room {{ item.room_number }}</span>
-                  <span class="text-gray-400 font-mono">Sem {{ item.semester_id || 1 }}</span>
-                </div>
+            <!-- Dynamic Slots Grid -->
+            <div *ngFor="let slot of filteredSlots" class="grid grid-cols-7 gap-3 text-xs items-center">
+              <div class="font-mono text-gray-400 text-center text-[11px] font-bold bg-[#111827] p-3 rounded-xl border border-[#1f2937] relative group shadow-inner">
+                <button *ngIf="!isTeacherView" (click)="deleteTimeSlotDefinition(slot)" title="Delete Time Slot" class="absolute -top-1.5 -left-1.5 w-5 h-5 bg-rose-600 hover:bg-rose-500 text-white rounded-full flex items-center justify-center text-[9px] shadow-md opacity-80 group-hover:opacity-100 transition-all cursor-pointer">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <div class="text-emerald-400 font-extrabold">{{ slot.slot_name }}</div>
+                <div class="text-gray-300 font-bold text-[10px] mt-0.5">{{ slot.start_time.slice(0,5) }} – {{ slot.end_time.slice(0,5) }}</div>
               </div>
 
-              <!-- Unassigned / Free Slot -->
-              <ng-template #emptySlot>
-                <div (click)="!isTeacherView ? clickFreeSlot(slot.slot_id, day) : null" 
-                     [ngClass]="{'cursor-pointer hover:border-emerald-500/80 hover:bg-emerald-950/40': !isTeacherView}"
-                     class="border border-dashed border-gray-800/80 p-2.5 rounded-xl text-center text-gray-500 font-bold text-[10px] flex flex-col items-center justify-center gap-1 min-h-[58px] group">
-                  <span class="text-xs text-gray-600 font-mono">{{ isTeacherView ? '—' : '+ Free' }}</span>
+              <div *ngFor="let day of ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']">
+                <!-- Assigned Slot (Click to Edit / Delete for Admin) -->
+                <div *ngIf="getSlotForDay(slot.slot_id, day) as item; else emptySlot" 
+                     (click)="!isTeacherView ? openEditSlotModal(item) : null"
+                     class="bg-[#064e3b]/90 hover:bg-emerald-900 border border-emerald-500/60 hover:border-emerald-400 p-3 rounded-xl space-y-1.5 relative shadow-lg cursor-pointer transition-all group">
+                  <div [title]="item.subject_name + ' (' + (item.subject_code || 'CODE') + ')'">
+                    <p class="font-extrabold text-emerald-300 truncate text-xs font-mono tracking-wide group-hover:text-emerald-200"><i class="fa-solid fa-book text-emerald-400 mr-1"></i>{{ item.subject_code }}</p>
+                    <p class="text-[11px] text-white truncate font-bold leading-tight">{{ item.subject_name }}</p>
+                  </div>
+                  <p class="text-[10px] text-amber-300 truncate font-bold font-mono"><i class="fa-solid fa-users text-amber-300 mr-1"></i>{{ item.group_code || item.group_name }}</p>
+                  <div class="flex items-center justify-between text-[9px] pt-1 border-t border-emerald-800/60">
+                    <span class="bg-emerald-950 text-emerald-200 px-1.5 py-0.5 rounded font-mono font-bold border border-emerald-700/50">Room {{ item.room_number }}</span>
+                    <span class="text-emerald-300/80 font-mono font-bold">Sem {{ item.semester_id || 1 }}</span>
+                  </div>
                 </div>
-              </ng-template>
+
+                <!-- Unassigned / Free Slot -->
+                <ng-template #emptySlot>
+                  <div (click)="!isTeacherView ? clickFreeSlot(slot.slot_id, day) : null" class="border border-dashed border-gray-800 hover:border-emerald-500/50 bg-[#111827]/30 p-3 rounded-xl text-center text-gray-600 hover:text-emerald-400 font-bold text-[10px] flex flex-col items-center justify-center gap-1 cursor-pointer transition-all min-h-[64px] group">
+                    <span class="text-xs text-gray-600 group-hover:text-emerald-400 font-mono">+ Assign</span>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -227,7 +312,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
       <div class="bg-[#1e293b] border border-[#1f2937] rounded-3xl p-6 w-full max-w-md space-y-5 shadow-2xl">
         <div class="flex items-center justify-between border-b border-[#1f2937] pb-3">
           <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-            ✏️ Edit / Delete Timetable Slot
+            <i class="fa-solid fa-pen-to-square text-emerald-400"></i> Edit / Delete Timetable Slot
           </h3>
           <button (click)="showEditSlotModal = false" class="text-gray-400 hover:text-white text-lg">
             <i class="fa-solid fa-xmark"></i>
@@ -243,7 +328,9 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
           <div>
             <label class="block font-bold text-gray-300 mb-1">TEACHER *</label>
             <select [(ngModel)]="editingSlot.teacher_id" (change)="onModalTeacherChange()" name="modal_teacher_id" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-3 py-2.5 font-bold focus:outline-none focus:border-emerald-500">
-              <option *ngFor="let t of filteredTeachers" [value]="t.teacher_id">{{ t.first_name }} {{ t.last_name }} ({{ t.specialization || 'Teacher' }})</option>
+              <option *ngFor="let t of filteredTeachers" [value]="t.teacher_id">
+                {{ isTeacherBusy(t.teacher_id, editingSlot.day_of_week, editingSlot.slot_id, editingSlot.timetable_id) ? '[Busy] ' : '[Free] ' }}{{ t.first_name }} {{ t.last_name }} ({{ t.specialization || 'Teacher' }})
+              </option>
             </select>
           </div>
 
@@ -259,7 +346,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block font-bold text-gray-300 mb-1">DAY *</label>
-              <select [(ngModel)]="editingSlot.day_of_week" name="modal_day_of_week" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-3 py-2.5">
+              <select [(ngModel)]="editingSlot.day_of_week" name="modal_day_of_week" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-3 py-2.5 font-bold">
                 <option value="MONDAY">Monday</option>
                 <option value="TUESDAY">Tuesday</option>
                 <option value="WEDNESDAY">Wednesday</option>
@@ -271,17 +358,42 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
 
             <div>
               <label class="block font-bold text-gray-300 mb-1">TIME SLOT *</label>
-              <select [(ngModel)]="editingSlot.slot_id" name="modal_slot_id" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-3 py-2.5">
-                <option *ngFor="let slot of slots" [value]="slot.slot_id">{{ slot.slot_name }} ({{ slot.start_time.slice(0,5) }} – {{ slot.end_time.slice(0,5) }})</option>
+              <select [(ngModel)]="editingSlot.slot_id" name="modal_slot_id" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-3 py-2.5 font-bold">
+                <option *ngFor="let slot of slots" [value]="slot.slot_id">[{{ slot.shift || 'MORNING' }}] {{ slot.slot_name }} ({{ slot.start_time.slice(0,5) }} – {{ slot.end_time.slice(0,5) }})</option>
               </select>
             </div>
           </div>
 
           <div>
             <label class="block font-bold text-gray-300 mb-1">ROOM *</label>
-            <select [(ngModel)]="editingSlot.room_id" name="modal_room_id" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-3 py-2.5">
-              <option *ngFor="let r of rooms" [value]="r.room_id">{{ r.room_number }} ({{ r.building || 'Main' }})</option>
+            <select [(ngModel)]="editingSlot.room_id" name="modal_room_id" class="w-full bg-[#111827] border border-[#1f2937] text-white rounded-xl px-3 py-2.5 font-bold">
+              <option *ngFor="let r of rooms" [value]="r.room_id">
+                {{ isRoomOccupied(r.room_id, editingSlot.day_of_week, editingSlot.slot_id, editingSlot.timetable_id) ? '[Occupied] ' : '[Free] ' }}{{ r.room_number }} ({{ r.building || 'Main' }})
+              </option>
             </select>
+          </div>
+
+          <!-- Real-time Availability & Anti-Collision Check Status Badge in Edit Modal -->
+          <div *ngIf="editingSlot.day_of_week && editingSlot.slot_id" class="bg-[#111827] border border-[#1f2937] p-3 rounded-xl space-y-2 text-xs font-mono">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-gray-400"><i class="fa-solid fa-user-check text-emerald-400 mr-1"></i>Teacher Availability:</span>
+              <span *ngIf="!getTeacherConflict(editingSlot.teacher_id, editingSlot.day_of_week, editingSlot.slot_id, editingSlot.timetable_id)" class="px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-800 text-emerald-300 font-extrabold text-[10px] flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Available
+              </span>
+              <span *ngIf="getTeacherConflict(editingSlot.teacher_id, editingSlot.day_of_week, editingSlot.slot_id, editingSlot.timetable_id) as tc" class="px-2.5 py-0.5 rounded-lg bg-rose-950/90 border border-rose-800 text-rose-300 font-extrabold text-[10px] flex items-center gap-1 shadow animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> BUSY: {{ tc.group_code }} ({{ tc.subject_name }}) in Rm {{ tc.room_number }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-[#1f2937] pt-1.5">
+              <span class="font-bold text-gray-400"><i class="fa-solid fa-door-open text-blue-400 mr-1"></i>Room Availability:</span>
+              <span *ngIf="!getRoomConflict(editingSlot.room_id, editingSlot.day_of_week, editingSlot.slot_id, editingSlot.timetable_id)" class="px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-800 text-emerald-300 font-extrabold text-[10px] flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Free
+              </span>
+              <span *ngIf="getRoomConflict(editingSlot.room_id, editingSlot.day_of_week, editingSlot.slot_id, editingSlot.timetable_id) as rc" class="px-2.5 py-0.5 rounded-lg bg-rose-950/90 border border-rose-800 text-rose-300 font-extrabold text-[10px] flex items-center gap-1 shadow animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> OCCUPIED: {{ rc.group_code }} ({{ rc.subject_name }})
+              </span>
+            </div>
           </div>
 
           <div class="pt-3 flex items-center justify-between gap-3 border-t border-[#1f2937]">
@@ -325,7 +437,9 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
           <div>
             <label class="block font-bold text-gray-300 mb-1">TEACHER *</label>
             <select [(ngModel)]="form.teacher_id" (change)="onTeacherChange()" name="modal_teacher_id" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-4 py-2.5 font-bold">
-              <option *ngFor="let t of filteredTeachers" [value]="t.teacher_id">{{ t.first_name }} {{ t.last_name }} ({{ t.specialization || 'Teacher' }})</option>
+              <option *ngFor="let t of filteredTeachers" [value]="t.teacher_id">
+                {{ isTeacherBusy(t.teacher_id, form.day_of_week, form.slot_id) ? '[Busy] ' : '[Free] ' }}{{ t.first_name }} {{ t.last_name }} ({{ t.specialization || 'Teacher' }})
+              </option>
             </select>
           </div>
 
@@ -348,6 +462,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
                 <option value="WEDNESDAY">Wednesday</option>
                 <option value="THURSDAY">Thursday</option>
                 <option value="FRIDAY">Friday</option>
+                <option value="SATURDAY">Saturday</option>
               </select>
             </div>
 
@@ -362,8 +477,33 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
           <div>
             <label class="block font-bold text-gray-300 mb-1">ROOM *</label>
             <select [(ngModel)]="form.room_id" name="modal_room_id" class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl px-4 py-2.5 font-bold">
-              <option *ngFor="let r of rooms" [value]="r.room_id">{{ r.room_number }} ({{ r.building || 'Main' }})</option>
+              <option *ngFor="let r of rooms" [value]="r.room_id">
+                {{ isRoomOccupied(r.room_id, form.day_of_week, form.slot_id) ? '[Occupied] ' : '[Free] ' }}{{ r.room_number }} ({{ r.building || 'Main' }})
+              </option>
             </select>
+          </div>
+
+          <!-- Real-time Availability & Anti-Collision Check Status Badge in Assign Modal -->
+          <div *ngIf="form.day_of_week && form.slot_id" class="bg-[#111827] border border-[#1f2937] p-3 rounded-xl space-y-2 text-xs font-mono">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-gray-400"><i class="fa-solid fa-user-check text-emerald-400 mr-1"></i>Teacher Availability:</span>
+              <span *ngIf="!getTeacherConflict(form.teacher_id, form.day_of_week, form.slot_id)" class="px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-800 text-emerald-300 font-extrabold text-[10px] flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Available
+              </span>
+              <span *ngIf="getTeacherConflict(form.teacher_id, form.day_of_week, form.slot_id) as tc" class="px-2.5 py-0.5 rounded-lg bg-rose-950/90 border border-rose-800 text-rose-300 font-extrabold text-[10px] flex items-center gap-1 shadow animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> BUSY: {{ tc.group_code }} ({{ tc.subject_name }}) in Rm {{ tc.room_number }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-[#1f2937] pt-1.5">
+              <span class="font-bold text-gray-400"><i class="fa-solid fa-door-open text-blue-400 mr-1"></i>Room Availability:</span>
+              <span *ngIf="!getRoomConflict(form.room_id, form.day_of_week, form.slot_id)" class="px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-800 text-emerald-300 font-extrabold text-[10px] flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Free
+              </span>
+              <span *ngIf="getRoomConflict(form.room_id, form.day_of_week, form.slot_id) as rc" class="px-2.5 py-0.5 rounded-lg bg-rose-950/90 border border-rose-800 text-rose-300 font-extrabold text-[10px] flex items-center gap-1 shadow animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> OCCUPIED: {{ rc.group_code }} ({{ rc.subject_name }})
+              </span>
+            </div>
           </div>
 
           <div class="pt-3 flex items-center justify-end gap-2 border-t border-[#1f2937]">
@@ -501,21 +641,99 @@ export class TimetableManagementComponent implements OnInit {
   rooms: any[] = [];
   slots: any[] = [];
   timetables: any[] = [];
+  allSchoolTimetables: any[] = [];
+
+  showScheduledSubjectsSummary: boolean = false;
+
+  get scheduledSubjectsSummary(): any[] {
+    if (!this.timetables || !this.timetables.length) return [];
+    const summaryMap = new Map<number, any>();
+    for (const t of this.timetables) {
+      const subId = Number(t.subject_id);
+      if (!summaryMap.has(subId)) {
+        summaryMap.set(subId, {
+          subject_id: subId,
+          subject_name: t.subject_name,
+          subject_code: t.subject_code,
+          teacher_name: `${t.teacher_fname || ''} ${t.teacher_lname || ''}`.trim() || 'Teacher Assigned',
+          room_number: t.room_number,
+          session_count: 1
+        });
+      } else {
+        const item = summaryMap.get(subId);
+        item.session_count += 1;
+      }
+    }
+    return Array.from(summaryMap.values());
+  }
+
+  get uniqueScheduledSubjectsCount(): number {
+    return this.scheduledSubjectsSummary.length;
+  }
+
+  loadAllSchoolTimetables(): void {
+    this.api.get<any>('timetables').subscribe(res => {
+      this.allSchoolTimetables = res.data?.timetables || res.data || [];
+    });
+  }
+
+  getTeacherConflict(teacherId: any, day: string, slotId: any, excludeTtId?: any): any {
+    if (!teacherId || !day || !slotId || !this.allSchoolTimetables.length) return null;
+    const tid = Number(teacherId);
+    const sid = Number(slotId);
+    const dayUpper = day.trim().toUpperCase();
+
+    return this.allSchoolTimetables.find(t =>
+      Number(t.teacher_id) === tid &&
+      Number(t.slot_id) === sid &&
+      t.day_of_week && t.day_of_week.trim().toUpperCase() === dayUpper &&
+      (!excludeTtId || Number(t.timetable_id) !== Number(excludeTtId))
+    );
+  }
+
+  getRoomConflict(roomId: any, day: string, slotId: any, excludeTtId?: any): any {
+    if (!roomId || !day || !slotId || !this.allSchoolTimetables.length) return null;
+    const rid = Number(roomId);
+    const sid = Number(slotId);
+    const dayUpper = day.trim().toUpperCase();
+
+    return this.allSchoolTimetables.find(t =>
+      Number(t.room_id) === rid &&
+      Number(t.slot_id) === sid &&
+      t.day_of_week && t.day_of_week.trim().toUpperCase() === dayUpper &&
+      (!excludeTtId || Number(t.timetable_id) !== Number(excludeTtId))
+    );
+  }
+
+  isTeacherBusy(teacherId: any, day: string, slotId: any, excludeTtId?: any): boolean {
+    return Boolean(this.getTeacherConflict(teacherId, day, slotId, excludeTtId));
+  }
+
+  isRoomOccupied(roomId: any, day: string, slotId: any, excludeTtId?: any): boolean {
+    return Boolean(this.getRoomConflict(roomId, day, slotId, excludeTtId));
+  }
 
   selectedGroupSemester: number = 1;
   selectedGroupShift: string = 'MORNING';
+  selectedTeacherShift: string = 'ALL';
 
   get filteredSlots(): any[] {
     if (!this.slots || !this.slots.length) return [];
-    if (this.isTeacherView) return this.slots;
+
+    if (this.isTeacherView) {
+      if (!this.selectedTeacherShift || this.selectedTeacherShift === 'ALL') {
+        return this.slots;
+      }
+      const targetUpper = this.selectedTeacherShift.toUpperCase();
+      return this.slots.filter(s => String(s.shift || 'MORNING').toUpperCase() === targetUpper);
+    }
 
     const selectedGroupObj = this.groups.find(g => Number(g.group_id) === Number(this.form.group_id));
     const targetShift = selectedGroupObj?.shift || this.selectedGroupShift || 'MORNING';
 
     if (!targetShift) return this.slots;
     const shiftUpper = String(targetShift).toUpperCase();
-    const matched = this.slots.filter(s => String(s.shift || 'MORNING').toUpperCase() === shiftUpper);
-    return matched.length > 0 ? matched : this.slots;
+    return this.slots.filter(s => String(s.shift || 'MORNING').toUpperCase() === shiftUpper);
   }
 
   getSlotsByShift(shiftName: string): any[] {
@@ -573,6 +791,29 @@ export class TimetableManagementComponent implements OnInit {
 
   onUpdateSlot(): void {
     if (!this.editingSlot.timetable_id) return;
+
+    const tConflict = this.getTeacherConflict(
+      this.editingSlot.teacher_id,
+      this.editingSlot.day_of_week,
+      this.editingSlot.slot_id,
+      this.editingSlot.timetable_id
+    );
+    if (tConflict) {
+      this.toast.error(`Teacher Conflict: Teacher is ALREADY assigned to teach ${tConflict.group_code} (${tConflict.subject_name}) at this time!`);
+      return;
+    }
+
+    const rConflict = this.getRoomConflict(
+      this.editingSlot.room_id,
+      this.editingSlot.day_of_week,
+      this.editingSlot.slot_id,
+      this.editingSlot.timetable_id
+    );
+    if (rConflict) {
+      this.toast.error(`Room Conflict: Room ${rConflict.room_number} is ALREADY occupied by ${rConflict.group_code} (${rConflict.subject_name}) at this time!`);
+      return;
+    }
+
     this.api.put(`timetables/${this.editingSlot.timetable_id}`, this.editingSlot).subscribe({
       next: () => {
         this.toast.success('Timetable slot updated successfully!');
@@ -687,34 +928,61 @@ export class TimetableManagementComponent implements OnInit {
     });
   }
 
+  getTeacherAssignedGroupIds(teacher: any): number[] {
+    if (!teacher) return [];
+    if (teacher.assigned_groups && Array.isArray(teacher.assigned_groups)) {
+      const idsFromObj = teacher.assigned_groups.map((g: any) => Number(g.group_id)).filter(Boolean);
+      if (idsFromObj.length > 0) return idsFromObj;
+    }
+    if (!teacher.assigned_group_ids) return [];
+    let ids: number[] = [];
+    if (Array.isArray(teacher.assigned_group_ids)) {
+      ids = teacher.assigned_group_ids.map(Number);
+    } else if (typeof teacher.assigned_group_ids === 'string') {
+      try {
+        ids = JSON.parse(teacher.assigned_group_ids).map(Number);
+      } catch (e) {
+        ids = teacher.assigned_group_ids.split(',').map(Number);
+      }
+    }
+    return ids.filter(n => !isNaN(n));
+  }
+
   get filteredTeachers(): any[] {
     if (!this.teachers || !this.teachers.length) return [];
     if (!this.form.group_id) return this.teachers;
 
-    const selectedGroup = this.groups.find(g => Number(g.group_id) === Number(this.form.group_id));
+    const selectedGroupId = Number(this.form.group_id);
+    const selectedGroupObj = this.groups.find(g => Number(g.group_id) === selectedGroupId);
     const classSubjectIds = new Set(this.allClassSubjects.map(s => Number(s.subject_id)));
 
     const groupTeachers = this.teachers.filter(t => {
-      // 1. Direct group_id match
-      if (t.group_id && Number(t.group_id) === Number(this.form.group_id)) return true;
+      // 1. Direct assigned_group_ids match (assigned in Teacher Management)
+      const groupIds = this.getTeacherAssignedGroupIds(t);
+      if (groupIds.includes(selectedGroupId)) return true;
 
-      // 2. Check if teacher has assigned subjects that match class subjects
+      // 2. Direct group_id match
+      if (t.group_id && Number(t.group_id) === selectedGroupId) return true;
+
+      // 3. Check if teacher has assigned subjects matching class subjects for this semester
       const teacherSubIds = this.getTeacherAssignedSubjectIds(t);
       if (teacherSubIds.some(id => classSubjectIds.has(id))) return true;
 
-      // 3. Check if teacher's specialization matches group program/code/name
-      if (selectedGroup && t.specialization) {
+      // 4. Check if teacher specialization matches group program/code/name
+      if (selectedGroupObj && t.specialization) {
         const specUpper = String(t.specialization).toUpperCase();
-        const pCode = String(selectedGroup.program_code || '').toUpperCase();
-        const gName = String(selectedGroup.group_name || '').toUpperCase();
+        const pCode = String(selectedGroupObj.program_code || '').toUpperCase();
+        const gName = String(selectedGroupObj.group_name || '').toUpperCase();
+        const gCode = String(selectedGroupObj.group_code || '').toUpperCase();
         if (pCode && specUpper.includes(pCode)) return true;
+        if (gCode && specUpper.includes(gCode)) return true;
         if (gName && specUpper.includes(gName)) return true;
       }
 
       return false;
     });
 
-    return groupTeachers.length > 0 ? groupTeachers : this.teachers;
+    return groupTeachers;
   }
 
   onClassChange(): void {
@@ -724,6 +992,8 @@ export class TimetableManagementComponent implements OnInit {
       if (!activeTeachers.some(t => Number(t.teacher_id) === Number(this.form.teacher_id))) {
         this.form.teacher_id = activeTeachers[0].teacher_id;
       }
+    } else {
+      this.form.teacher_id = null;
     }
     const activeSlots = this.filteredSlots;
     if (activeSlots.length > 0) {
@@ -756,7 +1026,11 @@ export class TimetableManagementComponent implements OnInit {
   }
 
   filterSubjectsForSelectedClass(): void {
-    if (!this.groups.length || !this.form.group_id) return;
+    if (!this.groups.length || !this.form.group_id) {
+      this.allClassSubjects = [...this.allMasterSubjects];
+      this.updateFilteredSubjectsForTeacher();
+      return;
+    }
 
     const selectedGroupObj = this.groups.find(g => Number(g.group_id) === Number(this.form.group_id));
     this.selectedGroupSemester = selectedGroupObj ? Number(selectedGroupObj.current_semester || 1) : 1;
@@ -767,27 +1041,39 @@ export class TimetableManagementComponent implements OnInit {
 
     let classSubjects: any[] = [];
 
-    // Extract subjects assigned in Curriculum Management strictly for THIS group's program & semester
+    // Extract subjects assigned in Curriculum Management strictly for THIS group's program AND current semester
     if (this.curriculumHierarchy.length > 0) {
       for (const fac of this.curriculumHierarchy) {
         for (const prog of fac.programs || []) {
           const matchProg = (programId && Number(prog.program_id) === programId) || (programCode && prog.program_code === programCode);
           if (matchProg) {
             if (prog.subjects && Array.isArray(prog.subjects)) {
-              classSubjects = prog.subjects.filter((sub: any) => Number(sub.semester_id || sub.semester_number || sub.semester || 1) === this.selectedGroupSemester);
+              const semFiltered = prog.subjects.filter((sub: any) => {
+                const subSem = Number(sub.semester_id || sub.semester_number || sub.semester || 1);
+                return subSem === this.selectedGroupSemester;
+              });
+              classSubjects = semFiltered.length > 0 ? semFiltered : prog.subjects;
             }
           }
         }
       }
     }
 
-    if (classSubjects.length === 0) {
-      classSubjects = this.allMasterSubjects.filter(sub => {
+    if (classSubjects.length === 0 && programId) {
+      const semFiltered = this.allMasterSubjects.filter(sub => {
+        const matchProg = !sub.program_id || Number(sub.program_id) === programId;
         const subSem = Number(sub.semester_id || sub.semester_number || sub.semester || 1);
-        const matchSem = subSem === this.selectedGroupSemester;
-        const matchProg = !programId || !sub.program_id || Number(sub.program_id) === programId;
-        return matchSem && matchProg;
+        return matchProg && subSem === this.selectedGroupSemester;
       });
+      classSubjects = semFiltered.length > 0 ? semFiltered : this.allMasterSubjects.filter(sub => !sub.program_id || Number(sub.program_id) === programId);
+    }
+
+    if (classSubjects.length === 0) {
+      const semFiltered = this.allMasterSubjects.filter(sub => {
+        const subSem = Number(sub.semester_id || sub.semester_number || sub.semester || 1);
+        return subSem === this.selectedGroupSemester;
+      });
+      classSubjects = semFiltered.length > 0 ? semFiltered : [...this.allMasterSubjects];
     }
 
     this.allClassSubjects = classSubjects;
@@ -802,15 +1088,9 @@ export class TimetableManagementComponent implements OnInit {
       const teacherSubIds = this.getTeacherAssignedSubjectIds(selectedTeacher);
 
       if (teacherSubIds.length > 0) {
-        // First match against class subjects for this group
-        let matched = this.allClassSubjects.filter(sub => teacherSubIds.includes(Number(sub.subject_id)));
-        if (matched.length === 0) {
-          // Fallback to match teacher's assigned subjects from all master subjects
-          matched = this.allMasterSubjects.filter(sub => teacherSubIds.includes(Number(sub.subject_id)));
-        }
-        this.subjects = matched.length > 0 ? matched : [...this.allClassSubjects];
+        const matched = this.allClassSubjects.filter(sub => teacherSubIds.includes(Number(sub.subject_id)));
+        this.subjects = matched.length > 0 ? matched : this.allClassSubjects.filter(sub => teacherSubIds.includes(Number(sub.subject_id)));
       } else {
-        // Check teacher specialization match if assigned_subject_ids is empty
         if (selectedTeacher && selectedTeacher.specialization) {
           const specUpper = String(selectedTeacher.specialization).toUpperCase();
           const specMatched = this.allClassSubjects.filter(sub =>
@@ -878,12 +1158,15 @@ export class TimetableManagementComponent implements OnInit {
         this.timetables = res.data?.timetables || res.data || [];
       }
     });
+
+    this.loadAllSchoolTimetables();
   }
 
   getSlotForDay(slotId: number, day: string): any {
     if (!this.timetables || !this.timetables.length) return null;
     return this.timetables.find(t =>
       Number(t.slot_id) === Number(slotId) &&
+      (!this.form.group_id || Number(t.group_id) === Number(this.form.group_id)) &&
       t.day_of_week &&
       t.day_of_week.trim().toUpperCase() === day.trim().toUpperCase()
     );
@@ -903,6 +1186,19 @@ export class TimetableManagementComponent implements OnInit {
   onSaveSlot(): void {
     if (!this.form.group_id || !this.form.subject_id || !this.form.teacher_id || !this.form.slot_id || !this.form.room_id) {
       this.toast.error('Please select Class, Teacher, Subject, Time Slot, and Room!');
+      return;
+    }
+
+    // Real-time Anti-collision check before posting
+    const tConflict = this.getTeacherConflict(this.form.teacher_id, this.form.day_of_week, this.form.slot_id);
+    if (tConflict) {
+      this.toast.error(`Teacher Conflict: Teacher is ALREADY assigned to teach ${tConflict.group_code} (${tConflict.subject_name}) at this time!`);
+      return;
+    }
+
+    const rConflict = this.getRoomConflict(this.form.room_id, this.form.day_of_week, this.form.slot_id);
+    if (rConflict) {
+      this.toast.error(`Room Conflict: Room ${rConflict.room_number} is ALREADY occupied by ${rConflict.group_code} (${rConflict.subject_name}) at this time!`);
       return;
     }
 

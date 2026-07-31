@@ -180,7 +180,7 @@ import { environment } from '../../../environments/environment';
                 
                 <!-- Green Top Header Banner -->
                 <div class="bg-[#16a34a] text-white text-center py-2 px-1 font-bold text-xs tracking-wide shadow-sm">
-                  <span>ប័ណ្ណសម្គាល់ខ្លួននិស្សិត</span>
+                  <span>Student Identification Card</span>
                 </div>
 
                 <div class="p-3 text-center space-y-1.5">

@@ -184,7 +184,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
                   <button (click)="viewCurriculumDetails(c.curriculum_id!)" title="View & Edit Subject List" class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-lg hover:bg-emerald-900">Subjects</button>
                   <button (click)="duplicateCurriculum(c)" title="Duplicate Curriculum" class="text-xs bg-blue-950 text-blue-400 border border-blue-800 px-2 py-1 rounded-lg hover:bg-blue-900"><i class="fa-solid fa-copy"></i></button>
                   <button (click)="openCopyToYearModal(c.curriculum_id!)" title="Copy to New Academic Year" class="text-xs bg-purple-950 text-purple-400 border border-purple-800 px-2 py-1 rounded-lg hover:bg-purple-900"><i class="fa-solid fa-calendar-plus"></i></button>
-                  <button (click)="deleteCurriculum(c)" title="Delete Curriculum" class="text-gray-400 hover:text-rose-400 p-1 rounded-lg hover:bg-gray-800"><i class="fa-solid fa-trash"></i></button>
+                  <button (click)="deleteCurriculum(c)" title="Delete Curriculum" class="text-gray-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors"><i class="fa-solid fa-trash"></i></button>
                 </td>
               </tr>
 

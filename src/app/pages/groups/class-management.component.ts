@@ -51,28 +51,41 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
       <!-- Class Groups Table -->
       <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
         <div class="flex items-center justify-between">
-          <h3 class="text-base font-bold text-white tracking-tight">All Academic Class Sections</h3>
+          <div class="flex items-center gap-3">
+            <h3 class="text-base font-bold text-white tracking-tight">All Academic Class Sections</h3>
+            <button *ngIf="selectedGroupIds.size > 0" 
+                    (click)="deleteSelectedGroups()" 
+                    class="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-lg shadow-rose-600/20 transition-all flex items-center gap-1.5 cursor-pointer animate-pulse">
+              <i class="fa-solid fa-trash"></i> Delete Selected ({{ selectedGroupIds.size }})
+            </button>
+          </div>
           <span class="text-xs font-semibold text-gray-400">{{ groups.length }} active sections</span>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto overflow-y-auto max-h-[620px] rounded-xl border border-[#1f2937]/50">
           <table class="w-full text-left border-collapse text-xs">
-            <thead>
+            <thead class="sticky top-0 z-10 bg-[#111827] shadow-md">
               <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
-                <th class="pb-3">CLASS GROUP / CODE</th>
-                <th class="pb-3">SHIFT & GENERATION</th>
-                <th class="pb-3">YEAR & SEMESTER</th>
-                <th class="pb-3">ENROLLED STUDENTS</th>
-                <th class="pb-3 text-right">ACTIONS</th>
+                <th *ngIf="!isTeacherView" class="py-3.5 px-3 w-10">
+                  <input type="checkbox" [checked]="isGroupAllSelected" (change)="toggleGroupSelectAll($event)" class="rounded border-[#1f2937] bg-[#111827] text-emerald-500 focus:ring-0 cursor-pointer">
+                </th>
+                <th class="py-3.5 px-3">CLASS GROUP / CODE</th>
+                <th class="py-3.5 px-3">SHIFT & GENERATION</th>
+                <th class="py-3.5 px-3">YEAR & SEMESTER</th>
+                <th class="py-3.5 px-3">ENROLLED STUDENTS</th>
+                <th *ngIf="!isTeacherView" class="py-3.5 px-3 text-right">ACTIONS</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]/50">
-              <tr *ngFor="let g of groups" class="hover:bg-gray-800/40 transition-colors">
-                <td class="py-3.5">
+              <tr *ngFor="let g of paginatedGroups" [ngClass]="{'bg-emerald-950/20': isGroupSelected(g.group_id)}" class="hover:bg-gray-800/40 transition-colors">
+                <td *ngIf="!isTeacherView" class="py-3.5 px-3">
+                  <input type="checkbox" [checked]="isGroupSelected(g.group_id)" (change)="toggleGroupSelect(g.group_id)" class="rounded border-[#1f2937] bg-[#111827] text-emerald-500 focus:ring-0 cursor-pointer">
+                </td>
+                <td class="py-3.5 px-3">
                   <span class="font-mono text-emerald-400 font-extrabold text-sm block">{{ g.group_code }}</span>
                   <span class="text-xs text-white font-bold block">{{ g.group_name }}</span>
                 </td>
-                <td class="py-3.5 space-y-1">
+                <td class="py-3.5 px-3 space-y-1">
                   <span [ngClass]="{
                     'bg-emerald-950 text-emerald-400 border-emerald-800': g.shift === 'MORNING',
                     'bg-amber-950 text-amber-400 border-amber-800': g.shift === 'AFTERNOON',
@@ -82,39 +95,88 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
                   </span>
                   <span class="text-[11px] font-bold text-amber-400 font-mono block">• {{ g.generation || 'Gen 9' }}</span>
                 </td>
-                <td class="py-3.5 font-mono">
+                <td class="py-3.5 px-3 font-mono">
                   <span [class.text-amber-400]="g.status !== 'GRADUATED'" [class.text-emerald-400]="g.status === 'GRADUATED'" class="font-bold block">
                     {{ g.status === 'GRADUATED' ? '🎓 GRADUATED' : 'Year ' + (g.academic_year_level || 0) + ' · Semester ' + (g.current_semester || 0) }}
                   </span>
                   <span class="text-[10px] text-gray-400 block font-mono">📅 {{ (g.semester_start_date ? (g.semester_start_date | date:'dd/MM/yyyy') : 'N/A') }} ➔ {{ (g.semester_end_date ? (g.semester_end_date | date:'dd/MM/yyyy') : 'N/A') }}</span>
                 </td>
-                <td class="py-3.5 font-mono">
+                <td class="py-3.5 px-3 font-mono">
                   <span class="font-bold text-white text-xs block">{{ g.student_count || 0 }} Enrolled</span>
                   <span class="text-[10px] text-gray-400 block">Cap: {{ g.max_capacity || 40 }} max</span>
                 </td>
-                <td *ngIf="!isTeacherView" class="py-3.5 text-right space-x-1.5">
-                  <button (click)="openPromotionAuditModal(g)" title="Audit Exam Status & Promote Class" class="text-purple-400 hover:text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 px-2.5 py-1.5 rounded-lg transition-colors border border-purple-500/20 font-bold text-[11px] flex-inline items-center gap-1">
-                    <i class="fa-solid fa-graduation-cap"></i> Promote
+                <td *ngIf="!isTeacherView" class="py-3.5 px-3 text-right space-x-1">
+                  <button (click)="openPromotionAuditModal(g)" title="Audit Exam Status & Promote Class" class="text-purple-400 hover:text-purple-300 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fa-solid fa-graduation-cap"></i>
                   </button>
-                  <button (click)="viewClassDetails(g)" title="View Class Overview" class="text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1.5 rounded-lg transition-colors border border-emerald-500/20 font-bold text-[11px] flex-inline items-center gap-1">
-                    <i class="fa-solid fa-eye"></i> View
+                  <button (click)="viewClassDetails(g)" title="View Class Overview" class="text-emerald-400 hover:text-emerald-300 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fa-solid fa-eye"></i>
                   </button>
-                  <button (click)="printGroupCards(g)" title="Print All Student ID Cards for this Group" class="text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1.5 rounded-lg transition-colors border border-amber-500/20 font-bold text-[11px] flex-inline items-center gap-1">
-                    <i class="fa-solid fa-address-card"></i> Cards
+                  <button (click)="printGroupCards(g)" title="Print All Student ID Cards for this Group" class="text-amber-400 hover:text-amber-300 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fa-solid fa-address-card"></i>
                   </button>
-                  <button (click)="openAssignStudentsModal(g)" title="Add / Assign Students by Major" class="text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 px-2.5 py-1.5 rounded-lg transition-colors border border-blue-500/20 font-bold text-[11px] flex-inline items-center gap-1">
-                    <i class="fa-solid fa-user-plus"></i> + Students
+                  <button (click)="openAssignStudentsModal(g)" title="Add / Assign Students by Major" class="text-blue-400 hover:text-blue-300 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i class="fa-solid fa-user-plus"></i>
                   </button>
                   <button (click)="editClass(g)" title="Edit Class Group" class="text-gray-400 hover:text-blue-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
-                    <i class="fa-solid fa-pen-to-square"></i>
+                    <i class="fa-solid fa-pen"></i>
                   </button>
                   <button (click)="deleteClass(g)" title="Delete Class Group" class="text-gray-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
-                    <i class="fa-solid fa-trash-can"></i>
+                    <i class="fa-solid fa-trash"></i>
                   </button>
                 </td>
               </tr>
+
+              <tr *ngIf="groups.length === 0">
+                <td [attr.colspan]="isTeacherView ? 4 : 6" class="py-8 text-center text-gray-500 italic">No class groups found.</td>
+              </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Interactive Pagination & Selection Footer Bar -->
+        <div class="mt-4 pt-4 border-t border-[#1f2937] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+          <div class="flex items-center gap-3">
+            <span *ngIf="selectedGroupIds.size > 0" class="px-2.5 py-1 rounded-lg bg-emerald-950 border border-emerald-800 text-emerald-400 font-bold flex items-center gap-2">
+              <i class="fa-solid fa-check-double"></i> {{ selectedGroupIds.size }} selected
+              <button (click)="deleteSelectedGroups()" title="Delete Selected Class Groups" class="px-2 py-0.5 rounded bg-rose-900/80 text-rose-300 hover:bg-rose-800 text-[10px] font-extrabold ml-1 border border-rose-700 flex items-center gap-1">
+                <i class="fa-solid fa-trash"></i> Delete Selected
+              </button>
+              <button (click)="clearGroupSelection()" class="text-xs text-gray-400 hover:text-white ml-1">✕</button>
+            </span>
+            <span>
+              Showing <strong class="text-white font-mono">{{ groups.length > 0 ? startIndex + 1 : 0 }}</strong> to <strong class="text-white font-mono">{{ endIndex }}</strong> of <strong class="text-emerald-400 font-mono">{{ groups.length }}</strong> active sections
+            </span>
+            <div class="flex items-center gap-1.5 ml-2 border-l border-[#1f2937] pl-3">
+              <span>Per page:</span>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#111827] border border-[#1f2937] text-emerald-400 font-bold rounded-lg px-2 py-1 focus:outline-none cursor-pointer">
+                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button (click)="setPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all">
+              <i class="fa-solid fa-angles-left"></i>
+            </button>
+            <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all flex items-center gap-1">
+              <i class="fa-solid fa-angle-left"></i> Prev
+            </button>
+
+            <button *ngFor="let p of pageRange" 
+                    (click)="setPage(p)" 
+                    [ngClass]="p === currentPage ? 'bg-emerald-600 border-emerald-500 text-white font-extrabold shadow-md shadow-emerald-600/30' : 'bg-[#111827] border-[#1f2937] text-gray-300 hover:text-white hover:border-emerald-500/40'"
+                    class="w-8 h-8 rounded-lg border font-mono text-xs flex items-center justify-center transition-all cursor-pointer">
+              {{ p }}
+            </button>
+
+            <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all flex items-center gap-1">
+              Next <i class="fa-solid fa-angle-right"></i>
+            </button>
+            <button (click)="setPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all">
+              <i class="fa-solid fa-angles-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -130,7 +192,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             </div>
             <div>
               <h3 class="text-base font-extrabold text-white">Add Students to {{ activeAssignModalGroup.group_code }}</h3>
-              <p class="text-xs text-emerald-400 font-mono">Filter & Assign Students by Major (បន្ថែមសិស្សចូលថ្នាក់រៀនតាមជំនាញ)</p>
+              <p class="text-xs text-emerald-400 font-mono">Filter & Assign Students by Major</p>
             </div>
           </div>
           <button (click)="activeAssignModalGroup = null" class="w-8 h-8 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center">
@@ -140,11 +202,11 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
 
         <!-- Filter by Major / Program Dropdown -->
         <div class="space-y-2 bg-[#111827] p-4 rounded-xl border border-[#1f2937]">
-          <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider">1. SELECT MAJOR / PROGRAM (ជ្រើសរើសជំនាញដើម្បីចោះសិស្ស) *</label>
+          <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider">1. SELECT MAJOR / PROGRAM *</label>
           <select [(ngModel)]="selectedProgramId" (change)="loadStudentsForProgram()" class="w-full bg-[#1e293b] border border-emerald-500/40 text-xs text-white rounded-xl px-4 py-2.5 font-bold">
             <option [value]="null">-- All Majors / Programs --</option>
             <option *ngFor="let p of programs" [value]="p.program_id">
-              🎓 {{ p.program_code }} — {{ p.program_name }} ({{ p.degree }})
+              {{ p.program_code }} — {{ p.program_name }} ({{ p.degree }})
             </option>
           </select>
         </div>
@@ -153,8 +215,8 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <h4 class="font-bold text-gray-300 uppercase tracking-wider text-[11px]">2. SELECT STUDENTS TO ASSIGN ({{ availableStudents.length }} Found)</h4>
-            <button (click)="toggleSelectAll()" class="text-xs text-emerald-400 font-bold hover:underline">
-              {{ isAllSelected ? 'Deselect All' : 'Select All' }}
+            <button (click)="toggleSelectAllStudents()" class="text-xs text-emerald-400 font-bold hover:underline">
+              {{ isAllStudentSelected ? 'Deselect All' : 'Select All' }}
             </button>
           </div>
 
@@ -455,10 +517,10 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             <table class="w-full text-left text-xs">
               <thead class="bg-[#111827] text-gray-400 font-bold uppercase sticky top-0">
                 <tr>
-                  <th class="p-3">ID & ឈ្មោះសិស្ស</th>
-                  <th class="p-3">ពិន្ទុទាបបំផុត</th>
-                  <th class="p-3">ស្ថានភាពដំឡើងឆ្នាំ/ឆមាស</th>
-                  <th class="p-3 text-right">សកម្មភាព RE-EXAM</th>
+                  <th class="p-3">ID & Student Name</th>
+                  <th class="p-3">Lowest Score</th>
+                  <th class="p-3">Promotion Status</th>
+                  <th class="p-3 text-right">Re-Exam Action</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#1f2937]">
@@ -471,25 +533,25 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
                     <span *ngIf="s.lowest_score !== null" [class.text-rose-400]="s.lowest_score < 50" [class.text-emerald-400]="s.lowest_score >= 50" class="font-bold">
                       {{ s.lowest_score }}/100
                     </span>
-                    <span *ngIf="s.lowest_score === null" class="text-gray-500 italic">គ្មានពិន្ទុ</span>
+                    <span *ngIf="s.lowest_score === null" class="text-gray-500 italic">No Scores</span>
                   </td>
                   <td class="p-3">
                     <span *ngIf="s.promotion_status === 'ELIGIBLE_PASSED'" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 inline-block">
-                      ✅ ប្រលងជាប់ ➔ ដំឡើងទៅឆមាសទី {{ auditData?.group?.next_semester }}
+                      PASSED ➔ Promoted to Semester {{ auditData?.group?.next_semester }}
                     </span>
                     <span *ngIf="s.promotion_status === 'ELIGIBLE_REEXAM_CLEARED'" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-800 inline-block">
-                      🔄 ប្រលងសងជាប់ ➔ ដំឡើងទៅឆមាសទី {{ auditData?.group?.next_semester }}
+                      RE-EXAM CLEARED ➔ Promoted to Semester {{ auditData?.group?.next_semester }}
                     </span>
                     <span *ngIf="s.promotion_status === 'RETAINED_FAILED'" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800 inline-block">
-                      ❌ ប្រលងធ្លាក់ ➔ នៅឆមាសទី {{ auditData?.group?.current_semester }} ដដែល
+                      FAILED ➔ Retained in Semester {{ auditData?.group?.current_semester }}
                     </span>
                   </td>
                   <td class="p-3 text-right">
-                    <button *ngIf="!s.is_cleared" (click)="markStudentReexamPassed(s)" title="ប្តូរស្ថានភាពប្រលងសងជាប់ (Mark Passed Re-Exam)" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow transition-all flex-inline items-center gap-1">
-                      <i class="fa-solid fa-circle-check"></i> ប្តូរ ៖ ប្រលងសងជាប់ (Pass Re-exam)
+                    <button *ngIf="!s.is_cleared" (click)="markStudentReexamPassed(s)" title="Mark Passed Re-Exam" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow transition-all flex-inline items-center gap-1">
+                      <i class="fa-solid fa-circle-check"></i> Pass Re-exam
                     </button>
                     <span *ngIf="s.is_cleared" class="text-[10px] text-emerald-400 font-bold font-mono">
-                      <i class="fa-solid fa-check"></i> រួចរាល់ (Cleared)
+                      Cleared
                     </span>
                   </td>
                 </tr>
@@ -501,11 +563,11 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
         <!-- Modal Footer Actions -->
         <div class="pt-3 border-t border-[#1f2937] flex items-center justify-between">
           <button type="button" (click)="activeAuditGroupModal = null" class="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold">
-            បោះបង់ (Cancel)
+            Cancel
           </button>
 
           <button type="button" (click)="executeConfirmedPromotion()" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold shadow-lg shadow-emerald-500/20 flex items-center gap-2">
-            <i class="fa-solid fa-arrow-up-right-dots"></i> យល់ព្រមដំឡើងឆ្នាំ & ឆមាស (Promote Eligible Students)
+            <i class="fa-solid fa-arrow-up-right-dots"></i> Promote Eligible Students
           </button>
         </div>
       </div>
@@ -519,6 +581,122 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
   selectedStudentIds: Set<number> = new Set();
   selectedProgramId: number | null = null;
   activeAssignModalGroup: any = null;
+
+  selectedGroupIds: Set<number> = new Set<number>();
+
+  currentPage: number = 1;
+  pageSize: number = 10;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
+
+  toggleGroupSelectAll(event: any): void {
+    if (event.target.checked) {
+      this.paginatedGroups.forEach(g => this.selectedGroupIds.add(g.group_id));
+    } else {
+      this.paginatedGroups.forEach(g => this.selectedGroupIds.delete(g.group_id));
+    }
+  }
+
+  toggleGroupSelect(groupId: number): void {
+    if (this.selectedGroupIds.has(groupId)) {
+      this.selectedGroupIds.delete(groupId);
+    } else {
+      this.selectedGroupIds.add(groupId);
+    }
+  }
+
+  isGroupSelected(groupId: number): boolean {
+    return this.selectedGroupIds.has(groupId);
+  }
+
+  get isGroupAllSelected(): boolean {
+    if (!this.paginatedGroups || this.paginatedGroups.length === 0) return false;
+    return this.paginatedGroups.every(g => this.selectedGroupIds.has(g.group_id));
+  }
+
+  clearGroupSelection(): void {
+    this.selectedGroupIds.clear();
+  }
+
+  deleteSelectedGroups(): void {
+    if (this.selectedGroupIds.size === 0) return;
+    const count = this.selectedGroupIds.size;
+
+    this.confirmService.confirm({
+      title: 'Delete Selected Class Groups?',
+      message: `Are you sure you want to delete ${count} selected class section(s)? This action cannot be undone.`,
+      confirmText: `Yes, Delete ${count} Section(s)`,
+      onConfirm: () => {
+        const idsToDelete = Array.from(this.selectedGroupIds);
+        let successCount = 0;
+        let completedCount = 0;
+
+        idsToDelete.forEach((id) => {
+          this.api.delete(`groups/${id}`).subscribe({
+            next: () => {
+              successCount++;
+              completedCount++;
+              if (completedCount === idsToDelete.length) {
+                this.toast.success(`Successfully deleted ${successCount} selected class group(s)!`);
+                this.selectedGroupIds.clear();
+                this.loadGroups();
+              }
+            },
+            error: () => {
+              completedCount++;
+              if (completedCount === idsToDelete.length) {
+                this.toast.success(`Successfully deleted ${successCount} selected class group(s)!`);
+                this.selectedGroupIds.clear();
+                this.loadGroups();
+              }
+            }
+          });
+        });
+      }
+    });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.groups.length / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return (this.currentPage - 1) * this.pageSize;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.startIndex + this.pageSize, this.groups.length);
+  }
+
+  get paginatedGroups(): any[] {
+    return this.groups.slice(this.startIndex, this.endIndex);
+  }
+
+  get pageRange(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range: number[] = [];
+
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    if (end - start < 4) {
+      start = Math.max(1, end - 4);
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
 
   activeAuditGroupModal: any = null;
   auditData: any = null;
@@ -549,7 +727,7 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
   markStudentReexamPassed(student: any): void {
     this.api.post('groups/resolve-reexam', { student_id: student.student_id, status: 'PASSED_REEXAM' }).subscribe({
       next: () => {
-        this.toast.success(`បានធ្វើបច្ចុប្បន្នភាពសិស្ស ${student.first_name} ${student.last_name} ទៅជា "ប្រលងសងជាប់ (Passed Re-Exam)" រួចរាល់!`);
+        this.toast.success(`Updated student ${student.first_name} ${student.last_name} to Passed Re-Exam!`);
         if (this.activeAuditGroupModal) {
           this.loadPromotionAudit(this.activeAuditGroupModal.group_id);
         }
@@ -563,7 +741,7 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
     const g = this.activeAuditGroupModal;
     this.api.post(`groups/${g.group_id}/promote`, {}).subscribe({
       next: (res: any) => {
-        this.toast.success(res.message || 'ដំឡើងឆមាស/ឆ្នាំសិក្សាជោគជ័យ!');
+        this.toast.success(res.message || 'Academic Year / Semester promoted successfully!');
         this.activeAuditGroupModal = null;
         this.loadGroups();
       },
@@ -686,12 +864,12 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  get isAllSelected(): boolean {
+  get isAllStudentSelected(): boolean {
     return this.availableStudents.length > 0 && this.availableStudents.every(s => this.selectedStudentIds.has(s.student_id));
   }
 
-  toggleSelectAll(): void {
-    if (this.isAllSelected) {
+  toggleSelectAllStudents(): void {
+    if (this.isAllStudentSelected) {
       this.selectedStudentIds.clear();
     } else {
       this.availableStudents.forEach(s => this.selectedStudentIds.add(s.student_id));
@@ -704,7 +882,7 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
     const studentIds = Array.from(this.selectedStudentIds);
     this.api.post(`groups/${this.activeAssignModalGroup.group_id}/assign-students`, { student_ids: studentIds }).subscribe({
       next: () => {
-        this.toast.success(`បានបញ្ចូលសិស្សចំនួន ${studentIds.length} នាក់ចូលថ្នាក់រៀន ${this.activeAssignModalGroup.group_code} ដោយជោគជ័យ!`);
+        this.toast.success(`Assigned ${studentIds.length} students to class ${this.activeAssignModalGroup.group_code} successfully!`);
         this.activeAssignModalGroup = null;
         this.loadGroups();
       },
@@ -749,10 +927,10 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
   }
 
   promoteClass(g: any): void {
-    if (confirm(`តើអ្នកពិតជាចង់ដំឡើងឆមាស/ឆ្នាំសិក្សាសម្រាប់ថ្នាក់រៀន "${g.group_code}" នេះមែនទេ?`)) {
+    if (confirm(`Are you sure you want to promote class "${g.group_code}" to the next semester/year?`)) {
       this.api.post(`groups/${g.group_id}/promote`, {}).subscribe({
         next: (res: any) => {
-          this.toast.success(res.message || 'ដំឡើងឆមាស/ឆ្នាំសិក្សាជោគជ័យ!');
+          this.toast.success(res.message || 'Academic Year / Semester promoted successfully!');
           this.loadGroups();
         },
         error: (err) => this.toast.error(err.error?.message || 'Promote failed')
@@ -763,12 +941,12 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
   promoteAllClasses(): void {
     this.confirmService.confirm({
       title: 'Bulk Promote All Classes?',
-      message: 'តើអ្នកពិតជាចង់ដំឡើងឆមាស/ឆ្នាំសិក្សាស្វ័យប្រវត្តិ (Bulk Promote) សម្រាប់ថ្នាក់រៀនទាំងអស់មែនទេ?',
+      message: 'Are you sure you want to bulk promote all active class groups to the next semester/year?',
       confirmText: 'Yes, Promote All',
       onConfirm: () => {
         this.api.post('groups/promote-all', {}).subscribe({
           next: (res: any) => {
-            this.toast.success(res.message || 'ដំឡើងឆមាស/ឆ្នាំសិក្សាស្វ័យប្រវត្តិសម្រាប់ថ្នាក់ទាំងអស់រួចរាល់!');
+            this.toast.success(res.message || 'All class groups promoted successfully!');
             this.loadGroups();
           },
           error: (err) => this.toast.error(err.error?.message || 'Bulk promote failed')
@@ -780,12 +958,12 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
   deleteClass(g: any): void {
     this.confirmService.confirm({
       title: 'Delete Class Group?',
-      message: `តើអ្នកពិតជាចង់លុបថ្នាក់រៀន "${g.group_code} — ${g.group_name}" នេះមែនទេ?`,
+      message: `Are you sure you want to delete class group "${g.group_code} — ${g.group_name}"?`,
       confirmText: 'Yes, Delete Class',
       onConfirm: () => {
         this.api.delete(`groups/${g.group_id}`).subscribe({
           next: () => {
-            this.toast.success('ថ្នាក់រៀនត្រូវបានលុបដោយជោគជ័យ!');
+            this.toast.success('Class group deleted successfully!');
             this.loadGroups();
           },
           error: (err) => this.toast.error(err.error?.message || 'Delete failed')
@@ -835,7 +1013,7 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
     if (this.isEdit && this.editingGroupId) {
       this.api.put(`groups/${this.editingGroupId}`, this.formGroup).subscribe({
         next: () => {
-          this.toast.success('ថ្នាក់រៀនត្រូវបានកែប្រែដោយជោគជ័យ (Class Group updated)!');
+          this.toast.success('Class Group updated successfully!');
           this.showModal = false;
           this.loadGroups();
         },
@@ -844,7 +1022,7 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
     } else {
       this.api.post('groups', this.formGroup).subscribe({
         next: () => {
-          this.toast.success('ថ្នាក់រៀនថ្មីត្រូវបានបង្កើតដោយជោគជ័យ (Class Group created)!');
+          this.toast.success('Class Group created successfully!');
           this.showModal = false;
           this.loadGroups();
         },

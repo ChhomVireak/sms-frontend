@@ -47,14 +47,23 @@ import { Student } from '../../core/models/student.model';
             </select>
           </div>
 
-          <!-- CSV Export Button -->
-          <button (click)="exportCSV()" 
-                  [disabled]="isExporting"
-                  title="Export student records to aligned Excel-compatible CSV file"
-                  class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-95">
-            <i [class]="isExporting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-excel text-sm'"></i>
-            <span>{{ isExporting ? 'Exporting...' : 'Export CSV' }}</span>
-          </button>
+          <!-- CSV Export & Import Buttons -->
+          <div class="flex items-center gap-2">
+            <button (click)="openImportModal()" 
+                    title="Import students from CSV or Excel file"
+                    class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer">
+              <i class="fa-solid fa-file-import text-sm"></i>
+              <span>Import CSV</span>
+            </button>
+
+            <button (click)="exportCSV()" 
+                    [disabled]="isExporting"
+                    title="Export student records to aligned Excel-compatible CSV file"
+                    class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer">
+              <i [class]="isExporting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-excel text-sm'"></i>
+              <span>{{ isExporting ? 'Exporting...' : 'Export CSV' }}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -88,41 +97,41 @@ import { Student } from '../../core/models/student.model';
           </h3>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto overflow-y-auto max-h-[620px] rounded-xl border border-[#1f2937]/50">
           <table class="w-full text-left border-collapse text-xs">
-            <thead>
+            <thead class="sticky top-0 z-10 bg-[#111827] shadow-md">
               <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
-                <th class="pb-3 w-10">
+                <th class="py-3 px-3 w-10">
                   <input type="checkbox" [checked]="isAllSelected" (change)="toggleSelectAll()" class="rounded bg-gray-800 border-gray-700 text-emerald-500 w-4 h-4 cursor-pointer">
                 </th>
-                <th class="pb-3">STUDENT ID</th>
-                <th class="pb-3">FULL NAME</th>
-                <th class="pb-3">CLASS GROUP</th>
-                <th class="pb-3">GENDER</th>
-                <th class="pb-3">DATE OF BIRTH</th>
-                <th class="pb-3">ENROLLED</th>
-                <th class="pb-3 text-right">ACTIONS</th>
+                <th class="py-3 px-3">STUDENT ID</th>
+                <th class="py-3 px-3">FULL NAME</th>
+                <th class="py-3 px-3">CLASS GROUP</th>
+                <th class="py-3 px-3">GENDER</th>
+                <th class="py-3 px-3">DATE OF BIRTH</th>
+                <th class="py-3 px-3">ENROLLED</th>
+                <th class="py-3 px-3 text-right">ACTIONS</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]/50">
-              <tr *ngFor="let s of filteredStudents" [class.bg-emerald-950]="selectedStudentIds.has(s.student_id)" class="hover:bg-gray-800/40 transition-colors">
-                <td class="py-3.5">
+              <tr *ngFor="let s of paginatedStudents" [class.bg-emerald-950]="selectedStudentIds.has(s.student_id)" class="hover:bg-gray-800/40 transition-colors">
+                <td class="py-3.5 px-3">
                   <input type="checkbox" [checked]="selectedStudentIds.has(s.student_id)" (change)="toggleSelectStudent(s.student_id)" class="rounded bg-gray-800 border-gray-700 text-emerald-500 w-4 h-4 cursor-pointer">
                 </td>
-                <td class="py-3.5 font-mono text-gray-300 font-semibold">{{ s.custom_student_id }}</td>
-                <td class="py-3.5 flex items-center gap-3">
+                <td class="py-3.5 px-3 font-mono text-gray-300 font-semibold">{{ s.custom_student_id }}</td>
+                <td class="py-3.5 px-3 flex items-center gap-3">
                   <img *ngIf="s.image" [src]="getPhotoUrl(s.image)" alt="Student Photo" class="w-8 h-8 rounded-full object-cover border border-emerald-500/40">
                   <div *ngIf="!s.image" class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
                     {{ s.first_name[0] }}{{ s.last_name[0] }}
                   </div>
                   <span class="font-bold text-white">{{ s.first_name }} {{ s.last_name }}</span>
                 </td>
-                <td class="py-3.5 text-blue-400 font-bold font-mono">{{ s.group_code || s.group_name || 'Form 3A' }}</td>
-                <td class="py-3.5 capitalize text-gray-300">{{ s.gender?.toLowerCase() }}</td>
-                <td class="py-3.5 text-gray-300 font-mono">{{ s.dob | date:'mediumDate' }}</td>
-                <td class="py-3.5 text-gray-400 font-mono">{{ s.enrollment_date | date:'MMM yyyy' }}</td>
+                <td class="py-3.5 px-3 text-blue-400 font-bold font-mono">{{ s.group_code || s.group_name || 'Form 3A' }}</td>
+                <td class="py-3.5 px-3 capitalize text-gray-300">{{ s.gender?.toLowerCase() }}</td>
+                <td class="py-3.5 px-3 text-gray-300 font-mono">{{ s.dob | date:'mediumDate' }}</td>
+                <td class="py-3.5 px-3 text-gray-400 font-mono">{{ s.enrollment_date | date:'MMM yyyy' }}</td>
                 
-                <td class="py-3.5 text-right space-x-1.5">
+                <td class="py-3.5 px-3 text-right space-x-1.5">
                   <button (click)="openIdCardModal(s)" title="Print / View Student ID Card" class="text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 p-1.5 rounded-lg border border-emerald-500/20 transition-colors"><i class="fa-solid fa-address-card"></i></button>
                   <button (click)="viewStudent(s)" title="View Student Detailed Record & Exam Results" class="text-gray-400 hover:text-emerald-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors"><i class="fa-solid fa-eye"></i></button>
                   <button (click)="editStudent(s)" title="Edit Student Record" class="text-gray-400 hover:text-blue-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors"><i class="fa-solid fa-pen"></i></button>
@@ -137,10 +146,46 @@ import { Student } from '../../core/models/student.model';
           </table>
         </div>
 
-        <div class="mt-6 flex items-center justify-between text-xs text-gray-400 pt-4 border-t border-[#1f2937]">
-          <span>Showing {{ filteredStudents.length }} of {{ students.length }}</span>
-          <div class="flex items-center gap-1">
-            <button class="px-2.5 py-1 rounded-lg bg-emerald-500 text-white font-bold">1</button>
+        <!-- Interactive Pagination Footer Bar -->
+        <div class="mt-4 pt-4 border-t border-[#1f2937] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+          <div class="flex items-center gap-3">
+            <span>
+              Showing <strong class="text-white font-mono">{{ filteredStudents.length > 0 ? startIndex + 1 : 0 }}</strong> to <strong class="text-white font-mono">{{ endIndex }}</strong> of <strong class="text-emerald-400 font-mono">{{ filteredStudents.length }}</strong> students
+            </span>
+            <div class="flex items-center gap-1.5 ml-2 border-l border-[#1f2937] pl-3">
+              <span>Per page:</span>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#111827] border border-[#1f2937] text-emerald-400 font-bold rounded-lg px-2 py-1 focus:outline-none cursor-pointer">
+                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <!-- First Page -->
+            <button (click)="setPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all">
+              <i class="fa-solid fa-angles-left"></i>
+            </button>
+            <!-- Prev Page -->
+            <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all flex items-center gap-1">
+              <i class="fa-solid fa-angle-left"></i> Prev
+            </button>
+
+            <!-- Page Number Buttons -->
+            <button *ngFor="let p of pageRange" 
+                    (click)="setPage(p)" 
+                    [ngClass]="p === currentPage ? 'bg-emerald-600 border-emerald-500 text-white font-extrabold shadow-md shadow-emerald-600/30' : 'bg-[#111827] border-[#1f2937] text-gray-300 hover:text-white hover:border-emerald-500/40'"
+                    class="w-8 h-8 rounded-lg border font-mono text-xs flex items-center justify-center transition-all cursor-pointer">
+              {{ p }}
+            </button>
+
+            <!-- Next Page -->
+            <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all flex items-center gap-1">
+              Next <i class="fa-solid fa-angle-right"></i>
+            </button>
+            <!-- Last Page -->
+            <button (click)="setPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] hover:border-emerald-500/50 disabled:opacity-40 disabled:hover:border-[#1f2937] text-white font-bold transition-all">
+              <i class="fa-solid fa-angles-right"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -221,7 +266,7 @@ import { Student } from '../../core/models/student.model';
 
               <div class="text-right">
                 <span class="bg-amber-950/80 text-amber-400 border border-amber-800/80 px-3 py-1 rounded-full font-bold text-xs font-mono shadow-md">
-                  🎓 Year {{ activeStudentModal.academic_year_level || 1 }} · Semester {{ activeStudentModal.current_semester || 1 }}
+                  Year {{ activeStudentModal.academic_year_level || 1 }} · Semester {{ activeStudentModal.current_semester || 1 }}
                 </span>
               </div>
             </div>
@@ -234,6 +279,12 @@ import { Student } from '../../core/models/student.model';
             <div><span class="text-gray-400">Date of Birth:</span> <span class="font-bold ml-1 text-white font-mono">{{ activeStudentModal.dob | date:'mediumDate' }}</span></div>
             <div><span class="text-gray-400">Enrollment Date:</span> <span class="font-bold ml-1 text-white font-mono">{{ activeStudentModal.enrollment_date | date:'mediumDate' }}</span></div>
             <div><span class="text-gray-400">Phone:</span> <span class="font-bold ml-1 text-white font-mono">{{ activeStudentModal.phone || '+855 12 111 001' }}</span></div>
+            <div class="col-span-2 pt-2 border-t border-[#1f2937]/60 flex items-center justify-between">
+              <span class="text-gray-400 font-semibold"><i class="fa-solid fa-graduation-cap text-emerald-400 mr-1"></i> 1-Year Cumulative GPA (2 Semesters):</span>
+              <span [ngClass]="cumulativeYearlyGPA.isComplete ? 'text-emerald-400 bg-emerald-950/80 border-emerald-800' : 'text-amber-400 bg-amber-950/80 border-amber-800'" class="font-bold font-mono px-2.5 py-0.5 rounded border text-xs">
+                {{ cumulativeYearlyGPA.isComplete ? (cumulativeYearlyGPA.gpa + ' / 4.00 (2 Semesters Completed)') : 'Pending (Requires 2 Semesters / 1 Year)' }}
+              </span>
+            </div>
           </div>
 
           <!-- Tuition Fee Status & Payment Plan Box -->
@@ -268,7 +319,7 @@ import { Student } from '../../core/models/student.model';
             <div *ngIf="filteredSemesterFees && filteredSemesterFees.length > 0" class="mt-2 space-y-2">
               <span class="text-gray-400 font-bold text-[11px] block">
                 <i class="fa-solid fa-layer-group text-purple-400 mr-1"></i> 
-                {{ isStudentPaidYearly ? 'Tuition Fee Breakdown (ស្ថានភាពបង់ប្រាក់តាមឆ្នាំ):' : 'Semester Fee Breakdown (ស្ថានភាពបង់ប្រាក់តាមឆមាស):' }}
+                {{ isStudentPaidYearly ? 'Tuition Fee Breakdown (Yearly):' : 'Semester Fee Breakdown (Semester):' }}
               </span>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div *ngFor="let sf of filteredSemesterFees" 
@@ -325,7 +376,7 @@ import { Student } from '../../core/models/student.model';
                       <td class="py-1.5 px-2 text-gray-300">{{ (p.payment_date || p.created_at) | date:'mediumDate' }}</td>
                       <td class="py-1.5 px-2">
                         <span [class.text-emerald-400]="(p.status || '').toUpperCase() === 'PAID'" [class.text-amber-400]="(p.status || '').toUpperCase() !== 'PAID'" class="font-bold">
-                          ✓ {{ p.status || 'Paid' }}
+                           {{ p.status || 'Paid' }}
                         </span>
                       </td>
                     </tr>
@@ -374,6 +425,48 @@ import { Student } from '../../core/models/student.model';
             </span>
           </div>
 
+          <!-- 1-Year Cumulative GPA Banner Card (Requires Completion of 2 Semesters = 1 Year) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-[#111827] p-4 rounded-xl border border-[#1f2937]">
+            <!-- Card 1: 1-Year Cumulative GPA -->
+            <div class="bg-[#1e293b]/70 border border-[#1f2937] p-3.5 rounded-xl space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-graduation-cap text-emerald-400"></i> 1-YEAR CUMULATIVE GPA
+                </span>
+                <span [ngClass]="cumulativeYearlyGPA.isComplete ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-amber-950 text-amber-300 border-amber-800'"
+                      class="px-2 py-0.5 rounded text-[10px] font-bold border font-mono">
+                  {{ cumulativeYearlyGPA.isComplete ? '2 SEMESTERS COMPLETED' : 'PENDING 2 SEMESTERS' }}
+                </span>
+              </div>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span class="text-2xl font-black font-mono" [ngClass]="cumulativeYearlyGPA.isComplete ? 'text-emerald-400' : 'text-amber-400'">
+                  {{ cumulativeYearlyGPA.isComplete ? cumulativeYearlyGPA.gpa : 'Pending' }}
+                </span>
+                <span *ngIf="cumulativeYearlyGPA.isComplete" class="text-xs text-gray-400 font-mono">/ 4.00</span>
+              </div>
+              <p class="text-[11px] text-gray-400 leading-tight">
+                {{ cumulativeYearlyGPA.statusText }}
+              </p>
+            </div>
+
+            <!-- Card 2: Academic Progress (Semesters Completed) -->
+            <div class="bg-[#1e293b]/70 border border-[#1f2937] p-3.5 rounded-xl space-y-1">
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                <i class="fa-solid fa-layer-group text-purple-400 mr-1.5"></i> SEMESTER PROGRESSION (2 SEM = 1 YEAR)
+              </span>
+              <div class="flex items-center gap-3 mt-2">
+                <div class="flex-1 bg-gray-800 rounded-full h-2.5 overflow-hidden border border-gray-700">
+                  <div class="bg-gradient-to-r from-purple-500 to-emerald-400 h-full transition-all duration-500"
+                       [style.width.%]="(cumulativeYearlyGPA.semCount / 2) * 100"></div>
+                </div>
+                <span class="text-xs font-mono font-bold text-emerald-400">{{ cumulativeYearlyGPA.semCount }}/2 Semesters</span>
+              </div>
+              <p class="text-[11px] text-gray-400 mt-1">
+                {{ cumulativeYearlyGPA.semCount >= 2 ? 'Completed 2 Semesters (1 Full Academic Year).' : 'Student has completed ' + cumulativeYearlyGPA.semCount + ' of 2 semesters required for 1-Year Cumulative GPA.' }}
+              </p>
+            </div>
+          </div>
+
           <!-- Empty State if no exam results recorded yet -->
           <div *ngIf="semesterExamResults.length === 0" 
                class="bg-[#111827] border border-[#1f2937] rounded-2xl p-8 text-center text-gray-400 space-y-2">
@@ -395,6 +488,10 @@ import { Student } from '../../core/models/student.model';
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-[11px] font-mono font-bold">
                   {{ sem.subjects.length }} Exam Subjects
                 </span>
+                <span [ngClass]="sem.semester_gpa !== 'N/A' ? 'bg-cyan-950 border-cyan-800 text-cyan-300' : 'bg-gray-800 border-gray-700 text-gray-400'"
+                      class="px-2.5 py-0.5 rounded-full border text-[11px] font-mono font-bold">
+                  Semester GPA: {{ sem.semester_gpa !== 'N/A' ? (sem.semester_gpa + ' / 4.00') : 'N/A' }}
+                </span>
               </div>
 
               <!-- Toggle Icon -->
@@ -404,15 +501,17 @@ import { Student } from '../../core/models/student.model';
               </div>
             </button>
 
-            <!-- Collapsible Body Content (Table of Exam Subjects) -->
+            <!-- Collapsible Body Content (Table of Exam Subjects Matrix) -->
             <div *ngIf="sem.isOpen" class="overflow-x-auto bg-[#111827] border border-[#1f2937] rounded-xl animate-fadeIn">
               <table class="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr class="bg-[#0f172a] border-b border-[#1f2937] font-bold text-purple-300">
                     <th class="py-2.5 px-4">Subject</th>
-                    <th class="py-2.5 px-3 w-24 text-center">Mid (/50)</th>
-                    <th class="py-2.5 px-3 w-24 text-center">Final (/50)</th>
-                    <th class="py-2.5 px-4 w-28 text-center text-amber-300">Total (/100)</th>
+                    <th class="py-2.5 px-3 w-20 text-center">Mid (/50)</th>
+                    <th class="py-2.5 px-3 w-20 text-center">Final (/50)</th>
+                    <th class="py-2.5 px-4 w-24 text-center text-amber-300">Total (/100)</th>
+                    <th class="py-2.5 px-3 w-20 text-center text-emerald-300">Grade</th>
+                    <th class="py-2.5 px-3 w-24 text-center text-cyan-300">GPA Point</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-[#1f2937]">
@@ -435,6 +534,26 @@ import { Student } from '../../core/models/student.model';
                     <!-- Total score -->
                     <td class="py-2.5 px-4 text-center font-extrabold text-amber-400">
                       {{ res.total_score !== null ? (res.total_score + '/100') : '-' }}
+                    </td>
+
+                    <!-- Grade -->
+                    <td class="py-2.5 px-3 text-center font-bold">
+                      <span *ngIf="res.letter_grade && res.letter_grade !== '-'"
+                            [ngClass]="{
+                              'bg-emerald-950 text-emerald-400 border-emerald-800': res.letter_grade === 'A' || res.letter_grade === 'B+',
+                              'bg-amber-950 text-amber-400 border-amber-800': res.letter_grade === 'B' || res.letter_grade === 'C+',
+                              'bg-cyan-950 text-cyan-400 border-cyan-800': res.letter_grade === 'C',
+                              'bg-rose-950 text-rose-400 border-rose-800': res.letter_grade === 'F'
+                            }"
+                            class="px-2 py-0.5 rounded border text-[11px] font-mono">
+                        {{ res.letter_grade }}
+                      </span>
+                      <span *ngIf="!res.letter_grade || res.letter_grade === '-'" class="text-gray-500">-</span>
+                    </td>
+
+                    <!-- GPA Point -->
+                    <td class="py-2.5 px-3 text-center font-bold text-cyan-400 font-mono">
+                      {{ res.gpa_point !== null && res.gpa_point !== undefined ? (res.gpa_point | number:'1.2-2') : '-' }}
                     </td>
                   </tr>
                 </tbody>
@@ -468,7 +587,7 @@ import { Student } from '../../core/models/student.model';
                   <td class="py-2 px-3 text-purple-400 font-bold">{{ h.group_code || 'SV34' }}</td>
                   <td class="py-2 px-3">
                     <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">
-                      ✓ {{ h.status || 'COMPLETED' }}
+                      {{ h.status || 'COMPLETED' }}
                     </span>
                   </td>
                   <td class="py-2 px-3 text-gray-400">{{ h.promotion_date | date:'mediumDate' }}</td>
@@ -476,7 +595,7 @@ import { Student } from '../../core/models/student.model';
 
                 <tr *ngIf="studentHistoryData.length === 0">
                   <td colspan="5" class="py-6 text-center text-gray-500 italic">
-                    និស្សិតទើបចាប់ផ្តើមឆមាសដំបូង (Enrolled in active 1st semester)
+                    Enrolled in active 1st semester
                   </td>
                 </tr>
               </tbody>
@@ -487,7 +606,7 @@ import { Student } from '../../core/models/student.model';
         <!-- Modal Footer Actions -->
         <div class="flex items-center justify-between border-t border-[#1f2937] pt-4">
           <button (click)="openIdCardModal(activeStudentModal)" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-600/20">
-            <i class="fa-solid fa-id-card"></i> 🪪 View Student ID Card
+            <i class="fa-solid fa-id-card"></i> View Student ID Card
           </button>
           <div class="flex items-center gap-2">
             <button (click)="closeModal()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs">Close</button>
@@ -584,9 +703,130 @@ import { Student } from '../../core/models/student.model';
             Close
           </button>
           <button (click)="printIdCard()" class="w-1/2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
-            <i class="fa-solid fa-print"></i> 🖨️ Print ID Card
+            <i class="fa-solid fa-print"></i> Print ID Card
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- CSV Import Modal -->
+    <div *ngIf="showImportModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-[#1e293b] border border-[#1f2937] w-full max-w-2xl rounded-2xl p-6 space-y-5 text-xs text-white max-h-[90vh] overflow-y-auto shadow-2xl">
+        
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-[#1f2937] pb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/40 font-bold flex items-center justify-center text-lg shadow-lg">
+              <i class="fa-solid fa-file-import"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-extrabold text-white">Import Students from CSV</h3>
+              <p class="text-xs text-gray-400">Batch upload student profiles with auto-created user accounts</p>
+            </div>
+          </div>
+          <button (click)="showImportModal = false" class="w-8 h-8 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Target Program & Class Group Assignment Bar -->
+        <div class="bg-[#111827] border border-[#1f2937] rounded-xl p-4 space-y-3">
+          <p class="font-bold text-blue-400 text-xs flex items-center gap-1.5 uppercase tracking-wider">
+            <i class="fa-solid fa-graduation-cap"></i> Target Major & Class Group Selection
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-gray-400 mb-1">SELECT MAJOR / PROGRAM *</label>
+              <select [(ngModel)]="importSelectedProgramId" (change)="onImportProgramChange()" class="w-full bg-[#1e293b] border border-[#374151] rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-blue-500 cursor-pointer">
+                <option [ngValue]="null" class="bg-[#111827] text-gray-400">-- Select Major / Program --</option>
+                <option *ngFor="let p of programs" [ngValue]="p.program_id" class="bg-[#111827] text-white">
+                  {{ p.program_code }} — {{ p.program_name }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-gray-400 mb-1">SELECT CLASS GROUP *</label>
+              <select [(ngModel)]="importSelectedGroupId" (change)="onImportGroupChange()" class="w-full bg-[#1e293b] border border-[#374151] rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-blue-500 cursor-pointer">
+                <option [ngValue]="null" class="bg-[#111827] text-gray-400">-- Select Class Group --</option>
+                <option *ngFor="let g of filteredImportGroups" [ngValue]="g.group_id" class="bg-[#111827] text-white">
+                  {{ g.group_code }} — {{ g.group_name }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Download Sample Template Banner -->
+        <div class="bg-[#111827] border border-[#1f2937] rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p class="font-bold text-emerald-400 text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-info"></i> CSV / Excel Template Format
+            </p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Required fields: First Name, Last Name. Optional: Gender, DOB, Phone, Class Group, Major.</p>
+          </div>
+          <button (click)="downloadSampleCSV()" class="px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-300 font-bold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer">
+            <i class="fa-solid fa-download"></i> Sample CSV
+          </button>
+        </div>
+
+        <!-- File Upload Dropzone -->
+        <div>
+          <input #csvFileInput type="file" (change)="onCSVFileSelected($event)" accept=".xlsx, .xls, .csv, .txt" class="hidden">
+          <div (click)="csvFileInput.click()" class="border-2 border-dashed border-[#1f2937] hover:border-blue-500/60 rounded-xl p-6 text-center cursor-pointer transition-all bg-[#111827]/50 relative overflow-hidden group">
+            <div class="w-12 h-12 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mx-auto mb-3 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-file-excel text-emerald-400"></i>
+            </div>
+            <p class="text-xs font-bold text-white">{{ importedFileName ? importedFileName : 'Click to Upload Excel (.xlsx / .xls) or CSV File' }}</p>
+            <p class="text-[10px] text-gray-400 mt-1">Supports Microsoft Excel (.xlsx, .xls) & Standard CSV (.csv)</p>
+          </div>
+        </div>
+
+        <!-- Preview Table -->
+        <div *ngIf="parsedImportStudents.length > 0" class="space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-gray-300 uppercase tracking-wider">Preview Students ({{ parsedImportStudents.length }} Found)</span>
+            <span class="text-emerald-400 font-mono font-bold">{{ parsedImportStudents.length }} valid records ready</span>
+          </div>
+
+          <div class="overflow-x-auto max-h-48 rounded-xl border border-[#1f2937] bg-[#111827]">
+            <table class="w-full text-left text-[11px]">
+              <thead class="bg-[#1e293b] text-gray-400 font-bold border-b border-[#1f2937]">
+                <tr>
+                  <th class="p-2.5">FIRST NAME</th>
+                  <th class="p-2.5">LAST NAME</th>
+                  <th class="p-2.5">GENDER</th>
+                  <th class="p-2.5">DOB</th>
+                  <th class="p-2.5">CLASS GROUP</th>
+                  <th class="p-2.5">PHONE</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#1f2937]/50 text-white">
+                <tr *ngFor="let s of parsedImportStudents.slice(0, 10)">
+                  <td class="p-2.5 font-bold">{{ s.first_name }}</td>
+                  <td class="p-2.5 font-bold">{{ s.last_name }}</td>
+                  <td class="p-2.5 font-mono text-emerald-400">{{ s.gender || 'MALE' }}</td>
+                  <td class="p-2.5 font-mono text-gray-400">{{ s.dob || '2005-01-01' }}</td>
+                  <td class="p-2.5 font-mono" [class.text-emerald-400]="getSelectedGroupCode(s)" [class.text-amber-400]="!getSelectedGroupCode(s)">
+                    {{ getSelectedGroupCode(s) || 'Unassigned' }}
+                  </td>
+                  <td class="p-2.5 font-mono text-gray-300">{{ s.phone || 'N/A' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p *ngIf="parsedImportStudents.length > 10" class="text-[10px] text-gray-400 italic text-center">... and {{ parsedImportStudents.length - 10 }} more students</p>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="flex items-center justify-end gap-3 border-t border-[#1f2937] pt-4">
+          <button (click)="showImportModal = false" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold cursor-pointer">Cancel</button>
+          <button (click)="submitImport()" [disabled]="isImporting || (!selectedExcelFile && parsedImportStudents.length === 0)" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-bold shadow-lg shadow-blue-600/20 flex items-center gap-2 cursor-pointer">
+            <i [class]="isImporting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-upload'"></i>
+            <span>{{ isImporting ? 'Importing...' : (selectedExcelFile ? 'Confirm & Import Excel File' : 'Confirm & Import (' + parsedImportStudents.length + ' Students)') }}</span>
+          </button>
+        </div>
+
       </div>
     </div>
   `
@@ -595,6 +835,10 @@ export class StudentListComponent implements OnInit {
   students: Student[] = [];
   filteredStudents: Student[] = [];
   groups: any[] = [];
+  programs: any[] = [];
+  importSelectedProgramId: number | null = null;
+  importSelectedGroupId: number | null = null;
+  filteredImportGroups: any[] = [];
 
   searchQuery = '';
   selectedGroup = '';
@@ -602,10 +846,66 @@ export class StudentListComponent implements OnInit {
   selectedStudentIds = new Set<number>();
   isAllSelected = false;
 
+  showImportModal = false;
+  isImporting = false;
+  importedFileName = '';
+  parsedImportStudents: any[] = [];
+  selectedExcelFile: File | null = null;
+
+  // Interactive Pagination Controls State
+  currentPage: number = 1;
+  pageSize: number = 10;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredStudents.length / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return (this.currentPage - 1) * this.pageSize;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.startIndex + this.pageSize, this.filteredStudents.length);
+  }
+
+  get paginatedStudents(): Student[] {
+    return this.filteredStudents.slice(this.startIndex, this.endIndex);
+  }
+
+  get pageRange(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range: number[] = [];
+
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    if (end - start < 4) {
+      start = Math.max(1, end - 4);
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updateSelectAllState();
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+    this.updateSelectAllState();
+  }
+
   isExporting = false;
   activeStudentModal: any = null;
   activeIdCardModal: any = null;
-  activeTab: string = 'examResult'; // Default to Exam Result tab as requested
+  activeTab: string = 'student'; // Default to Student tab as requested
 
   midExamDate: string | null = null;
   finalExamDate: string | null = null;
@@ -615,6 +915,49 @@ export class StudentListComponent implements OnInit {
 
   semesterExamResults: any[] = [];
 
+  get cumulativeYearlyGPA(): { gpa: string; isComplete: boolean; semCount: number; statusText: string } {
+    if (!this.semesterExamResults || this.semesterExamResults.length === 0) {
+      return {
+        gpa: 'N/A',
+        isComplete: false,
+        semCount: 0,
+        statusText: 'No exam records available yet'
+      };
+    }
+
+    const completedSemesters = this.semesterExamResults.filter(s => s.is_completed);
+
+    // Rule: Full Year Cumulative GPA requires completion of 2 semesters (1 academic year)
+    if (completedSemesters.length >= 2) {
+      let totalGpaPoints = 0;
+      let totalSubjects = 0;
+
+      completedSemesters.forEach(sem => {
+        sem.subjects.forEach((sub: any) => {
+          if (sub.gpa_point !== null && sub.gpa_point !== undefined) {
+            totalGpaPoints += Number(sub.gpa_point);
+            totalSubjects++;
+          }
+        });
+      });
+
+      const yearlyGpa = totalSubjects > 0 ? (totalGpaPoints / totalSubjects).toFixed(2) : 'N/A';
+      return {
+        gpa: yearlyGpa,
+        isComplete: true,
+        semCount: completedSemesters.length,
+        statusText: 'Academic Year Complete (Semesters 1 & 2 Completed)'
+      };
+    } else {
+      return {
+        gpa: 'Pending',
+        isComplete: false,
+        semCount: completedSemesters.length,
+        statusText: 'Requires Completion of Both Semesters 1 & 2 (1 Academic Year) to calculate Cumulative GPA'
+      };
+    }
+  }
+
   constructor(
     private api: ApiService,
     private toast: ToastService,
@@ -623,6 +966,7 @@ export class StudentListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.loadPrograms();
     this.loadGroups();
     this.loadStudents();
   }
@@ -640,18 +984,62 @@ export class StudentListComponent implements OnInit {
     return `http://localhost:5000/${cleanPath}`;
   }
 
-  loadGroups(): void {
-    this.api.get<any>('groups').subscribe({
+  loadPrograms(): void {
+    this.api.get<any>('programs').subscribe({
       next: (res) => {
         if (res.success && res.data) {
-          this.groups = res.data.groups || res.data || [];
+          this.programs = res.data.programs || res.data || [];
         }
       }
     });
   }
 
+  loadGroups(): void {
+    this.api.get<any>('groups').subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.groups = res.data.groups || res.data || [];
+          this.filteredImportGroups = [...this.groups];
+        }
+      }
+    });
+  }
+
+  onImportProgramChange(): void {
+    if (!this.importSelectedProgramId) {
+      this.filteredImportGroups = [...this.groups];
+      this.importSelectedGroupId = null;
+      return;
+    }
+
+    this.filteredImportGroups = this.groups.filter(g => Number(g.program_id) === Number(this.importSelectedProgramId));
+    if (this.filteredImportGroups.length > 0) {
+      this.importSelectedGroupId = this.filteredImportGroups[0].group_id;
+    } else {
+      this.importSelectedGroupId = null;
+    }
+  }
+
+  onImportGroupChange(): void {
+    if (this.importSelectedGroupId) {
+      const g = this.groups.find(x => Number(x.group_id) === Number(this.importSelectedGroupId));
+      if (g && g.program_id) {
+        this.importSelectedProgramId = g.program_id;
+      }
+    }
+  }
+
+  getSelectedGroupCode(s: any): string {
+    if (s.group_code || s.class_group) return s.group_code || s.class_group;
+    if (this.importSelectedGroupId) {
+      const g = this.groups.find(x => Number(x.group_id) === Number(this.importSelectedGroupId));
+      return g ? (g.group_code || g.group_name) : '';
+    }
+    return '';
+  }
+
   loadStudents(): void {
-    this.api.get<any>('students').subscribe({
+    this.api.get<any>('students?limit=1000').subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.students = res.data.students || res.data || [];
@@ -662,19 +1050,29 @@ export class StudentListComponent implements OnInit {
   }
 
   filterStudents(): void {
+    const sel = this.selectedGroup ? this.selectedGroup.toString().trim().toLowerCase() : '';
+    const q = this.searchQuery ? this.searchQuery.toString().trim().toLowerCase() : '';
+
     this.filteredStudents = this.students.filter(s => {
       const full = `${s.first_name} ${s.last_name}`.toLowerCase();
-      const matchSearch = !this.searchQuery ||
-        full.includes(this.searchQuery.toLowerCase()) ||
-        (s.custom_student_id && s.custom_student_id.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      const customId = (s.custom_student_id || '').toLowerCase();
+      const matchSearch = !q || full.includes(q) || customId.includes(q);
 
-      const groupMatch = !this.selectedGroup ||
-        s.group_code === this.selectedGroup ||
-        s.group_name === this.selectedGroup;
+      const sGroupCode = (s.group_code || '').toString().trim().toLowerCase();
+      const sGroupName = (s.group_name || '').toString().trim().toLowerCase();
+      const sGroupId = s.group_id ? s.group_id.toString() : '';
+
+      const groupMatch = !sel ||
+        sGroupCode === sel ||
+        sGroupName === sel ||
+        sGroupId === sel ||
+        (sGroupCode && sGroupCode.includes(sel)) ||
+        (customId && customId.startsWith(sel));
 
       return matchSearch && groupMatch;
     });
 
+    this.currentPage = 1;
     this.updateSelectAllState();
   }
 
@@ -762,7 +1160,7 @@ export class StudentListComponent implements OnInit {
       'Enrollment Date',
       'Status'
     ];
-    
+
     let tableHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head>
 <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
@@ -914,7 +1312,7 @@ export class StudentListComponent implements OnInit {
 
   viewStudent(s: any): void {
     this.activeStudentModal = s;
-    this.activeTab = 'examResult';
+    this.activeTab = 'student';
     this.studentHistoryData = [];
     this.studentPaymentsData = [];
     this.studentSemesterFees = [];
@@ -986,16 +1384,49 @@ export class StudentListComponent implements OnInit {
         });
 
         this.semesterExamResults = Array.from(semMap.values()).map(sem => {
+          let semTotalGpa = 0;
+          let semCount = 0;
+
           const subjects = Array.from(sem.subjectsMap.values()).map((sub: any) => {
-            const m = sub.mid_score !== null ? Number(sub.mid_score) : 0;
-            const f = sub.final_score !== null ? Number(sub.final_score) : 0;
-            sub.total_score = (sub.mid_score !== null || sub.final_score !== null) ? (m + f) : null;
+            const m = sub.mid_score !== null ? Number(sub.mid_score) : null;
+            const f = sub.final_score !== null ? Number(sub.final_score) : null;
+            
+            let total: number | null = null;
+            if (m !== null && f !== null) {
+              total = m + f;
+            } else if (m !== null) {
+              total = m <= 50 ? m * 2 : m;
+            } else if (f !== null) {
+              total = f <= 50 ? f * 2 : f;
+            }
+
+            sub.total_score = total;
+
+            if (total !== null) {
+              if (total >= 90) { sub.letter_grade = 'A'; sub.gpa_point = 4.0; }
+              else if (total >= 80) { sub.letter_grade = 'B+'; sub.gpa_point = 3.5; }
+              else if (total >= 70) { sub.letter_grade = 'B'; sub.gpa_point = 3.0; }
+              else if (total >= 60) { sub.letter_grade = 'C+'; sub.gpa_point = 2.5; }
+              else if (total >= 50) { sub.letter_grade = 'C'; sub.gpa_point = 2.0; }
+              else { sub.letter_grade = 'F'; sub.gpa_point = 0.0; }
+
+              semTotalGpa += sub.gpa_point;
+              semCount++;
+            } else {
+              sub.letter_grade = '-';
+              sub.gpa_point = null;
+            }
             return sub;
           });
+
+          const semesterGpa = semCount > 0 ? (semTotalGpa / semCount).toFixed(2) : 'N/A';
+
           return {
             semester_name: sem.semester_name,
             isOpen: sem.isOpen,
-            subjects: subjects
+            subjects: subjects,
+            semester_gpa: semesterGpa,
+            is_completed: semCount > 0
           };
         });
       },
@@ -1034,6 +1465,181 @@ export class StudentListComponent implements OnInit {
             this.loadStudents();
           }
         });
+      }
+    });
+  }
+
+  openImportModal(): void {
+    this.importedFileName = '';
+    this.parsedImportStudents = [];
+    this.showImportModal = true;
+  }
+
+  downloadSampleCSV(): void {
+    const csvHeader = 'First Name,Last Name,Gender,DOB,Phone,Class Group Code,Parent Name,Parent Phone,Enrollment Date\n';
+    const sampleRows = 'Sok,Samnang,MALE,2005-04-15,012345678,SV34,Mr. Sok Meas,012999888,2025-09-01\n' +
+      'Keo,Bopha,FEMALE,2006-08-20,098765432,SA01,Mrs. Keo Chann,098111222,2025-09-01\n' +
+      'Chan,Vireak,MALE,2005-11-10,077123456,SV35,Mr. Chan Dara,077333444,2025-09-01\n';
+
+    const blob = new Blob(['\uFEFF' + csvHeader + sampleRows], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'sample_students_import_template.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  onCSVFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    this.importedFileName = file.name;
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      const text = e.target.result || '';
+      this.parseCSVText(text);
+    };
+    reader.readAsText(file);
+  }
+
+  parseCSVLine(line: string): string[] {
+    const result: string[] = [];
+    let cur = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (c === ',' && !inQuotes) {
+        result.push(cur.trim());
+        cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  parseCSVText(csvText: string): void {
+    const lines = csvText.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length <= 1) {
+      this.toast.error('CSV file is empty or missing headers');
+      return;
+    }
+
+    const headers = this.parseCSVLine(lines[0]).map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+    const students: any[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const cleanCols = this.parseCSVLine(lines[i]).map(c => c.replace(/^["']|["']$/g, '').trim());
+      if (cleanCols.length < 2) continue;
+
+      const obj: any = {};
+      headers.forEach((h, idx) => {
+        const val = cleanCols[idx] || '';
+
+        if (h === 'student id' || h === 'custom_student_id' || h === 'id') {
+          obj.custom_student_id = val;
+        } else if (h === 'first name' || h === 'first_name') {
+          obj.first_name = val;
+        } else if (h === 'last name' || h === 'last_name') {
+          obj.last_name = val;
+        } else if (h === 'gender') {
+          obj.gender = val.toUpperCase();
+        } else if (h === 'date of birth (dob)' || h === 'dob' || h === 'date of birth') {
+          obj.dob = val;
+        } else if (h === 'phone number' || h === 'phone' || h === 'mobile') {
+          obj.phone = val.replace(/^'/, '');
+        } else if (h === 'class group' || h === 'group_code' || h === 'class' || h === 'group') {
+          obj.group_code = val;
+        } else if (h === 'degree / major' || h === 'program_code' || h === 'major' || h === 'degree') {
+          obj.program_code = val;
+        } else if (h === 'parent / guardian name' || h === 'parent_name' || h === 'parent name') {
+          obj.parent_name = val;
+        } else if (h === 'parent phone' || h === 'parent_phone') {
+          obj.parent_phone = val.replace(/^'/, '');
+        } else if (h === 'previous school' || h === 'previous_school') {
+          obj.previous_school = val;
+        } else if (h === 'enrollment date' || h === 'enrollment_date') {
+          obj.enrollment_date = val;
+        } else if (h === 'status') {
+          obj.status = val.toUpperCase();
+        }
+      });
+
+      if ((!obj.first_name || !obj.last_name) && cleanCols[3] && headers.includes('full name')) {
+        const parts = cleanCols[3].trim().split(' ');
+        if (parts.length >= 2) {
+          obj.first_name = obj.first_name || parts[0];
+          obj.last_name = obj.last_name || parts.slice(1).join(' ');
+        }
+      }
+
+      if (obj.first_name && obj.last_name) {
+        students.push(obj);
+      }
+    }
+
+    this.parsedImportStudents = students;
+    if (students.length === 0) {
+      this.toast.error('No valid student rows found in CSV file');
+    } else {
+      this.toast.success(`Parsed ${students.length} student records from CSV!`);
+    }
+  }
+
+  submitImport(): void {
+    if (this.selectedExcelFile) {
+      this.isImporting = true;
+      const formData = new FormData();
+      formData.append('file', this.selectedExcelFile);
+      if (this.importSelectedProgramId) formData.append('program_id', String(this.importSelectedProgramId));
+      if (this.importSelectedGroupId) formData.append('group_id', String(this.importSelectedGroupId));
+
+      this.api.post('students/import-excel', formData).subscribe({
+        next: (res: any) => {
+          this.isImporting = false;
+          this.showImportModal = false;
+          this.toast.success(res.message || 'Successfully imported Excel student records!');
+          this.selectedExcelFile = null;
+          this.parsedImportStudents = [];
+          this.loadStudents();
+        },
+        error: (err: any) => {
+          this.isImporting = false;
+          this.toast.error(err.error?.message || 'Excel Import failed');
+        }
+      });
+      return;
+    }
+
+    if (this.parsedImportStudents.length === 0) return;
+
+    this.isImporting = true;
+    const payload = {
+      students: this.parsedImportStudents,
+      program_id: this.importSelectedProgramId,
+      group_id: this.importSelectedGroupId
+    };
+
+    this.api.post('students/import', payload).subscribe({
+      next: (res: any) => {
+        this.isImporting = false;
+        this.showImportModal = false;
+        this.toast.success(res.message || `Successfully imported ${this.parsedImportStudents.length} students!`);
+        this.parsedImportStudents = [];
+        this.loadStudents();
+      },
+      error: (err: any) => {
+        this.isImporting = false;
+        this.toast.error(err.error?.message || 'CSV Import failed');
       }
     });
   }

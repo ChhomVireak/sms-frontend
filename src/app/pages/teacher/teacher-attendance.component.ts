@@ -32,13 +32,13 @@ import { environment } from '../../../environments/environment';
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">PRESENT TODAY</span>
           <h3 class="text-2xl font-extrabold text-emerald-400 mt-2">{{ countStatus('PRESENT') }} Students</h3>
-          <p class="text-xs text-emerald-400 mt-1 font-semibold">✓ In class today</p>
+          <p class="text-xs text-emerald-400 mt-1 font-semibold">In class today</p>
         </div>
 
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">ABSENT TODAY</span>
           <h3 class="text-2xl font-extrabold text-rose-400 mt-2">{{ countStatus('ABSENT') }} Students</h3>
-          <p class="text-xs text-rose-400 mt-1 font-semibold">✗ Unexcused absence</p>
+          <p class="text-xs text-rose-400 mt-1 font-semibold">Unexcused absence</p>
         </div>
 
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
@@ -84,7 +84,7 @@ import { environment } from '../../../environments/environment';
           <div class="lg:col-span-3">
             <label class="block font-bold text-gray-400 mb-1 uppercase tracking-wider text-[10px]">BATCH MARK STUDENTS</label>
             <div class="grid grid-cols-4 gap-2">
-              <button (click)="markAll('PRESENT')" class="p-2.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 font-bold text-xs transition-all flex items-center justify-center gap-1">✓ All Present</button>
+              <button (click)="markAll('PRESENT')" class="p-2.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 font-bold text-xs transition-all flex items-center justify-center gap-1">All Present</button>
               <button (click)="markAll('ABSENT')" class="p-2.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-400 font-bold text-xs transition-all flex items-center justify-center gap-1">All Absent</button>
               <button (click)="markAll('LATE')" class="p-2.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-800 text-amber-400 font-bold text-xs transition-all flex items-center justify-center gap-1">All Late</button>
               <button (click)="markAll('EXCUSED')" class="p-2.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-400 font-bold text-xs transition-all flex items-center justify-center gap-1">All Excused</button>
@@ -105,18 +105,19 @@ import { environment } from '../../../environments/environment';
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Scrollable Student Roster Container with Sticky Header -->
+        <div class="max-h-[620px] overflow-y-auto relative rounded-xl border border-[#1f2937] bg-[#111827]/40 shadow-inner">
           <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
-                <th class="pb-3">STUDENT</th>
-                <th class="pb-3 text-center">ATTENDANCE STATUS</th>
-                <th class="pb-3">REASON / NOTE</th>
+            <thead class="bg-[#1e293b] text-gray-400 font-bold border-b border-[#1f2937] sticky top-0 z-10 shadow">
+              <tr class="uppercase tracking-wider">
+                <th class="p-3">STUDENT</th>
+                <th class="p-3 text-center">ATTENDANCE STATUS</th>
+                <th class="p-3">REASON / NOTE</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]/50">
-              <tr *ngFor="let s of filteredStudents" class="hover:bg-gray-800/40 transition-colors">
-                <td class="py-3 flex items-center gap-3 font-bold text-white">
+              <tr *ngFor="let s of paginatedStudents" class="hover:bg-gray-800/40 transition-colors">
+                <td class="p-3 flex items-center gap-3 font-bold text-white">
                   <!-- Student Avatar Image / Initials Fallback -->
                   <img *ngIf="getStudentImageUrl(s.image) && !s.imageError" 
                        [src]="getStudentImageUrl(s.image)" 
@@ -131,32 +132,32 @@ import { environment } from '../../../environments/environment';
                   </div>
                 </td>
 
-                <td class="py-3 text-center">
+                <td class="p-3 text-center">
                   <div class="inline-flex items-center gap-1.5 bg-[#111827] p-1 rounded-xl border border-[#1f2937]">
                     <button (click)="quickMarkStudentStatus(s, 'PRESENT')" 
                             [ngClass]="isStatus(s.status, 'PRESENT') ? 'bg-emerald-500 text-white shadow-md font-extrabold' : 'text-gray-400 hover:text-white'" 
-                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all">
+                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer">
                       PRESENT
                     </button>
                     <button (click)="quickMarkStudentStatus(s, 'ABSENT')" 
                             [ngClass]="isStatus(s.status, 'ABSENT') ? 'bg-rose-500 text-white shadow-md font-extrabold' : 'text-gray-400 hover:text-white'" 
-                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all">
+                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer">
                       ABSENT
                     </button>
                     <button (click)="quickMarkStudentStatus(s, 'LATE')" 
                             [ngClass]="isStatus(s.status, 'LATE') ? 'bg-amber-500 text-white shadow-md font-extrabold' : 'text-gray-400 hover:text-white'" 
-                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all">
+                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer">
                       LATE
                     </button>
                     <button (click)="quickMarkStudentStatus(s, 'EXCUSED')" 
                             [ngClass]="(isStatus(s.status, 'EXCUSED') || isStatus(s.status, 'PERMISSION')) ? 'bg-indigo-500 text-white shadow-md font-extrabold' : 'text-gray-400 hover:text-white'" 
-                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all">
+                            class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer">
                       EXCUSED
                     </button>
                   </div>
                 </td>
 
-                <td class="py-3">
+                <td class="p-3">
                   <div *ngIf="s.note && (s.status === 'EXCUSED' || s.status === 'PERMISSION')" class="text-[11px] text-purple-300 font-extrabold flex items-center gap-1.5 mb-1.5 bg-purple-950/60 px-3 py-1 rounded-lg border border-purple-800/60 w-fit">
                     <i class="fa-solid fa-file-signature text-purple-400"></i> Student Leave Note: {{ s.note }}
                   </div>
@@ -172,6 +173,39 @@ import { environment } from '../../../environments/environment';
             </tbody>
           </table>
         </div>
+
+        <!-- Interactive Pagination Controls Bar -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#1f2937] text-xs">
+          <div class="flex items-center gap-3 text-gray-400 font-medium">
+            <span>Showing {{ filteredStudents.length > 0 ? startIndex + 1 : 0 }} to {{ endIndex }} of {{ filteredStudents.length }} students</span>
+            <div class="flex items-center gap-1.5 ml-2">
+              <label class="text-gray-400">Per page:</label>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#111827] border border-[#1f2937] text-white rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500 font-bold cursor-pointer">
+                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div *ngIf="totalPages > 1" class="flex items-center gap-1">
+            <button (click)="setPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-angles-left"></i>
+            </button>
+            <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <button *ngFor="let p of pageRange" (click)="setPage(p)" [class]="p === currentPage ? 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-extrabold shadow-md cursor-pointer' : 'px-3 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 border border-[#1f2937] text-gray-300 font-bold cursor-pointer'">
+              {{ p }}
+            </button>
+
+            <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button (click)="setPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] hover:bg-gray-800 disabled:opacity-30 border border-[#1f2937] text-gray-300 font-bold cursor-pointer">
+              <i class="fa-solid fa-angles-right"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `
@@ -182,6 +216,54 @@ export class TeacherAttendanceComponent implements OnInit {
   selectedDate: string = '';
   students: any[] = [];
   studentSearchQuery = '';
+
+  // Interactive Pagination Controls State
+  currentPage: number = 1;
+  pageSize: number = 10;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredStudents.length / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return (this.currentPage - 1) * this.pageSize;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.startIndex + this.pageSize, this.filteredStudents.length);
+  }
+
+  get paginatedStudents(): any[] {
+    return this.filteredStudents.slice(this.startIndex, this.endIndex);
+  }
+
+  get pageRange(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range: number[] = [];
+
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + 4);
+    if (end - start < 4) {
+      start = Math.max(1, end - 4);
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
 
   constructor(private api: ApiService, private toast: ToastService, private socket: SocketService) { }
 

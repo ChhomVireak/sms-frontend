@@ -21,7 +21,7 @@ import { ToastService } from '../../core/services/toast.service';
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TOTAL COLLECTED</span>
           <h3 class="text-2xl font-extrabold text-emerald-400 mt-2">\${{ getTotalCollected() | number:'1.2-2' }}</h3>
-          <p class="text-xs text-emerald-400 mt-1 font-semibold">✓ Verified Payments</p>
+          <p class="text-xs text-emerald-400 mt-1 font-semibold">Verified Payments</p>
         </div>
 
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
@@ -192,7 +192,7 @@ import { ToastService } from '../../core/services/toast.service';
               </div>
 
               <div class="pt-2 text-center border-t border-[#1f2937]/50">
-                <span class="px-3 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold">✓ PAID & VERIFIED</span>
+                <span class="px-3 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold">PAID & VERIFIED</span>
               </div>
             </div>
 
@@ -299,7 +299,7 @@ import { ToastService } from '../../core/services/toast.service';
         <!-- Actions -->
         <div class="space-y-2 pt-2 border-t border-[#1f2937]">
           <button (click)="confirmKhqrPaid()" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-            ✓ Simulate KHQR Scan Payment Success
+            Simulate KHQR Scan Payment Success
           </button>
           <button (click)="showKhqrModal = false" class="w-full py-2 rounded-xl border border-[#1f2937] text-gray-400 hover:text-white text-xs">
             Cancel

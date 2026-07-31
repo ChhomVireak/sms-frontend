@@ -77,17 +77,17 @@ import { ToastService } from '../../core/services/toast.service';
           <button (click)="activeCategory = 'ANNOUNCEMENT'"
                   [ngClass]="activeCategory === 'ANNOUNCEMENT' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-[#111827] text-gray-400 hover:text-white border border-[#1f2937]'"
                   class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0">
-            📢 School Announcements
+            School Announcements
           </button>
           <button (click)="activeCategory = 'EXAM'"
                   [ngClass]="activeCategory === 'EXAM' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-[#111827] text-gray-400 hover:text-white border border-[#1f2937]'"
                   class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0">
-            📝 Exam Schedules
+            Exam Schedules
           </button>
           <button (click)="activeCategory = 'ATTENDANCE'"
                   [ngClass]="activeCategory === 'ATTENDANCE' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-[#111827] text-gray-400 hover:text-white border border-[#1f2937]'"
                   class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0">
-            📋 Attendance Logs
+            Attendance Logs
           </button>
         </div>
 
@@ -116,7 +116,7 @@ import { ToastService } from '../../core/services/toast.service';
                   <span>{{ item.title }}</span>
                   <span *ngIf="!item.read" class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
                 </h4>
-                <span class="text-[10px] text-gray-400 font-mono">📅 {{ item.created_at | date:'dd/MM/yyyy · HH:mm' }}</span>
+                <span class="text-[10px] text-gray-400 font-mono">{{ item.created_at | date:'dd/MM/yyyy · HH:mm' }}</span>
               </div>
             </div>
 
@@ -125,7 +125,7 @@ import { ToastService } from '../../core/services/toast.service';
                       class="px-3 py-1 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30 transition-all">
                 Mark Read
               </button>
-              <span *ngIf="item.read" class="text-xs font-bold text-gray-500 font-mono">✓ Read</span>
+              <span *ngIf="item.read" class="text-xs font-bold text-gray-500 font-mono">Read</span>
             </div>
           </div>
 
@@ -157,7 +157,6 @@ export class TeacherNotificationsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.markAllAsReadSilent();
     this.loadNotifications();
     this.initSocketListener();
   }
@@ -205,25 +204,18 @@ export class TeacherNotificationsComponent implements OnInit, OnDestroy {
   }
 
   loadNotifications(): void {
-    const isGlobalRead = localStorage.getItem('global_alerts_read') === 'true';
-    const lastReadTime = Number(localStorage.getItem('last_read_notif') || 0);
-    const readIdsStr = localStorage.getItem('read_notif_ids') || '[]';
-    const readIds = new Set(JSON.parse(readIdsStr));
-
     this.api.get<any>('notifications').subscribe({
       next: (res) => {
         const list = res.data?.notifications || res.data || [];
         this.notifications = list.map((n: any) => {
           const id = n.notification_id || n.id;
-          const notifTime = new Date(n.created_at || n.publish_date || Date.now()).getTime();
-          const isRead = isGlobalRead || Boolean(n.is_read) || readIds.has(id) || (lastReadTime > 0 && notifTime <= lastReadTime);
           return {
             id: id,
             type: n.type || 'ANNOUNCEMENT',
             title: n.title || 'School Announcement',
             message: n.message || n.content,
             created_at: n.created_at || new Date(),
-            read: isRead
+            read: Boolean(n.is_read)
           };
         });
       },
@@ -260,27 +252,20 @@ export class TeacherNotificationsComponent implements OnInit, OnDestroy {
   }
 
   markAsRead(item: any): void {
-    item.read = true;
-    const readIdsStr = localStorage.getItem('read_notif_ids') || '[]';
-    const readIds = new Set(JSON.parse(readIdsStr));
-    readIds.add(item.id);
-    localStorage.setItem('read_notif_ids', JSON.stringify(Array.from(readIds)));
-    localStorage.setItem('last_read_notif', Date.now().toString());
-    this.toast.success('Notification marked as read');
+    this.api.post<any>(`notifications/${item.id}/read`, {}).subscribe({
+      next: () => {
+        item.read = true;
+        this.toast.success('Notification marked as read');
+      }
+    });
   }
 
   markAllAsRead(): void {
-    const now = Date.now().toString();
-    localStorage.setItem('global_alerts_read', 'true');
-    localStorage.setItem('alerts_read_all', 'true');
-    localStorage.setItem('last_read_notif', now);
-    localStorage.setItem('teacher_last_read_notif', now);
-    localStorage.setItem('student_last_read_notif', now);
-
-    const readIds = new Set(this.notifications.map(n => n.id));
-    localStorage.setItem('read_notif_ids', JSON.stringify(Array.from(readIds)));
-
-    this.notifications.forEach(n => n.read = true);
-    this.toast.success('All notifications marked as read!');
+    this.api.post<any>('notifications/read-all', {}).subscribe({
+      next: () => {
+        this.notifications.forEach(n => n.read = true);
+        this.toast.success('All notifications marked as read!');
+      }
+    });
   }
 }

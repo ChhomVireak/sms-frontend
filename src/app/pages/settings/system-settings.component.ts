@@ -148,7 +148,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
                   <div>
                     <div class="flex items-center gap-2">
                       <span class="font-extrabold text-white font-mono text-sm">{{ y.year_label }}</span>
-                      <span *ngIf="y.is_current" class="px-2 py-0.5 rounded bg-emerald-900 text-emerald-300 text-[9px] font-bold">✓ ACTIVE YEAR</span>
+                      <span *ngIf="y.is_current" class="px-2 py-0.5 rounded bg-emerald-900 text-emerald-300 text-[9px] font-bold">ACTIVE YEAR</span>
                     </div>
                     <p class="text-[10px] text-gray-400 font-mono mt-1">
                       {{ (y.start_date | date:'shortDate') || 'N/A' }} – {{ (y.end_date | date:'shortDate') || 'N/A' }}
@@ -209,9 +209,40 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
               </div>
             </div>
 
+            <!-- Teacher Attendance Check-in GPS & Wi-Fi Configuration -->
+            <div class="p-4 bg-[#111827] rounded-2xl border border-[#1f2937] space-y-3">
+              <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+                <p class="font-bold text-white text-xs flex items-center gap-2">
+                  <i class="fa-solid fa-wifi text-cyan-400"></i> Teacher Attendance Wi-Fi & GPS Check-in
+                </p>
+                <span class="text-[10px] text-cyan-400 font-mono">Dynamic Multi-Factor Check-in</span>
+              </div>
+
+              <div>
+                <label class="block font-bold text-gray-300 mb-1">AUTHORIZED SCHOOL WI-FI IP ADDRESSES (Comma or Newline separated)</label>
+                <textarea [(ngModel)]="school.authorized_wifi_ips" rows="2" placeholder="e.g. 192.168.1.1, 10.0.0.1, 115.78.12.3, 127.0.0.1" class="w-full bg-[#0b0f19] border border-[#1f2937] text-xs text-emerald-400 font-mono rounded-xl p-2.5 focus:border-emerald-500 focus:outline-none"></textarea>
+                <p class="text-[10px] text-gray-400 mt-1">Enter authorized Wi-Fi network IPs or subnets. Admin can update here whenever school Wi-Fi IP changes.</p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <div>
+                  <label class="block font-bold text-gray-300 mb-1">CAMPUS LATITUDE</label>
+                  <input type="number" step="0.0000001" [(ngModel)]="school.school_lat" class="w-full bg-[#0b0f19] border border-[#1f2937] text-xs text-white rounded-xl px-3 py-2 font-mono">
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-300 mb-1">CAMPUS LONGITUDE</label>
+                  <input type="number" step="0.0000001" [(ngModel)]="school.school_lng" class="w-full bg-[#0b0f19] border border-[#1f2937] text-xs text-white rounded-xl px-3 py-2 font-mono">
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-300 mb-1">ALLOWED RADIUS (METERS)</label>
+                  <input type="number" [(ngModel)]="school.allowed_radius_meters" class="w-full bg-[#0b0f19] border border-[#1f2937] text-xs text-white rounded-xl px-3 py-2 font-mono">
+                </div>
+              </div>
+            </div>
+
             <div class="pt-3 border-t border-[#1f2937] flex justify-end">
               <button (click)="saveSettings()" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/20">
-                Save Security Settings
+                Save Security & Check-in Settings
               </button>
             </div>
           </div>
@@ -264,7 +295,11 @@ export class SystemSettingsComponent implements OnInit {
     theme_mode: 'Dark',
     accent_color: 'Emerald',
     session_timeout: 60,
-    password_policy: 'strong'
+    password_policy: 'strong',
+    school_lat: 11.5564000,
+    school_lng: 104.9282000,
+    allowed_radius_meters: 100,
+    authorized_wifi_ips: '127.0.0.1, 192.168.1.1, 10.0.0.1'
   };
 
   academicYears: any[] = [];

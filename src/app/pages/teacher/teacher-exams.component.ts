@@ -126,23 +126,23 @@ import { SocketService } from '../../core/services/socket.service';
               <!-- Category & Date Badge Header -->
               <div class="flex items-center justify-between gap-1">
                 <span class="text-[9px] font-mono font-extrabold text-purple-300 bg-purple-900/90 border border-purple-600 px-1.5 py-0.5 rounded text-center uppercase truncate">
-                  📝 {{ ex.category || 'EXAM' }}
+                  {{ ex.category || 'EXAM' }}
                 </span>
                 <span class="text-[9px] font-mono font-extrabold text-amber-300 bg-amber-950 border border-amber-700/80 px-1.5 py-0.5 rounded shrink-0">
-                  📅 {{ ex.exam_date | date:'dd/MM/yyyy' }}
+                  {{ ex.exam_date | date:'dd/MM/yyyy' }}
                 </span>
               </div>
 
               <!-- Subject Code & Title -->
               <div>
-                <p class="font-extrabold text-white text-xs truncate">📘 {{ ex.subject_code }}</p>
+                <p class="font-extrabold text-white text-xs truncate"><i class="fa-solid fa-book text-emerald-400 mr-1"></i>{{ ex.subject_code }}</p>
                 <p class="text-[10px] text-purple-200 truncate font-semibold">{{ ex.subject_name }}</p>
               </div>
 
               <!-- Group Code, Exam Date & Location -->
               <div class="space-y-1 pt-1 border-t border-purple-800/80 font-mono text-[10px]">
-                <p class="text-amber-300 font-bold truncate">👥 {{ ex.group_code || ex.group_name }}</p>
-                <p class="text-emerald-300 font-bold truncate">🚪 {{ ex.room_number || 'Room 204' }}</p>
+                <p class="text-amber-300 font-bold truncate"><i class="fa-solid fa-users text-amber-300 mr-1"></i>{{ ex.group_code || ex.group_name }}</p>
+                <p class="text-emerald-300 font-bold truncate">Room {{ ex.room_number || 'Room 204' }}</p>
                 <p class="text-cyan-300 font-extrabold text-[10px] bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800 flex items-center gap-1">
                   <i class="fa-regular fa-calendar-check text-amber-400"></i> Date Exam: {{ ex.exam_date | date:'dd/MM/yyyy' }}
                 </p>
@@ -174,7 +174,7 @@ import { SocketService } from '../../core/services/socket.service';
                   {{ ex.subject_code || 'CS101' }}
                 </span>
                 <span class="text-xs font-mono font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2.5 py-0.5 rounded-lg">
-                  👥 Group {{ ex.group_code || ex.group_name }}
+                  Group {{ ex.group_code || ex.group_name }}
                 </span>
                 <span class="text-[10px] font-bold text-cyan-400 bg-cyan-950/80 border border-cyan-800 px-2 py-0.5 rounded-md uppercase font-mono">
                   {{ ex.category || 'Midterm' }}

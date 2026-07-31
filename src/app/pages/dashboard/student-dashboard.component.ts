@@ -34,8 +34,8 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
       </div>
 
-      <!-- 4 Top Metric Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <!-- 3 Top Metric Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <!-- Attendance Rate -->
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <div class="flex items-center justify-between">
@@ -70,20 +70,6 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
         </div>
 
-        <!-- Tuition Fee Balance -->
-        <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">FEE BALANCE</span>
-            <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-base">
-              <i class="fa-solid fa-receipt"></i>
-            </div>
-          </div>
-          <div class="mt-4">
-            <h3 class="text-3xl font-extrabold text-white tracking-tight">\${{ stats.feeBalance | number:'1.2-2' }}</h3>
-            <p class="text-xs text-rose-400 font-semibold mt-1">Outstanding Balance</p>
-          </div>
-        </div>
-
         <!-- Upcoming Exam -->
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <div class="flex items-center justify-between">
@@ -99,55 +85,41 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
       </div>
 
-      <!-- Main Split: My Grades Table (Left) + Term GPA & Upcoming Exams (Right) -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- My Grades Matrix -->
-        <div class="lg:col-span-2 bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
+      <!-- Main Content Grid: Today's Schedule (Left) + Overall GPA & Upcoming Exams (Right) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Today's Class Schedule Card -->
+        <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-[#1f2937] pb-4">
             <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
-              <i class="fa-solid fa-clipboard-list text-emerald-400"></i> My Academic Results
+              <i class="fa-regular fa-clock text-cyan-400"></i> Today's Schedule
             </h3>
-            <a routerLink="/student/grades" class="text-xs text-emerald-400 hover:underline font-semibold">Full Grade History →</a>
+            <a routerLink="/student/timetable" class="text-xs text-cyan-400 hover:underline font-semibold">Full Timetable →</a>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
-                  <th class="pb-3">SUBJECT</th>
-                  <th class="pb-3">EXAM / ASSESSMENT</th>
-                  <th class="pb-3">RAW SCORE</th>
-                  <th class="pb-3">LETTER GRADE</th>
-                  <th class="pb-3 text-right">GPA PTS</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-[#1f2937]/50">
-                <tr *ngFor="let g of grades" class="hover:bg-gray-800/40 transition-colors">
-                  <td class="py-3.5 font-bold text-white">
-                    <span class="block text-sm font-extrabold text-white">{{ g.subject_name }}</span>
-                    <span class="text-[10px] text-gray-400 font-mono">{{ g.subject_code }}</span>
-                  </td>
-                  <td class="py-3.5 text-gray-300 font-medium">{{ g.exam_title || 'Assessment' }}</td>
-                  <td class="py-3.5 text-gray-300 font-mono font-bold">{{ g.raw_score }}/50</td>
-                  <td class="py-3.5">
-                    <span [ngClass]="{
-                      'bg-emerald-950 text-emerald-400 border-emerald-800': g.letter_grade === 'A' || g.letter_grade === 'B+',
-                      'bg-amber-950 text-amber-400 border-amber-800': g.letter_grade === 'B' || g.letter_grade === 'C+',
-                      'bg-rose-950 text-rose-400 border-rose-800': g.letter_grade === 'C' || g.letter_grade === 'F'
-                    }" class="px-2.5 py-1 rounded-md font-extrabold text-xs border font-mono">
-                      {{ g.letter_grade }}
-                    </span>
-                  </td>
-                  <td class="py-3.5 text-right font-mono font-extrabold text-emerald-400 text-sm">{{ g.grade_point | number:'1.1-1' }}</td>
-                </tr>
+          <div *ngIf="todaySchedule.length === 0" class="flex flex-col items-center justify-center py-12 text-center text-gray-500 space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-gray-800/60 flex items-center justify-center text-gray-500 text-lg">
+              <i class="fa-regular fa-calendar"></i>
+            </div>
+            <p class="text-xs font-semibold">No classes scheduled for today</p>
+          </div>
 
-                <tr *ngIf="grades.length === 0">
-                  <td colspan="5" class="py-8 text-center text-gray-500 italic">
-                    No academic exam results published yet.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div *ngIf="todaySchedule.length > 0" class="space-y-3">
+            <div *ngFor="let item of todaySchedule" class="bg-[#111827]/80 border border-[#1f2937] p-4 rounded-xl flex items-center justify-between shadow-sm">
+              <div>
+                <span class="text-xs font-mono text-cyan-400 font-extrabold">
+                  {{ (item.start_time || '08:00').slice(0,5) }} – {{ (item.end_time || '09:30').slice(0,5) }}
+                </span>
+                <p class="text-xs font-bold text-white mt-0.5">
+                  <i class="fa-solid fa-book text-emerald-400 mr-1.5"></i>{{ item.subject_name }}
+                </p>
+                <p *ngIf="item.teacher_name" class="text-xs text-amber-300 font-mono font-bold mt-1">
+                  <i class="fa-solid fa-chalkboard-user text-amber-300 mr-1.5"></i>{{ item.teacher_name }}
+                </p>
+              </div>
+              <span class="text-xs font-bold bg-emerald-950/80 text-emerald-300 px-3.5 py-1.5 rounded-lg border border-emerald-800/60 font-mono shadow-sm">
+                Room {{ item.room_number || 'TBA' }}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -198,6 +170,40 @@ import { AuthService } from '../../core/services/auth.service';
               </div>
             </div>
           </div>
+
+          <!-- Active Broadcast Alerts Card -->
+          <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-[#1f2937] pb-3">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-bullhorn text-amber-400 text-sm"></i>
+                <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Broadcast Alerts Feed</h4>
+                <span *ngIf="unreadAlertsCount > 0" class="bg-rose-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full animate-pulse font-mono">
+                  {{ unreadAlertsCount }} Unread
+                </span>
+              </div>
+              <a routerLink="/student/notifications" class="text-xs text-amber-400 hover:underline font-semibold">View all →</a>
+            </div>
+
+            <div *ngIf="recentNotifications.length === 0" class="py-6 text-center text-xs text-gray-500 italic">
+              No active broadcast alerts published.
+            </div>
+
+            <div *ngIf="recentNotifications.length > 0" class="space-y-2.5">
+              <div *ngFor="let notif of recentNotifications.slice(0, 3)" class="bg-[#111827]/80 border border-[#1f2937] p-3 rounded-xl space-y-1.5 hover:border-amber-500/40 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-white text-xs flex items-center gap-1.5">
+                    <span class="truncate max-w-[180px]">{{ notif.title }}</span>
+                    <span *ngIf="!notif.is_read" class="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
+                  </span>
+                  <button *ngIf="!notif.is_read" (click)="markNotifRead(notif)" class="px-2.5 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold text-[10px] border border-emerald-500/30 shrink-0">
+                    Mark Read
+                  </button>
+                  <span *ngIf="notif.is_read" class="text-[10px] font-bold text-gray-500 font-mono shrink-0">Read</span>
+                </div>
+                <p class="text-[11px] text-gray-300 line-clamp-2 leading-relaxed">{{ notif.message }}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -207,6 +213,8 @@ export class StudentDashboardComponent implements OnInit {
   studentName: string = 'Chhom Vireak';
   studentCustomId: string = 'SV-2026-0001';
   studentGroupName: string = 'SV34 — Management Information Systems (MIS)';
+  unreadAlertsCount: number = 0;
+  recentNotifications: any[] = [];
 
   stats: any = {
     attendanceRate: null,
@@ -217,6 +225,7 @@ export class StudentDashboardComponent implements OnInit {
 
   grades: any[] = [];
   upcomingExams: any[] = [];
+  todaySchedule: any[] = [];
 
   constructor(
     private api: ApiService,
@@ -263,6 +272,14 @@ export class StudentDashboardComponent implements OnInit {
   }
 
   loadStudentDashboard(): void {
+    this.api.get<any>('notifications').subscribe({
+      next: (res) => {
+        const notifs = res.data?.notifications || res.data || [];
+        this.recentNotifications = notifs;
+        this.unreadAlertsCount = notifs.filter((n: any) => !n.is_read).length;
+      }
+    });
+
     this.api.get<any>('dashboard/student').subscribe({
       next: (res) => {
         if (res.success && res.data) {
@@ -283,7 +300,17 @@ export class StudentDashboardComponent implements OnInit {
           if (res.data.stats) this.stats = res.data.stats;
           if (res.data.grades) this.grades = res.data.grades;
           if (res.data.upcomingExams) this.upcomingExams = res.data.upcomingExams;
+          if (res.data.todaySchedule) this.todaySchedule = res.data.todaySchedule;
         }
+      }
+    });
+  }
+
+  markNotifRead(notif: any): void {
+    this.api.post<any>(`notifications/${notif.notification_id || notif.id}/read`, {}).subscribe({
+      next: () => {
+        notif.is_read = true;
+        this.unreadAlertsCount = Math.max(0, this.unreadAlertsCount - 1);
       }
     });
   }

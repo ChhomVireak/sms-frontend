@@ -161,7 +161,6 @@ import { environment } from '../../../environments/environment';
                   <th class="pb-3">STUDENT</th>
                   <th class="pb-3">CLASS</th>
                   <th class="pb-3">GENDER</th>
-                  <th class="pb-3">FEE STATUS</th>
                   <th class="pb-3">ENROLLED</th>
                   <th class="pb-3 text-right">ACTIONS</th>
                 </tr>
@@ -180,15 +179,6 @@ import { environment } from '../../../environments/environment';
                   </td>
                   <td class="py-3.5 text-gray-300 text-xs font-bold">{{ s.class_name || 'Unassigned' }}</td>
                   <td class="py-3.5 text-gray-300 text-xs capitalize">{{ (s.gender || 'MALE').toLowerCase() }}</td>
-                  <td class="py-3.5">
-                    <span [ngClass]="{
-                      'status-badge-paid': (s.fee_status || '').toUpperCase() === 'PAID',
-                      'status-badge-pending': (s.fee_status || '').toUpperCase() === 'PENDING',
-                      'status-badge-overdue': (s.fee_status || '').toUpperCase() === 'OVERDUE'
-                    }" class="status-badge">
-                      • {{ s.fee_status || 'Paid' }}
-                    </span>
-                  </td>
                   <td class="py-3.5 text-gray-400 text-xs font-mono">{{ (s.enrollment_date || '2026-01-01') | date:'mediumDate' }}</td>
                   <td class="py-3.5 text-right space-x-2">
                     <button (click)="router.navigate(['/admin/students'])" title="View Student List" class="text-gray-400 hover:text-emerald-400 text-xs p-1"><i class="fa-solid fa-eye"></i></button>
@@ -197,7 +187,7 @@ import { environment } from '../../../environments/environment';
                 </tr>
 
                 <tr *ngIf="recentStudents.length === 0">
-                  <td colspan="6" class="py-8 text-center text-gray-500 italic">No recent student registrations recorded in MySQL.</td>
+                  <td colspan="5" class="py-8 text-center text-gray-500 italic">No recent student registrations recorded in MySQL.</td>
                 </tr>
               </tbody>
             </table>

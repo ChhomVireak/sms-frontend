@@ -37,35 +37,37 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
 
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">DEFAULT LATE PENALTY</span>
-          <h3 class="text-2xl font-extrabold text-amber-400 mt-2">5.0%</h3>
+          <h3 class="text-2xl font-extrabold text-amber-400 mt-2">0%</h3>
           <p class="text-xs text-gray-400 mt-1">After due date deadline</p>
         </div>
       </div>
 
       <!-- Active Fee Schedules Table (Full Width) -->
       <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4 text-xs shadow-lg">
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
           <div>
             <h3 class="text-base font-bold text-white tracking-tight">Fee Schedules (4-Year Degree & Semester Structure)</h3>
             <p class="text-[11px] text-gray-400 mt-0.5">Manage degree tuition schedules, semester billing cycles, and due dates</p>
           </div>
-          
+          <span class="text-xs text-gray-400 font-mono">Total Schedules: <strong class="text-emerald-400 font-bold">{{ feeSchedules.length }}</strong></span>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto overflow-y-auto max-h-[620px] rounded-xl border border-[#1f2937]/50">
           <table class="w-full text-left border-collapse">
-            <thead>
+            <thead class="sticky top-0 z-10 bg-[#111827] shadow-md">
               <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider text-[11px]">
-                <th class="pb-3 px-3">FEE TITLE</th>
-                <th class="pb-3 px-3">YEAR / SEMESTER</th>
-                <th class="pb-3 px-3">CLASS GROUP</th>
-                <th class="pb-3 px-3">AMOUNT ($)</th>
-                <th class="pb-3 px-3">DUE DATE</th>
-                <th class="pb-3 px-3 text-right">ACTIONS</th>
+                <th class="py-3 px-3 w-8">#</th>
+                <th class="py-3 px-3">FEE TITLE</th>
+                <th class="py-3 px-3">YEAR / SEMESTER</th>
+                <th class="py-3 px-3">CLASS GROUP</th>
+                <th class="py-3 px-3">AMOUNT ($)</th>
+                <th class="py-3 px-3">DUE DATE</th>
+                <th class="py-3 px-3 text-right">ACTIONS</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]/50">
-              <tr *ngFor="let fee of feeSchedules" class="hover:bg-gray-800/40 transition-colors">
+              <tr *ngFor="let fee of paginatedFeeSchedules; let i = index" class="hover:bg-gray-800/40 transition-colors">
+                <td class="py-3.5 px-3 font-mono text-gray-500">{{ (startIndex + i + 1) < 10 ? '0' + (startIndex + i + 1) : (startIndex + i + 1) }}</td>
                 <td class="py-3.5 px-3 font-bold text-white">{{ fee.fee_title }}</td>
                 <td class="py-3.5 px-3 font-mono">
                   <span class="px-2.5 py-1 rounded-lg bg-blue-950 text-blue-400 border border-blue-800 font-bold text-[10px]">
@@ -82,10 +84,41 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
               </tr>
 
               <tr *ngIf="feeSchedules.length === 0">
-                <td colspan="6" class="py-8 text-center text-gray-500 italic font-bold">No active fee schedules found.</td>
+                <td colspan="7" class="py-8 text-center text-gray-500 italic font-bold">No active fee schedules found.</td>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Pagination Controls Bar -->
+        <div *ngIf="feeSchedules.length > 0" class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#1f2937] text-xs">
+          <div class="flex items-center gap-3 text-gray-400">
+            <span>Showing <strong class="text-white font-mono">{{ startIndex + 1 }}</strong> to <strong class="text-white font-mono">{{ endIndex }}</strong> of <strong class="text-white font-mono">{{ feeSchedules.length }}</strong> schedules</span>
+            <div class="flex items-center gap-1.5 ml-2">
+              <span class="text-gray-400">Per page:</span>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#111827] border border-[#1f2937] text-xs text-white rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500 font-mono font-bold cursor-pointer">
+                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button (click)="setPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] text-gray-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <i class="fa-solid fa-angles-left"></i>
+            </button>
+            <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] text-gray-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="px-3 py-1 font-mono font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800 rounded-lg">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] text-gray-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button (click)="setPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1.5 rounded-lg bg-[#111827] border border-[#1f2937] text-gray-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <i class="fa-solid fa-angles-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -174,6 +207,38 @@ export class FeeManagementComponent implements OnInit {
   feeSchedules: any[] = [];
   groups: any[] = [];
 
+  // Pagination State
+  currentPage = 1;
+  pageSize = 10;
+  pageSizeOptions = [10, 25, 50, 100];
+
+  get paginatedFeeSchedules(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.feeSchedules.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.feeSchedules.length / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return (this.currentPage - 1) * this.pageSize;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.startIndex + this.pageSize, this.feeSchedules.length);
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
+
   newFee: any = {
     fee_title: 'Semester 2 Tuition Fee',
     year_level: 'Year 3',
@@ -208,7 +273,7 @@ export class FeeManagementComponent implements OnInit {
         this.newFee.amount = baseSemFee;
         this.newFee.fee_title = `${selectedGroup.group_code} — Year ${yearLevel} ${this.newFee.term_cycle || 'Semester ' + semNumber} Tuition Fee`;
       }
-      this.toast.success(`ជ្រើសរើសថ្នាក់ ${selectedGroup.group_code}:  auto-set ទៅ $${this.newFee.amount.toFixed(2)}!`);
+      this.toast.success(`Selected group ${selectedGroup.group_code}: auto-set to $${this.newFee.amount.toFixed(2)}!`);
     }
   }
 
@@ -263,7 +328,7 @@ export class FeeManagementComponent implements OnInit {
       group_id: defaultGroupId,
       amount: baseSemFee,
       due_date: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10),
-      late_penalty_rate: 5.0
+      late_penalty_rate: 0.0
     };
     this.showModal = true;
   }

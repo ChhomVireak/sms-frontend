@@ -145,7 +145,7 @@ import { ToastService } from '../../core/services/toast.service';
               <div class="flex items-center gap-2 pt-2 border-t border-[#1f2937]/50">
                 <span class="status-badge status-badge-active">• {{ n.status || 'Published' }}</span>
                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-300 border border-gray-700 font-mono">{{ n.target_audience }}</span>
-                <span *ngIf="n.priority === 'High'" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-400 border border-rose-800 font-mono">🚨 High Priority</span>
+                <span *ngIf="n.priority === 'High'" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-400 border border-rose-800 font-mono">High Priority</span>
               </div>
             </div>
           </div>
@@ -261,7 +261,7 @@ export class NotificationsComponent implements OnInit {
 
     this.api.post('notifications', payload).subscribe({
       next: () => {
-        this.toast.success('✓ System Broadcast Alert saved to database and broadcasted live!');
+        this.toast.success('System Broadcast Alert saved to database and broadcasted live!');
         this.form.title = '';
         this.form.message = '';
         this.selectedGroupIds = [];

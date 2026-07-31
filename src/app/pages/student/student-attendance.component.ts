@@ -32,7 +32,7 @@ import { SocketService } from '../../core/services/socket.service';
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">PRESENT</span>
           <h3 class="text-3xl font-extrabold text-emerald-400 mt-2">{{ presentCount }} {{ presentCount === 1 ? 'Day' : 'Days' }}</h3>
-          <p class="text-xs text-emerald-400 mt-1">✓ Attended class sessions</p>
+          <p class="text-xs text-emerald-400 mt-1">Attended class sessions</p>
         </div>
 
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
@@ -81,27 +81,27 @@ import { SocketService } from '../../core/services/socket.service';
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto max-h-[620px] overflow-y-auto rounded-xl border border-[#1f2937]">
           <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
-                <th class="pb-3">DATE</th>
-                <th class="pb-3">SUBJECT</th>
-                <th class="pb-3">TEACHER / LECTURER</th>
-                <th class="pb-3">STATUS</th>
+            <thead class="sticky top-0 z-10 bg-[#1e293b] border-b border-[#1f2937] shadow-sm">
+              <tr class="font-bold text-gray-400 uppercase tracking-wider">
+                <th class="py-3 px-4">DATE</th>
+                <th class="py-3 px-4">SUBJECT</th>
+                <th class="py-3 px-4">TEACHER / LECTURER</th>
+                <th class="py-3 px-4">STATUS</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]/50 font-mono">
-              <tr *ngFor="let a of filteredLogs" class="hover:bg-gray-800/40 transition-colors">
-                <td class="py-3.5 font-bold text-white">{{ a.date | date:'dd/MM/yyyy' }}</td>
-                <td class="py-3.5 font-sans font-bold text-gray-200">
+              <tr *ngFor="let a of paginatedLogs" class="hover:bg-gray-800/40 transition-colors">
+                <td class="py-3.5 px-4 font-bold text-white">{{ a.date | date:'dd/MM/yyyy' }}</td>
+                <td class="py-3.5 px-4 font-sans font-bold text-gray-200">
                   <span>{{ a.subject_name || 'Class Subject' }}</span>
                   <span *ngIf="a.subject_code" class="block text-[10px] text-gray-400 font-mono">{{ a.subject_code }}</span>
                 </td>
-                <td class="py-3.5 font-sans text-gray-300">
+                <td class="py-3.5 px-4 font-sans text-gray-300">
                   {{ a.teacher_fname ? (a.teacher_fname + ' ' + (a.teacher_lname || '')) : 'Faculty' }}
                 </td>
-                <td class="py-3.5 font-sans">
+                <td class="py-3.5 px-4 font-sans">
                   <span [ngClass]="{
                     'bg-emerald-950 text-emerald-400 border-emerald-800': isStatus(a.status, 'PRESENT'),
                     'bg-rose-950 text-rose-400 border-rose-800': isStatus(a.status, 'ABSENT'),
@@ -121,6 +121,35 @@ import { SocketService } from '../../core/services/socket.service';
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Controls -->
+        <div *ngIf="filteredLogs.length > 0" class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#1f2937] pt-4 font-mono">
+          <div class="flex items-center gap-3 text-xs text-gray-400">
+            <span>Show</span>
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#111827] border border-[#1f2937] text-white rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-cyan-500 font-bold">
+              <option *ngFor="let option of pageSizeOptions" [value]="option">{{ option }}</option>
+            </select>
+            <span>logs per page · Showing {{ pageRangeStart }} to {{ pageRangeEnd }} of {{ filteredLogs.length }}</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button (click)="setPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1 rounded-lg bg-[#111827] border border-[#1f2937] text-xs font-bold text-gray-300 hover:text-white disabled:opacity-40 transition-all">
+              « First
+            </button>
+            <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-2.5 py-1 rounded-lg bg-[#111827] border border-[#1f2937] text-xs font-bold text-gray-300 hover:text-white disabled:opacity-40 transition-all">
+              ‹ Prev
+            </button>
+            <span class="px-3 py-1 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800 text-xs font-extrabold">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-2.5 py-1 rounded-lg bg-[#111827] border border-[#1f2937] text-xs font-bold text-gray-300 hover:text-white disabled:opacity-40 transition-all">
+              Next ›
+            </button>
+            <button (click)="setPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1 rounded-lg bg-[#111827] border border-[#1f2937] text-xs font-bold text-gray-300 hover:text-white disabled:opacity-40 transition-all">
+              Last »
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `
@@ -129,6 +158,10 @@ export class StudentAttendanceComponent implements OnInit {
   attendanceLogs: any[] = [];
   selectedDate: string = '';
   statusFilter: string = 'ALL';
+
+  currentPage: number = 1;
+  pageSize: number = 10;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
 
   constructor(private api: ApiService, private socket: SocketService) {}
 
@@ -181,6 +214,34 @@ export class StudentAttendanceComponent implements OnInit {
     });
   }
 
+  get paginatedLogs(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredLogs.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredLogs.length / this.pageSize) || 1;
+  }
+
+  get pageRangeStart(): number {
+    if (this.filteredLogs.length === 0) return 0;
+    return (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get pageRangeEnd(): number {
+    return Math.min(this.currentPage * this.pageSize, this.filteredLogs.length);
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
+
   loadAttendance(): void {
     const params: any = {};
     if (this.selectedDate) {
@@ -189,6 +250,7 @@ export class StudentAttendanceComponent implements OnInit {
     this.api.get<any>('attendance', params).subscribe({
       next: (res) => {
         this.attendanceLogs = res.data?.attendance || res.data || [];
+        this.currentPage = 1;
       },
       error: () => {
         this.attendanceLogs = [];

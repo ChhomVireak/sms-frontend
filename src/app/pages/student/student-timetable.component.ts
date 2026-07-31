@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
                   [class.text-gray-400]="activeTab !== 'CLASS'"
                   class="px-5 py-2.5 rounded-xl border border-[#1f2937] font-bold text-xs transition-all flex items-center gap-2 shadow-md">
             <i class="fa-solid fa-calendar-days text-emerald-300"></i>
-            <span>Weekly Class Schedule (កាលវិភាគសិក្សា)</span>
+            <span>Weekly Class Schedule</span>
           </button>
 
           <button (click)="activeTab = 'EXAM'; loadExamSchedules()"
@@ -32,7 +32,7 @@ import { FormsModule } from '@angular/forms';
                   [class.text-gray-400]="activeTab !== 'EXAM'"
                   class="px-5 py-2.5 rounded-xl border border-[#1f2937] font-bold text-xs transition-all flex items-center gap-2 shadow-md">
             <i class="fa-solid fa-graduation-cap text-amber-300"></i>
-            <span>Exam Timetable Schedule (កាលវិភាគប្រឡង)</span>
+            <span>Exam Timetable Schedule</span>
             <span *ngIf="scheduledExams.length > 0" class="px-2 py-0.5 rounded-full bg-amber-400 text-black text-[10px] font-extrabold ml-1">
               {{ scheduledExams.length }}
             </span>
@@ -57,56 +57,70 @@ import { FormsModule } from '@angular/forms';
             <p class="text-[11px] text-gray-400 mt-0.5">Semester timetable schedule for your enrolled class section</p>
           </div>
 
-          <!-- Semester History Selector -->
+          <!-- Semester View Selector -->
           <div class="flex items-center gap-2">
             <span class="text-xs font-bold text-gray-400">Semester View:</span>
-            <select [(ngModel)]="selectedSemester" (change)="loadTimetables()" class="bg-[#111827] border border-emerald-500/50 text-xs font-extrabold text-emerald-400 rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-400">
-              <option [ngValue]="null">Current Active Semester</option>
-              <option *ngFor="let s of availableSemesters" [ngValue]="s">Semester {{ s }} (History)</option>
+            <select [(ngModel)]="selectedSemester" (change)="loadTimetables()" class="bg-[#111827] border border-emerald-500/50 text-xs font-extrabold text-emerald-400 rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-400 shadow-md cursor-pointer">
+              <option *ngFor="let s of availableSemesters" [ngValue]="s">
+                Semester {{ s }} {{ s === currentStudentSemester ? '(Active Current)' : '' }}
+              </option>
             </select>
           </div>
         </div>
 
-        <!-- Days Header -->
-        <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-400 border-b border-[#1f2937] pb-2 items-center">
-          <div class="py-1 font-mono text-cyan-400">TIME</div>
-          <div *ngFor="let dayObj of [
-            { code: 'MONDAY', label: 'MON' },
-            { code: 'TUESDAY', label: 'TUE' },
-            { code: 'WEDNESDAY', label: 'WED' },
-            { code: 'THURSDAY', label: 'THU' },
-            { code: 'FRIDAY', label: 'FRI' },
-            { code: 'SATURDAY', label: 'SAT' }
-          ]" class="py-1">
-            <span>{{ dayObj.label }}</span>
-          </div>
-        </div>
-
-        <!-- Dynamic Slots Grid -->
-        <div *ngFor="let slot of activeSlots" class="grid grid-cols-7 gap-2 text-xs items-center">
-          <div class="font-mono text-gray-400 text-center text-[11px] font-bold bg-[#111827] p-2 rounded-xl border border-[#1f2937]">
-            <div class="text-emerald-300 font-extrabold">{{ slot.slot_name }}</div>
-            <div class="text-gray-300 font-bold text-[10px] mt-0.5">{{ (slot.start_time || '08:00').slice(0,5) }} – {{ (slot.end_time || '09:30').slice(0,5) }}</div>
-          </div>
-
-          <div *ngFor="let day of ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']">
-            <div *ngIf="getSlotForDay(slot.slot_id, day) as item; else emptySlot" 
-                 class="bg-emerald-950/80 border border-emerald-700/80 p-2.5 rounded-xl space-y-1 relative shadow-sm transition-all hover:border-emerald-500">
-              <div>
-                <p class="font-extrabold text-emerald-300 truncate text-xs font-mono tracking-wide">📘 {{ item.subject_code }}</p>
-                <p class="text-[10px] text-white truncate font-bold">{{ item.subject_name }}</p>
-              </div>
-              <p class="text-[10px] text-amber-400 truncate font-semibold">👨‍🏫 {{ item.teacher_fname || 'Prof.' }} {{ item.teacher_lname || 'Teacher' }}</p>
-              <div class="flex items-center justify-between text-[9px] pt-0.5">
-                <span class="bg-emerald-900/60 text-emerald-200 px-1.5 py-0.5 rounded font-mono font-bold">🚪 Room {{ item.room_number || 'TBA' }}</span>
+        <!-- Scrollable Timetable Table Wrapper -->
+        <div class="overflow-x-auto rounded-xl border border-[#1f2937] bg-[#111827]/40 p-4">
+          <div class="min-w-[850px] space-y-3">
+            <!-- Days Header -->
+            <div class="grid grid-cols-7 gap-3 text-center text-xs font-bold text-gray-400 border-b border-[#1f2937] pb-3 items-center">
+              <div class="py-1 uppercase tracking-wider text-cyan-400 font-extrabold">TIME</div>
+              <div *ngFor="let dayObj of [
+                { code: 'MONDAY', label: 'MON' },
+                { code: 'TUESDAY', label: 'TUE' },
+                { code: 'WEDNESDAY', label: 'WED' },
+                { code: 'THURSDAY', label: 'THU' },
+                { code: 'FRIDAY', label: 'FRI' },
+                { code: 'SATURDAY', label: 'SAT' }
+              ]" class="py-1 font-extrabold text-gray-300">
+                <span>{{ dayObj.label }}</span>
               </div>
             </div>
 
-            <ng-template #emptySlot>
-              <div class="border border-dashed border-gray-800/80 p-2.5 rounded-xl text-center text-gray-600 font-bold text-[10px] flex flex-col items-center justify-center gap-1 min-h-[58px]">
-                <span class="text-xs text-gray-600 font-mono">—</span>
+            <!-- Dynamic Slots Grid -->
+            <div *ngFor="let slot of activeSlots" class="grid grid-cols-7 gap-3 text-xs items-center">
+              <div class="font-mono text-gray-400 text-center text-[11px] font-bold bg-[#111827] p-3 rounded-xl border border-[#1f2937] shadow-inner">
+                <div class="text-emerald-400 font-extrabold">{{ slot.slot_name }}</div>
+                <div class="text-gray-300 font-bold text-[10px] mt-0.5">{{ (slot.start_time || '08:00').slice(0,5) }} – {{ (slot.end_time || '09:30').slice(0,5) }}</div>
               </div>
-            </ng-template>
+
+              <div *ngFor="let day of ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']">
+                <!-- Assigned Slot -->
+                <div *ngIf="getSlotForDay(slot.slot_id, day) as item; else emptySlot" 
+                     class="bg-[#064e3b]/90 border border-emerald-500/60 p-3 rounded-xl space-y-1.5 relative shadow-lg hover:border-emerald-400 transition-all">
+                  <div [title]="item.subject_name + ' (' + (item.subject_code || 'CODE') + ')'">
+                    <p class="font-extrabold text-emerald-300 truncate text-xs font-mono tracking-wide">
+                      <i class="fa-solid fa-book text-emerald-400 mr-1"></i>{{ item.subject_code }}
+                    </p>
+                    <p class="text-[11px] text-white truncate font-bold leading-tight">{{ item.subject_name }}</p>
+                  </div>
+                  <p class="text-[10px] text-amber-300 truncate font-bold font-mono">
+                    <i class="fa-solid fa-chalkboard-user text-amber-300 mr-1"></i>{{ item.teacher_fname || 'Prof.' }} {{ item.teacher_lname || 'Teacher' }}
+                  </p>
+                  <div class="flex items-center justify-between text-[9px] pt-1 border-t border-emerald-800/60">
+                    <span class="bg-emerald-950 text-emerald-200 px-1.5 py-0.5 rounded font-mono font-bold border border-emerald-700/50">
+                      <i class="fa-solid fa-door-open text-emerald-300 mr-1"></i>Room {{ item.room_number || 'TBA' }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Unassigned / Free Slot -->
+                <ng-template #emptySlot>
+                  <div class="border border-dashed border-gray-800 bg-[#111827]/30 p-3 rounded-xl text-center text-gray-600 font-bold text-[10px] flex flex-col items-center justify-center gap-1 min-h-[64px]">
+                    <span class="text-xs text-gray-600 font-mono">—</span>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -321,15 +335,34 @@ export class StudentTimetableComponent implements OnInit {
   classGroupName: string = '';
   studentGroupId: number | null = null;
 
-  selectedSemester: number | null = null;
+  currentStudentSemester: number = 1;
+  selectedSemester: number = 1;
   availableSemesters: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
+    this.fetchStudentProfile();
     this.loadSlots();
     this.loadTimetables();
     this.loadExamSchedules();
+  }
+
+  fetchStudentProfile(): void {
+    this.api.get<any>('students/me').subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const s = res.data.student || {};
+          const g = res.data.group || {};
+          const sem = Number(s.current_semester || s.semester_id || g.current_semester || 1);
+          this.currentStudentSemester = sem;
+          if (!this.selectedSemester || this.selectedSemester === 1) {
+            this.selectedSemester = sem;
+            this.loadTimetables();
+          }
+        }
+      }
+    });
   }
 
   loadSlots(): void {
@@ -351,6 +384,11 @@ export class StudentTimetableComponent implements OnInit {
         if (first.group_code) {
           this.classGroupName = `${first.group_code} — ${first.group_name || ''}`;
           this.studentGroupId = first.group_id;
+        }
+        if (first.semester_id && (!this.selectedSemester || this.selectedSemester === 1)) {
+          const firstSem = Number(first.semester_id);
+          this.currentStudentSemester = firstSem;
+          this.selectedSemester = firstSem;
         }
       }
     });
@@ -430,12 +468,50 @@ export class StudentTimetableComponent implements OnInit {
     });
   }
 
+  isBreakSlot(slot: any): boolean {
+    if (!slot) return false;
+    const name = String(slot.slot_name || slot.name || '').toLowerCase();
+    return name.includes('break') || name.includes('breack') || name.includes('សម្រាក');
+  }
+
   get activeSlots(): any[] {
     if (!this.slots || this.slots.length === 0) return [];
-    if (!this.timetables || this.timetables.length === 0) return this.slots;
-    
-    const scheduledSlotIds = new Set(this.timetables.map(t => Number(t.slot_id)));
-    return this.slots.filter(s => scheduledSlotIds.has(Number(s.slot_id)));
+    if (!this.timetables || this.timetables.length === 0) return [];
+
+    const scheduledShifts = new Set<string>();
+    const scheduledSlotIds = new Set<number>();
+
+    this.timetables.forEach(t => {
+      if (t.slot_id) scheduledSlotIds.add(Number(t.slot_id));
+      const sObj = this.slots.find(s => Number(s.slot_id) === Number(t.slot_id));
+      const shift = String(t.group_shift || t.shift || sObj?.shift || '').toUpperCase();
+      if (shift) scheduledShifts.add(shift);
+    });
+
+    return this.slots.filter(s => {
+      const isScheduled = scheduledSlotIds.has(Number(s.slot_id));
+      if (isScheduled) return true;
+
+      const isBreak = this.isBreakSlot(s);
+      if (!isBreak) return false;
+
+      const slotShift = String(s.shift || '').toUpperCase();
+      const startTime = String(s.start_time || '00:00');
+
+      let inferredShift = slotShift;
+      if (!inferredShift) {
+        const hour = parseInt(startTime.split(':')[0], 10) || 0;
+        if (hour < 12) inferredShift = 'MORNING';
+        else if (hour < 17) inferredShift = 'AFTERNOON';
+        else inferredShift = 'EVENING';
+      }
+
+      if (scheduledShifts.size > 0) {
+        return scheduledShifts.has(inferredShift);
+      }
+
+      return false;
+    });
   }
 
   getSlotForDay(slotId: number, day: string): any {

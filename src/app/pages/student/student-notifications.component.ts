@@ -40,10 +40,10 @@ import { SocketService } from '../../core/services/socket.service';
           ALL ({{ notifications.length }})
         </button>
         <button (click)="setFilter('ANNOUNCEMENT')" [ngClass]="selectedFilter === 'ANNOUNCEMENT' ? 'bg-amber-500 text-white shadow-md' : 'bg-[#111827] text-gray-400 border border-[#1f2937] hover:text-white'" class="px-4 py-2 rounded-xl transition-all">
-          📢 ANNOUNCEMENTS
+          ANNOUNCEMENTS
         </button>
         <button (click)="setFilter('EXAM')" [ngClass]="selectedFilter === 'EXAM' ? 'bg-amber-500 text-white shadow-md' : 'bg-[#111827] text-gray-400 border border-[#1f2937] hover:text-white'" class="px-4 py-2 rounded-xl transition-all">
-          📝 EXAM NOTICES
+          EXAM NOTICES
         </button>
       </div>
 
@@ -62,7 +62,7 @@ import { SocketService } from '../../core/services/socket.service';
               <div>
                 <h3 class="text-sm font-extrabold text-white">{{ n.title }}</h3>
                 <div class="flex items-center gap-2 mt-1">
-                  <span class="text-[10px] font-mono text-gray-400">📅 {{ (n.publish_date || n.created_at) | date:'dd/MM/yyyy' }}</span>
+                  <span class="text-[10px] font-mono text-gray-400">{{ (n.publish_date || n.created_at) | date:'dd/MM/yyyy' }}</span>
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#111827] text-amber-400 border border-[#1f2937]">
                     {{ n.target_audience || 'All Users' }}
                   </span>
@@ -104,18 +104,8 @@ export class StudentNotificationsComponent implements OnInit, OnDestroy {
   constructor(private api: ApiService, private socketService: SocketService) { }
 
   ngOnInit(): void {
-    this.markAllAsReadSilent();
     this.loadNotifications();
     this.initSocketListener();
-  }
-
-  markAllAsReadSilent(): void {
-    const now = Date.now().toString();
-    localStorage.setItem('global_alerts_read', 'true');
-    localStorage.setItem('alerts_read_all', 'true');
-    localStorage.setItem('last_read_notif', now);
-    localStorage.setItem('student_last_read_notif', now);
-    localStorage.setItem('teacher_last_read_notif', now);
   }
 
   ngOnDestroy(): void {
@@ -131,22 +121,15 @@ export class StudentNotificationsComponent implements OnInit, OnDestroy {
   }
 
   loadNotifications(): void {
-    const isGlobalRead = localStorage.getItem('global_alerts_read') === 'true';
-    const lastReadTime = Number(localStorage.getItem('last_read_notif') || 0);
-    const readIdsStr = localStorage.getItem('read_notif_ids') || '[]';
-    const readIds = new Set(JSON.parse(readIdsStr));
-
     this.api.get<any>('notifications').subscribe({
       next: (res) => {
         const notifs = res.data?.notifications || res.data || [];
         this.notifications = notifs.map((n: any) => {
           const id = n.notification_id || n.id;
-          const notifTime = new Date(n.created_at || n.publish_date || Date.now()).getTime();
-          const isRead = isGlobalRead || Boolean(n.is_read) || readIds.has(id) || (lastReadTime > 0 && notifTime <= lastReadTime);
           return {
             ...n,
             id: id,
-            read: isRead
+            read: Boolean(n.is_read)
           };
         });
         this.filterNotifications();

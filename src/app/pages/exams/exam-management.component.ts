@@ -262,8 +262,8 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
                     {{ ex.room_number || 'Room 101' }}
                   </td>
                   <td class="py-3.5 text-right">
-                    <button (click)="deleteExam(ex)" title="Delete Exam Schedule" class="p-2 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 font-bold text-xs transition-all">
-                      <i class="fa-solid fa-trash-can"></i>
+                    <button (click)="deleteExam(ex)" title="Delete Exam Schedule" class="text-gray-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+                      <i class="fa-solid fa-trash"></i>
                     </button>
                   </td>
                 </tr>

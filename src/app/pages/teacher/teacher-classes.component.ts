@@ -76,7 +76,7 @@ import { SocketService } from '../../core/services/socket.service';
                     </span>
                   </div>
                   <span *ngIf="!g.taught_subjects || g.taught_subjects.length === 0" class="text-cyan-400 font-mono text-xs font-bold">
-                    📘 {{ g.primary_subject_name || g.group_name }}
+                    <i class="fa-solid fa-book text-emerald-400 mr-1.5"></i>{{ g.primary_subject_name || g.group_name }}
                   </span>
                 </td>
                 <td class="py-3.5 space-y-1">
@@ -91,9 +91,9 @@ import { SocketService } from '../../core/services/socket.service';
                 </td>
                 <td class="py-3.5 font-mono">
                   <span [class.text-amber-400]="g.status !== 'GRADUATED'" [class.text-emerald-400]="g.status === 'GRADUATED'" class="font-bold block">
-                    {{ g.status === 'GRADUATED' ? '🎓 GRADUATED' : 'Year ' + (g.academic_year_level || 0) + ' · Semester ' + (g.current_semester || 0) }}
+                    {{ g.status === 'GRADUATED' ? 'GRADUATED' : 'Year ' + (g.academic_year_level || 0) + ' · Semester ' + (g.current_semester || 0) }}
                   </span>
-                  <span class="text-[10px] text-gray-400 block font-mono">📅 {{ (g.semester_start_date ? (g.semester_start_date | date:'dd/MM/yyyy') : 'N/A') }} ➔ {{ (g.semester_end_date ? (g.semester_end_date | date:'dd/MM/yyyy') : 'N/A') }}</span>
+                  <span class="text-[10px] text-gray-400 block font-mono"><i class="fa-regular fa-calendar text-cyan-400 mr-1"></i>{{ (g.semester_start_date ? (g.semester_start_date | date:'dd/MM/yyyy') : 'N/A') }} ➔ {{ (g.semester_end_date ? (g.semester_end_date | date:'dd/MM/yyyy') : 'N/A') }}</span>
                 </td>
                 <td class="py-3.5 font-mono">
                   <span class="font-bold text-white text-xs block">{{ g.student_count || 0 }} Enrolled</span>

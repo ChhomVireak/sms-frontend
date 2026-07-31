@@ -23,14 +23,14 @@ import { ApiService } from '../../core/services/api.service';
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">TOTAL AMOUNT PAID</span>
           <h3 class="text-3xl font-extrabold text-emerald-400 mt-2">\${{ totalPaid | number:'1.2-2' }}</h3>
-          <p class="text-xs text-emerald-400 mt-1">✓ Verified Payments</p>
+          <p class="text-xs text-emerald-400 mt-1">Verified Payments</p>
         </div>
 
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-5">
           <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">REMAINING BALANCE DUE</span>
           <h3 class="text-3xl font-extrabold text-rose-400 mt-2">\${{ balanceDue | number:'1.2-2' }}</h3>
           <p class="text-xs mt-1 font-semibold" [ngClass]="balanceDue === 0 ? 'text-emerald-400' : 'text-rose-400'">
-            {{ balanceDue === 0 ? '✓ Fully Paid' : 'Outstanding Tuition Balance' }}
+            {{ balanceDue === 0 ? 'Fully Paid' : 'Outstanding Tuition Balance' }}
           </p>
         </div>
 
@@ -51,9 +51,14 @@ import { ApiService } from '../../core/services/api.service';
           <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
             <i class="fa-solid fa-receipt text-emerald-400"></i> Tuition Fee Schedules & Payment Plan
           </h3>
-          <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800">
-            {{ filteredFeeSchedules.length }} Schedules ({{ activePaymentPlanType === 'YEARLY' ? 'Yearly' : (activePaymentPlanType === 'SEMESTER' ? 'Semester' : 'Installment') }})
-          </span>
+          <div class="flex items-center gap-2">
+            <span *ngIf="studentGroup" class="text-xs font-mono font-bold text-cyan-300 bg-cyan-950 px-3 py-1 rounded-lg border border-cyan-800 flex items-center gap-1">
+              <i class="fa-solid fa-users-rectangle"></i> Class Group: {{ studentGroup.group_code || studentGroup.group_name }}
+            </span>
+            <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800">
+              {{ filteredFeeSchedules.length }} Schedules ({{ activePaymentPlanType === 'YEARLY' ? 'Yearly' : (activePaymentPlanType === 'SEMESTER' ? 'Semester' : 'Installment') }})
+            </span>
+          </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -166,10 +171,11 @@ import { ApiService } from '../../core/services/api.service';
 export class StudentFeesComponent implements OnInit {
   feeSchedules: any[] = [];
   payments: any[] = [];
+  studentGroup: any = null;
   totalScheduled: number = 0;
   totalPaid: number = 0;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   ngOnInit(): void {
     this.loadFeeData();
@@ -207,17 +213,30 @@ export class StudentFeesComponent implements OnInit {
   get filteredFeeSchedules(): any[] {
     if (!this.feeSchedules || this.feeSchedules.length === 0) return [];
 
+    // Filter strictly by student's assigned class group
+    let groupFiltered = this.feeSchedules;
+    if (this.studentGroup && this.studentGroup.group_id) {
+      const targetGroupId = Number(this.studentGroup.group_id);
+      groupFiltered = this.feeSchedules.filter(f => !f.group_id || Number(f.group_id) === targetGroupId);
+    }
+
+    // Filter strictly: ONLY display PAID schedules for student portal
+    const paidOnly = groupFiltered.filter(f => this.isPaid(f));
+
     const planType = this.activePaymentPlanType;
 
     if (planType === 'YEARLY') {
-      return this.feeSchedules.filter(f => this.isYearlyPayment(f));
+      const yearly = paidOnly.filter(f => this.isYearlyPayment(f));
+      return yearly.length > 0 ? yearly : paidOnly;
     } else if (planType === 'SEMESTER') {
-      return this.feeSchedules.filter(f => this.isSemesterPayment(f) && !this.isYearlyPayment(f));
+      const semester = paidOnly.filter(f => this.isSemesterPayment(f) && !this.isYearlyPayment(f));
+      return semester.length > 0 ? semester : paidOnly;
     } else if (planType === 'INSTALLMENT') {
-      return this.feeSchedules.filter(f => this.isInstallmentPayment(f));
+      const installment = paidOnly.filter(f => this.isInstallmentPayment(f));
+      return installment.length > 0 ? installment : paidOnly;
     }
 
-    return this.feeSchedules;
+    return paidOnly;
   }
 
   isYearlyPayment(item: any): boolean {
@@ -227,7 +246,7 @@ export class StudentFeesComponent implements OnInit {
 
     // If title or cycle explicitly references semester, sem 1, sem 2, or ឆមាស -> NOT a Yearly Schedule!
     if (title.includes('semester') || title.includes('sem ') || title.includes('sem1') || title.includes('sem2') || title.includes('ឆមាស') ||
-        cycle.includes('semester') || cycle.includes('sem ') || cycle.includes('sem1') || cycle.includes('sem2') || cycle.includes('ឆមាស')) {
+      cycle.includes('semester') || cycle.includes('sem ') || cycle.includes('sem1') || cycle.includes('sem2') || cycle.includes('ឆមាស')) {
       return false;
     }
 
@@ -280,13 +299,17 @@ export class StudentFeesComponent implements OnInit {
   }
 
   isPaid(fee: any): boolean {
-    return this.totalPaid >= Number(fee?.amount || 0);
+    if (!fee) return false;
+    const st = String(fee.status || fee.payment_status || '').toUpperCase();
+    if (st === 'PAID' || st === 'VERIFIED' || fee.is_paid) return true;
+    return this.totalPaid >= Number(fee.amount || 0);
   }
 
   loadFeeData(): void {
     this.api.get<any>('fees/schedules').subscribe({
       next: (res) => {
         this.feeSchedules = res.data?.schedules || res.data || [];
+        this.studentGroup = res.data?.studentGroup || null;
         this.totalScheduled = this.feeSchedules.reduce((acc, f) => acc + (Number(f.amount) || 0), 0);
       }
     });

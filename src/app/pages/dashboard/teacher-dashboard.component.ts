@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { SocketService } from '../../core/services/socket.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -100,17 +101,64 @@ import { SocketService } from '../../core/services/socket.service';
           </div>
 
           <div *ngIf="todaySchedule.length > 0" class="space-y-3">
-            <div *ngFor="let item of todaySchedule" class="bg-[#111827]/80 border border-[#1f2937] p-3.5 rounded-xl flex items-center justify-between">
-              <div>
-                <span class="text-xs font-mono text-cyan-400 font-bold">
-                  {{ (item.start_time || '08:00').slice(0,5) }} – {{ (item.end_time || '09:30').slice(0,5) }}
-                </span>
-                <p class="text-sm font-bold text-white mt-0.5">{{ item.subject_name || 'C++ Programming' }}</p>
+            <div *ngFor="let item of todaySchedule" class="bg-[#111827]/80 border border-[#1f2937] p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono text-cyan-400 font-bold bg-cyan-950/80 border border-cyan-800 px-2 py-0.5 rounded">
+                    {{ (item.start_time || '08:00').slice(0,5) }} – {{ (item.end_time || '09:30').slice(0,5) }}
+                  </span>
+                  <span class="text-xs font-semibold bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700 font-mono">
+                    Room {{ item.room_number || '8' }}
+                  </span>
+                </div>
+                <p class="text-sm font-bold text-white mt-1">{{ item.subject_name || 'C++ Programming' }}</p>
                 <p class="text-xs text-gray-400 font-mono">{{ item.group_code || item.group_name }}</p>
               </div>
-              <span class="text-xs font-semibold bg-gray-800 text-gray-300 px-3 py-1 rounded-lg border border-gray-700 font-mono">
-                Room {{ item.room_number || '8' }}
-              </span>
+
+              <!-- Multi-state Dynamic Check-in Button / Status Badge -->
+              <div class="shrink-0 flex items-center gap-2">
+                <!-- State 1: Checked In -->
+                <div *ngIf="item.button_state === 'CHECKED_IN' || item.is_checked_in"
+                     class="bg-emerald-950/90 border border-emerald-800 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold font-mono flex items-center gap-2 shadow-md">
+                  <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                  <div class="flex flex-col">
+                    <span>Checked in at {{ item.check_in_time }}</span>
+                    <span *ngIf="item.distance_meters !== null" class="text-[10px] text-emerald-400/80 font-normal">
+                      GPS {{ item.distance_meters }}m · Wi-Fi Verified
+                    </span>
+                  </div>
+                </div>
+
+                <!-- State 2: Too Early (Before class start_time) -->
+                <button *ngIf="item.button_state === 'TOO_EARLY' && !item.is_checked_in"
+                        disabled
+                        title="Check-in opens at class start time"
+                        class="bg-gray-800/80 border border-gray-700 text-gray-400 px-3.5 py-2 rounded-xl text-xs font-bold font-mono flex items-center gap-2 cursor-not-allowed opacity-70">
+                  <i class="fa-solid fa-hourglass-half text-amber-400"></i>
+                  <span>Too Early</span>
+                </button>
+
+                <!-- State 3: ABSENT (Missed 15-minute check-in grace period) -->
+                <div *ngIf="(item.button_state === 'ABSENT' || item.button_state === 'EXPIRED' || item.check_in_status === 'ABSENT') && !item.is_checked_in"
+                     class="bg-rose-950/80 border border-rose-800 text-rose-300 px-3.5 py-2 rounded-xl text-xs font-bold font-mono flex items-center gap-2 shadow-md">
+                  <i class="fa-solid fa-circle-xmark text-rose-500 text-sm"></i>
+                  <div class="flex flex-col">
+                    <span class="text-rose-400 font-extrabold">ABSENT (អវត្តមាន)</span>
+                    <span class="text-[10px] text-rose-400/80 font-normal">
+                      Missed 15-min check-in window
+                    </span>
+                  </div>
+                </div>
+
+                <!-- State 4: Check-in Now (Enabled 🟢) -->
+                <button *ngIf="item.button_state === 'CHECKIN_NOW' && !item.is_checked_in"
+                        (click)="performCheckIn(item)"
+                        [disabled]="isCheckingIn"
+                        class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition-all cursor-pointer animate-pulse">
+                  <i [class]="checkingInId === item.timetable_id ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-location-dot text-sm'"></i>
+                  <span>{{ checkingInId === item.timetable_id ? 'Verifying GPS & IP...' : 'Check-in Now' }}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -131,7 +179,7 @@ import { SocketService } from '../../core/services/socket.service';
                   <i class="fa-solid fa-book-bookmark text-emerald-400 text-xs"></i>
                   <span>{{ c.subject_name || c.group_name }}</span>
                 </p>
-                <p class="text-xs text-gray-400 font-mono mt-1">👥 {{ c.group_code }} — {{ c.group_name }}</p>
+                <p class="text-xs text-gray-400 font-mono mt-1"><i class="fa-solid fa-users text-amber-400 mr-1"></i>{{ c.group_code }} — {{ c.group_name }}</p>
               </div>
               <div class="bg-[#111827] border border-[#1f2937] px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-mono text-gray-300 shrink-0">
                 <i class="fa-solid fa-user-group text-emerald-400 text-xs"></i>
@@ -241,6 +289,40 @@ import { SocketService } from '../../core/services/socket.service';
             </div>
           </div>
         </div>
+
+        <!-- Active System Broadcast Alerts Card -->
+        <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 flex flex-col justify-between min-h-[220px]">
+          <div class="flex items-center justify-between mb-4 border-b border-[#1f2937] pb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-bullhorn text-amber-400 text-sm"></i>
+              <h3 class="text-sm font-bold text-white">System Broadcast Alerts</h3>
+              <span *ngIf="unreadAlertsCount > 0" class="bg-rose-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full animate-pulse font-mono">
+                {{ unreadAlertsCount }} Unread
+              </span>
+            </div>
+            <a routerLink="/teacher/notifications" class="text-xs text-amber-400 hover:underline font-semibold">View all →</a>
+          </div>
+
+          <div *ngIf="recentNotifications.length === 0" class="flex-1 flex flex-col items-center justify-center py-6 text-center text-gray-500 italic">
+            No active broadcast alerts
+          </div>
+
+          <div *ngIf="recentNotifications.length > 0" class="space-y-2.5">
+            <div *ngFor="let notif of recentNotifications.slice(0, 3)" class="bg-[#111827]/80 border border-[#1f2937] p-3 rounded-xl space-y-1.5 hover:border-amber-500/40 transition-all">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white text-xs flex items-center gap-1.5">
+                  <span class="truncate max-w-[180px]">{{ notif.title }}</span>
+                  <span *ngIf="!notif.is_read" class="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
+                </span>
+                <button *ngIf="!notif.is_read" (click)="markNotifRead(notif)" class="px-2.5 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold text-[10px] border border-emerald-500/30 shrink-0">
+                  Mark Read
+                </button>
+                <span *ngIf="notif.is_read" class="text-[10px] font-bold text-gray-500 font-mono shrink-0">Read</span>
+              </div>
+              <p class="text-[11px] text-gray-300 line-clamp-2 leading-relaxed">{{ notif.message }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   `
@@ -248,7 +330,9 @@ import { SocketService } from '../../core/services/socket.service';
 export class TeacherDashboardComponent implements OnInit, OnDestroy {
   teacherName: string = 'Teacher';
   unreadAlertsCount: number = 0;
+  recentNotifications: any[] = [];
   private socketSub!: Subscription;
+  private timerInterval: any;
 
   stats: any = {
     myClasses: 0,
@@ -271,20 +355,27 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   recentAttendance: any[] = [];
   upcomingExams: any[] = [];
 
+  isCheckingIn = false;
+  checkingInId: number | null = null;
+
   constructor(
     private api: ApiService,
     public router: Router,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private toast: ToastService
   ) { }
 
   ngOnInit(): void {
     this.loadDashboardData();
     this.loadUnreadNotifications();
     this.initSocketListener();
+    // Real-time ticker to auto-evaluate time window states every 5 seconds without page reload
+    this.timerInterval = setInterval(() => this.updateScheduleStatesRealtime(), 5000);
   }
 
   ngOnDestroy(): void {
     if (this.socketSub) this.socketSub.unsubscribe();
+    if (this.timerInterval) clearInterval(this.timerInterval);
   }
 
   markReadAndNavigate(): void {
@@ -302,6 +393,9 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
       if (event === 'new_announcement_created' || event === 'new_exam_scheduled') {
         localStorage.removeItem('global_alerts_read');
         this.unreadAlertsCount = 1;
+      }
+      if (event === 'teacher_attendance_updated' || event === 'ATTENDANCE_UPDATED') {
+        this.loadDashboardData();
       }
     });
   }
@@ -335,6 +429,14 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadDashboardData(): void {
+    this.api.get<any>('notifications').subscribe({
+      next: (res) => {
+        const notifs = res.data?.notifications || res.data || [];
+        this.recentNotifications = notifs;
+        this.unreadAlertsCount = notifs.filter((n: any) => !n.is_read).length;
+      }
+    });
+
     this.api.get<any>('dashboard/teacher').subscribe({
       next: (res) => {
         if (res.success && res.data) {
@@ -345,7 +447,101 @@ export class TeacherDashboardComponent implements OnInit, OnDestroy {
           if (res.data.attendance30d) this.attendance30d = res.data.attendance30d;
           if (res.data.recentAttendance) this.recentAttendance = res.data.recentAttendance;
           if (res.data.upcomingExams) this.upcomingExams = res.data.upcomingExams;
+          this.updateScheduleStatesRealtime();
         }
+      }
+    });
+  }
+
+  updateScheduleStatesRealtime(): void {
+    if (!this.todaySchedule || this.todaySchedule.length === 0) return;
+
+    const now = new Date();
+    this.todaySchedule.forEach((item) => {
+      if (item.is_checked_in || item.check_in_time) {
+        item.button_state = 'CHECKED_IN';
+        return;
+      }
+
+      const startTimeParts = String(item.start_time || '08:00:00').split(':');
+      const classStart = new Date(now);
+      classStart.setHours(parseInt(startTimeParts[0], 10), parseInt(startTimeParts[1], 10), 0, 0);
+
+      const classCheckInClose = new Date(classStart.getTime() + 15 * 60 * 1000); // 15 mins after start_time
+
+      if (now < classStart) {
+        item.button_state = 'TOO_EARLY';
+      } else if (now > classCheckInClose) {
+        item.button_state = 'ABSENT';
+        item.check_in_status = 'ABSENT';
+      } else {
+        item.button_state = 'CHECKIN_NOW';
+      }
+    });
+  }
+
+  performCheckIn(item: any): void {
+    if (this.isCheckingIn) return;
+
+    if (!navigator.geolocation) {
+      this.toast.error('HTML5 Geolocation is not supported by your browser or device.');
+      return;
+    }
+
+    this.isCheckingIn = true;
+    this.checkingInId = item.timetable_id;
+
+    // Capture GPS Geolocation with high accuracy
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const payload = {
+          timetable_id: item.timetable_id,
+          teacher_id: item.teacher_id,
+          user_lat: position.coords.latitude,
+          user_lng: position.coords.longitude
+        };
+
+        this.api.post('teacher/attendance/check-in', payload).subscribe({
+          next: (res: any) => {
+            this.isCheckingIn = false;
+            this.checkingInId = null;
+            this.toast.success(res.message || 'Check-in successful!');
+            this.loadDashboardData();
+          },
+          error: (err: any) => {
+            this.isCheckingIn = false;
+            this.checkingInId = null;
+            const errMsg = err.error?.message || err.message || 'Check-in verification failed.';
+            this.toast.error(errMsg);
+          }
+        });
+      },
+      (error) => {
+        this.isCheckingIn = false;
+        this.checkingInId = null;
+        let msg = 'Failed to acquire GPS Geolocation.';
+        if (error.code === error.PERMISSION_DENIED) {
+          msg = 'GPS location permission denied. Please enable Location access in your browser settings.';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          msg = 'GPS Location information is unavailable on your device.';
+        } else if (error.code === error.TIMEOUT) {
+          msg = 'GPS location request timed out. Please try again.';
+        }
+        this.toast.error(msg);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  }
+
+  markNotifRead(notif: any): void {
+    this.api.post<any>(`notifications/${notif.notification_id || notif.id}/read`, {}).subscribe({
+      next: () => {
+        notif.is_read = true;
+        this.unreadAlertsCount = Math.max(0, this.unreadAlertsCount - 1);
       }
     });
   }

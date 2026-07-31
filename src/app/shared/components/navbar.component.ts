@@ -106,11 +106,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.realAlertCount = 0;
-    const isGlobalRead = localStorage.getItem('global_alerts_read') === 'true' || localStorage.getItem('alerts_read_all') === 'true';
-    if (isGlobalRead) {
-      this.realAlertCount = 0;
-    }
     this.fetchRealNotifications();
     this.initSocketListener();
   }
@@ -133,54 +128,43 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   initSocketListener(): void {
     this.socketSub = this.socketService.onRealtimeEvent().subscribe(({ event }) => {
-      // Admin is the sender who creates announcements/exams, so Admin does not get unread alert notifications!
       if (this.isAdmin) return;
 
-      if (event === 'new_announcement_created' || event === 'new_exam_scheduled') {
-        localStorage.removeItem('global_alerts_read');
-        localStorage.removeItem('alerts_read_all');
-        this.realAlertCount = 1;
+      if (event === 'announcement_created' || event.startsWith('exam_') || event.startsWith('scores_')) {
+        this.fetchRealNotifications();
       }
     });
   }
 
   markAllAsReadSilent(): void {
-    const now = Date.now().toString();
-    localStorage.setItem('global_alerts_read', 'true');
-    localStorage.setItem('alerts_read_all', 'true');
-    localStorage.setItem('last_read_notif', now);
-    localStorage.setItem('teacher_last_read_notif', now);
-    localStorage.setItem('student_last_read_notif', now);
-    this.realAlertCount = 0;
+    this.api.post<any>('notifications/read-all', {}).subscribe({
+      next: () => {
+        this.alertList = this.alertList.map(n => ({ ...n, is_read: true }));
+        this.realAlertCount = 0;
+      }
+    });
   }
 
   fetchRealNotifications(): void {
-    this.realAlertCount = 0;
     if (this.isAdmin) {
       this.api.get<any>('notifications').subscribe({
         next: (res) => {
           this.alertList = res.data?.notifications || res.data || [];
+          this.realAlertCount = 0;
         },
         error: () => {
           this.alertList = [];
+          this.realAlertCount = 0;
         }
       });
       return;
     }
 
-    const isGlobalRead = localStorage.getItem('global_alerts_read') === 'true' || localStorage.getItem('alerts_read_all') === 'true';
-
     this.api.get<any>('notifications').subscribe({
       next: (res) => {
         const notifs = res.data?.notifications || res.data || [];
         this.alertList = notifs;
-
-        if (isGlobalRead) {
-          this.realAlertCount = 0;
-        } else {
-          // Mark read silently so it never pops up unread count on page reloads
-          this.markAllAsReadSilent();
-        }
+        this.realAlertCount = notifs.filter((n: any) => !n.is_read).length;
       },
       error: () => {
         this.alertList = [];

@@ -69,8 +69,8 @@ import { environment } from '../../../environments/environment';
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-bold text-emerald-400 mb-1.5">SELECT MAJOR / PROGRAM *</label>
-                  <select [(ngModel)]="form.program_id" (change)="onProgramChange()" name="program_id" required class="w-full bg-[#111827] border border-emerald-500/60 rounded-xl px-4 py-2.5 text-xs text-white font-bold focus:outline-none focus:border-emerald-500">
-                    <option *ngFor="let p of programs" [value]="p.program_id">
+                  <select [(ngModel)]="form.program_id" (change)="onProgramChange()" name="program_id" required class="w-full bg-[#111827] border border-emerald-500/60 rounded-xl px-4 py-2.5 text-xs text-white font-bold focus:outline-none focus:border-emerald-500 cursor-pointer">
+                    <option *ngFor="let p of programs" [ngValue]="p.program_id">
                       {{ p.program_code }} — {{ p.program_name }} ({{ p.degree }})
                     </option>
                   </select>
@@ -78,11 +78,11 @@ import { environment } from '../../../environments/environment';
 
                 <div>
                   <label class="block text-xs font-bold text-emerald-400 mb-1.5">SELECT CLASS GROUP *</label>
-                  <select [(ngModel)]="form.group_id" (change)="onGroupSelectChange()" name="group_id" required class="w-full bg-[#111827] border border-emerald-500/60 rounded-xl px-4 py-2.5 text-xs text-white font-bold focus:outline-none focus:border-emerald-500">
-                    <option *ngFor="let g of filteredGroups" [value]="g.group_id">
+                  <select [(ngModel)]="form.group_id" (change)="onGroupSelectChange()" name="group_id" required class="w-full bg-[#111827] border border-emerald-500/60 rounded-xl px-4 py-2.5 text-xs text-white font-bold focus:outline-none focus:border-emerald-500 cursor-pointer">
+                    <option *ngFor="let g of filteredGroups" [ngValue]="g.group_id">
                       {{ g.group_code }} — {{ g.group_name }}
                     </option>
-                    <option *ngIf="filteredGroups.length === 0" [value]="null" disabled>
+                    <option *ngIf="filteredGroups.length === 0" [ngValue]="null" disabled>
                       -- No class groups available for this program --
                     </option>
                   </select>
@@ -195,6 +195,7 @@ import { environment } from '../../../environments/environment';
 export class StudentFormComponent implements OnInit {
   isEdit = false;
   studentId: number | null = null;
+  originalGroupId: number | null = null;
   groups: any[] = [];
   programs: Program[] = [];
   selectedFile: File | null = null;
@@ -239,19 +240,23 @@ export class StudentFormComponent implements OnInit {
   loadDropdowns(): void {
     this.api.get<any>('groups').subscribe(res => {
       this.groups = res.data?.groups || res.data || [];
-      if (this.groups.length > 0 && !this.form.group_id) {
-        this.form.group_id = this.groups[0].group_id;
-      }
-      if (!this.form.enrollment_date) {
-        this.onGroupSelectChange();
-      }
-    });
-
-    this.academicService.getPrograms().subscribe(res => {
-      this.programs = res.data?.programs || [];
-      if (this.programs.length > 0 && !this.form.program_id) {
-        this.form.program_id = this.programs[0].program_id;
-      }
+      this.academicService.getPrograms().subscribe(progRes => {
+        this.programs = progRes.data?.programs || [];
+        if (this.programs.length > 0) {
+          if (!this.form.program_id || !this.programs.some(p => p.program_id == this.form.program_id)) {
+            this.form.program_id = this.programs[0].program_id;
+          }
+        }
+        if (!this.isEdit) {
+          const matching = this.filteredGroups;
+          if (matching.length > 0) {
+            this.form.group_id = matching[0].group_id;
+            this.onGroupSelectChange();
+          } else {
+            this.form.group_id = null;
+          }
+        }
+      });
     });
   }
 
@@ -260,14 +265,27 @@ export class StudentFormComponent implements OnInit {
       next: (res) => {
         if (res.success && res.data.student) {
           const s = res.data.student;
+
+          let assignedGroupId = s.group_id ? Number(s.group_id) : null;
+          let assignedProgramId = s.program_id ? Number(s.program_id) : null;
+
+          if (!assignedProgramId && assignedGroupId && this.groups.length > 0) {
+            const foundG = this.groups.find(g => g.group_id == assignedGroupId);
+            if (foundG && foundG.program_id) {
+              assignedProgramId = Number(foundG.program_id);
+            }
+          }
+          if (!assignedProgramId && this.programs.length > 0) assignedProgramId = this.programs[0].program_id;
+
+          this.originalGroupId = assignedGroupId;
           this.form = {
             first_name: s.first_name || '',
             last_name: s.last_name || '',
             gender: s.gender || 'MALE',
             dob: s.dob ? s.dob.slice(0, 10) : '',
             phone: s.phone || '',
-            program_id: s.program_id || 1,
-            group_id: s.group_id || 1,
+            program_id: assignedProgramId,
+            group_id: assignedGroupId,
             parent_name: s.parent_name || '',
             parent_phone: s.parent_phone || '',
             previous_school: s.previous_school || '',
@@ -301,8 +319,21 @@ export class StudentFormComponent implements OnInit {
   }
 
   get filteredGroups(): any[] {
+    if (!this.groups || this.groups.length === 0) return [];
     if (!this.form.program_id) return [];
-    return this.groups.filter(g => !g.program_id || g.program_id == this.form.program_id);
+
+    // Strictly filter class groups belonging to selected program_id
+    const filtered = this.groups.filter(g => g.program_id == this.form.program_id);
+
+    // Ensure the currently assigned group is always present in the dropdown list when editing
+    if (this.isEdit && this.form.group_id && !filtered.some(g => g.group_id == this.form.group_id)) {
+      const assignedGroup = this.groups.find(g => g.group_id == this.form.group_id);
+      if (assignedGroup) {
+        return [assignedGroup, ...filtered];
+      }
+    }
+
+    return filtered;
   }
 
   onProgramChange(): void {
@@ -317,6 +348,9 @@ export class StudentFormComponent implements OnInit {
 
   get isGroupFull(): boolean {
     if (!this.form.group_id) return false;
+    if (this.isEdit && this.originalGroupId == this.form.group_id) {
+      return false;
+    }
     const g = this.groups.find(item => item.group_id == this.form.group_id);
     if (!g) return false;
     return (g.student_count || 0) >= (g.max_capacity || 40);
