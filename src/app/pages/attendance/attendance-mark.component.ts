@@ -133,34 +133,9 @@ import { SocketService } from '../../core/services/socket.service';
 
         <!-- Attendance Sheet Table (Full Width) -->
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
-            <!-- Teacher Leave Alert Banner -->
-            <div *ngIf="assignedTeacherLeaveNotice" class="bg-amber-950/90 border-2 border-amber-500 rounded-2xl p-4 flex items-center justify-between gap-4 text-amber-200 shadow-xl">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-amber-900/90 text-amber-400 font-bold flex items-center justify-center text-lg shrink-0 border border-amber-700">
-                  <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <div>
-                  <h4 class="font-extrabold text-sm text-white flex items-center gap-2">
-                    Teacher Leave Notice
-                  </h4>
-                  <p class="text-xs text-amber-200 mt-0.5">
-                    Teacher <strong>{{ assignedTeacherLeaveNotice.teacher_name }}</strong> is marked as 
-                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase" [class.bg-indigo-900]="assignedTeacherLeaveNotice.status === 'LEAVE'" [class.bg-rose-900]="assignedTeacherLeaveNotice.status === 'ABSENT'" [class.text-indigo-300]="assignedTeacherLeaveNotice.status === 'LEAVE'" [class.text-rose-300]="assignedTeacherLeaveNotice.status === 'ABSENT'">
-                      • {{ assignedTeacherLeaveNotice.status }}
-                    </span>
-                    on {{ assignedTeacherLeaveNotice.date }} <span class="font-bold text-amber-300 font-mono">({{ assignedTeacherLeaveNotice.time_slot || '07:30 - 09:00 AM' }})</span>!
-                    <span *ngIf="assignedTeacherLeaveNotice.note" class="italic font-semibold text-amber-100">("{{ assignedTeacherLeaveNotice.note }}")</span>
-                  </p>
-                </div>
-              </div>
-              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-900 text-amber-300 border border-amber-700 shrink-0">
-                Class {{ getSelectedGroupCode() }}
-              </span>
-            </div>
-
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
               <h3 class="text-base font-bold text-white tracking-tight">
-                Class Roster Attendance Sheet · <span class="text-emerald-400 font-mono">{{ selectedDate | date:'mediumDate' }}</span>
+               <span class="text-emerald-400 font-mono">{{ selectedDate | date:'mediumDate' }}</span>
               </h3>
 
               <!-- Search Bar by Name, Student ID, or Phone Number -->
@@ -394,7 +369,7 @@ import { SocketService } from '../../core/services/socket.service';
         <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <h3 class="text-base font-bold text-white tracking-tight">
-              Faculty Teachers Attendance Roster Sheet · <span class="text-emerald-400 font-mono">{{ teacherAttendanceDate | date:'mediumDate' }}</span>
+              <span class="text-emerald-400 font-mono">{{ teacherAttendanceDate | date:'mediumDate' }}</span>
             </h3>
 
             <!-- Search Bar by Name, ID, or Phone -->
@@ -402,7 +377,7 @@ import { SocketService } from '../../core/services/socket.service';
               <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
               <input type="text" 
                      [(ngModel)]="teacherSearchQuery" 
-                     placeholder="🔍 Search Teacher Name, ID, or Phone..." 
+                     placeholder="Search Teacher Name, ID, or Phone..." 
                      class="w-full bg-[#111827] border border-[#1f2937] text-xs text-white rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:border-emerald-500 font-bold shadow-sm placeholder:text-gray-500">
             </div>
 
@@ -815,7 +790,7 @@ export class AttendanceMarkComponent implements OnInit {
         const slots = res.data?.time_slots || res.data || [];
         this.masterTimeSlots = slots.filter((s: any) => s.slot_name !== 'Breack' && s.slot_name !== 'Break');
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -1043,7 +1018,7 @@ export class AttendanceMarkComponent implements OnInit {
     let list = this.teacherAttendanceList || [];
     if (this.selectedTeacherDept) {
       const qDept = this.selectedTeacherDept.toLowerCase().trim();
-      list = list.filter(t => 
+      list = list.filter(t =>
         (t.department && t.department.toLowerCase().includes(qDept)) ||
         (t.faculty && t.faculty.toLowerCase().includes(qDept))
       );

@@ -54517,7 +54517,7 @@ function AttendanceMarkComponent_button_6_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_8_option_47_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -54542,67 +54542,9 @@ function AttendanceMarkComponent_div_8_option_54_Template(rf, ctx) {
     \u0275\u0275textInterpolate3(" ", sub_r5.subject_code, " \u2014 ", sub_r5.subject_name, " (", sub_r5.teacher_name || ctx_r1.getAssignedTeacherName(sub_r5) || "Assigned Teacher", ") ");
   }
 }
-function AttendanceMarkComponent_div_8_div_72_span_18_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_tr_107_img_7_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "span", 97);
-    \u0275\u0275text(1);
-    \u0275\u0275elementEnd();
-  }
-  if (rf & 2) {
-    const ctx_r1 = \u0275\u0275nextContext(3);
-    \u0275\u0275advance();
-    \u0275\u0275textInterpolate1('("', ctx_r1.assignedTeacherLeaveNotice.note, '")');
-  }
-}
-function AttendanceMarkComponent_div_8_div_72_Template(rf, ctx) {
-  if (rf & 1) {
-    \u0275\u0275elementStart(0, "div", 88)(1, "div", 72)(2, "div", 89);
-    \u0275\u0275element(3, "i", 90);
-    \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(4, "div")(5, "h4", 91);
-    \u0275\u0275text(6, " Teacher Leave Notice ");
-    \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(7, "p", 92);
-    \u0275\u0275text(8, " Teacher ");
-    \u0275\u0275elementStart(9, "strong");
-    \u0275\u0275text(10);
-    \u0275\u0275elementEnd();
-    \u0275\u0275text(11, " is marked as ");
-    \u0275\u0275elementStart(12, "span", 93);
-    \u0275\u0275text(13);
-    \u0275\u0275elementEnd();
-    \u0275\u0275text(14);
-    \u0275\u0275elementStart(15, "span", 94);
-    \u0275\u0275text(16);
-    \u0275\u0275elementEnd();
-    \u0275\u0275text(17, "! ");
-    \u0275\u0275template(18, AttendanceMarkComponent_div_8_div_72_span_18_Template, 2, 1, "span", 95);
-    \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(19, "span", 96);
-    \u0275\u0275text(20);
-    \u0275\u0275elementEnd()();
-  }
-  if (rf & 2) {
-    const ctx_r1 = \u0275\u0275nextContext(2);
-    \u0275\u0275advance(10);
-    \u0275\u0275textInterpolate(ctx_r1.assignedTeacherLeaveNotice.teacher_name);
-    \u0275\u0275advance(2);
-    \u0275\u0275classProp("bg-indigo-900", ctx_r1.assignedTeacherLeaveNotice.status === "LEAVE")("bg-rose-900", ctx_r1.assignedTeacherLeaveNotice.status === "ABSENT")("text-indigo-300", ctx_r1.assignedTeacherLeaveNotice.status === "LEAVE")("text-rose-300", ctx_r1.assignedTeacherLeaveNotice.status === "ABSENT");
-    \u0275\u0275advance();
-    \u0275\u0275textInterpolate1(" \u2022 ", ctx_r1.assignedTeacherLeaveNotice.status, " ");
-    \u0275\u0275advance();
-    \u0275\u0275textInterpolate1(" on ", ctx_r1.assignedTeacherLeaveNotice.date, " ");
-    \u0275\u0275advance(2);
-    \u0275\u0275textInterpolate1("(", ctx_r1.assignedTeacherLeaveNotice.time_slot || "07:30 - 09:00 AM", ")");
-    \u0275\u0275advance(2);
-    \u0275\u0275property("ngIf", ctx_r1.assignedTeacherLeaveNotice.note);
-    \u0275\u0275advance(2);
-    \u0275\u0275textInterpolate1(" Class ", ctx_r1.getSelectedGroupCode(), " ");
-  }
-}
-function AttendanceMarkComponent_div_8_tr_108_img_7_Template(rf, ctx) {
-  if (rf & 1) {
-    \u0275\u0275element(0, "img", 109);
+    \u0275\u0275element(0, "img", 98);
   }
   if (rf & 2) {
     const s_r7 = \u0275\u0275nextContext().$implicit;
@@ -54610,7 +54552,7 @@ function AttendanceMarkComponent_div_8_tr_108_img_7_Template(rf, ctx) {
     \u0275\u0275property("src", ctx_r1.getPhotoUrl(s_r7.image || s_r7.photo), \u0275\u0275sanitizeUrl);
   }
 }
-function AttendanceMarkComponent_div_8_tr_108_span_8_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_tr_107_span_8_Template(rf, ctx) {
   if (rf & 1) {
     \u0275\u0275elementStart(0, "span");
     \u0275\u0275text(1);
@@ -54622,10 +54564,10 @@ function AttendanceMarkComponent_div_8_tr_108_span_8_Template(rf, ctx) {
     \u0275\u0275textInterpolate2("", s_r7.first_name ? s_r7.first_name[0] : "S", "", s_r7.last_name ? s_r7.last_name[0] : "", "");
   }
 }
-function AttendanceMarkComponent_div_8_tr_108_div_12_span_4_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_tr_107_div_12_span_4_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "span", 114);
-    \u0275\u0275element(1, "i", 115);
+    \u0275\u0275elementStart(0, "span", 103);
+    \u0275\u0275element(1, "i", 104);
     \u0275\u0275text(2);
     \u0275\u0275elementEnd();
   }
@@ -54636,13 +54578,13 @@ function AttendanceMarkComponent_div_8_tr_108_div_12_span_4_Template(rf, ctx) {
     \u0275\u0275textInterpolate1("", ctx_r1.getActiveDisplaySubject(s_r7).teacher_name || ctx_r1.getAssignedTeacherName(ctx_r1.getActiveDisplaySubject(s_r7)), " ");
   }
 }
-function AttendanceMarkComponent_div_8_tr_108_div_12_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_tr_107_div_12_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "div", 110)(1, "span", 111);
-    \u0275\u0275element(2, "i", 112);
+    \u0275\u0275elementStart(0, "div", 99)(1, "span", 100);
+    \u0275\u0275element(2, "i", 101);
     \u0275\u0275text(3);
     \u0275\u0275elementEnd();
-    \u0275\u0275template(4, AttendanceMarkComponent_div_8_tr_108_div_12_span_4_Template, 3, 1, "span", 113);
+    \u0275\u0275template(4, AttendanceMarkComponent_div_8_tr_107_div_12_span_4_Template, 3, 1, "span", 102);
     \u0275\u0275elementEnd();
   }
   if (rf & 2) {
@@ -54654,70 +54596,70 @@ function AttendanceMarkComponent_div_8_tr_108_div_12_Template(rf, ctx) {
     \u0275\u0275property("ngIf", ctx_r1.getActiveDisplaySubject(s_r7).teacher_name || ctx_r1.getAssignedTeacherName(ctx_r1.getActiveDisplaySubject(s_r7)));
   }
 }
-function AttendanceMarkComponent_div_8_tr_108_div_13_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_tr_107_div_13_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "div", 116);
+    \u0275\u0275elementStart(0, "div", 105);
     \u0275\u0275text(1, " General Class Attendance ");
     \u0275\u0275elementEnd();
   }
 }
-function AttendanceMarkComponent_div_8_tr_108_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_tr_107_Template(rf, ctx) {
   if (rf & 1) {
     const _r6 = \u0275\u0275getCurrentView();
-    \u0275\u0275elementStart(0, "tr", 98)(1, "td", 99);
+    \u0275\u0275elementStart(0, "tr", 87)(1, "td", 88);
     \u0275\u0275text(2);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(3, "td", 100);
+    \u0275\u0275elementStart(3, "td", 89);
     \u0275\u0275text(4);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(5, "td", 101)(6, "div", 102);
-    \u0275\u0275template(7, AttendanceMarkComponent_div_8_tr_108_img_7_Template, 1, 1, "img", 103)(8, AttendanceMarkComponent_div_8_tr_108_span_8_Template, 2, 2, "span", 70);
+    \u0275\u0275elementStart(5, "td", 90)(6, "div", 91);
+    \u0275\u0275template(7, AttendanceMarkComponent_div_8_tr_107_img_7_Template, 1, 1, "img", 92)(8, AttendanceMarkComponent_div_8_tr_107_span_8_Template, 2, 2, "span", 69);
     \u0275\u0275elementEnd();
     \u0275\u0275elementStart(9, "span");
     \u0275\u0275text(10);
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(11, "td", 104);
-    \u0275\u0275template(12, AttendanceMarkComponent_div_8_tr_108_div_12_Template, 5, 2, "div", 105)(13, AttendanceMarkComponent_div_8_tr_108_div_13_Template, 2, 0, "div", 106);
+    \u0275\u0275elementStart(11, "td", 93);
+    \u0275\u0275template(12, AttendanceMarkComponent_div_8_tr_107_div_12_Template, 5, 2, "div", 94)(13, AttendanceMarkComponent_div_8_tr_107_div_13_Template, 2, 0, "div", 95);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(14, "td", 67)(15, "div", 76)(16, "button", 107);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_108_Template_button_click_16_listener() {
+    \u0275\u0275elementStart(14, "td", 66)(15, "div", 75)(16, "button", 96);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_107_Template_button_click_16_listener() {
       const s_r7 = \u0275\u0275restoreView(_r6).$implicit;
       const ctx_r1 = \u0275\u0275nextContext(2);
       return \u0275\u0275resetView(ctx_r1.quickMarkStudentStatus(s_r7, "PRESENT"));
     });
     \u0275\u0275text(17, "Present");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(18, "button", 107);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_108_Template_button_click_18_listener() {
+    \u0275\u0275elementStart(18, "button", 96);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_107_Template_button_click_18_listener() {
       const s_r7 = \u0275\u0275restoreView(_r6).$implicit;
       const ctx_r1 = \u0275\u0275nextContext(2);
       return \u0275\u0275resetView(ctx_r1.quickMarkStudentStatus(s_r7, "ABSENT"));
     });
     \u0275\u0275text(19, "Absent");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(20, "button", 107);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_108_Template_button_click_20_listener() {
+    \u0275\u0275elementStart(20, "button", 96);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_107_Template_button_click_20_listener() {
       const s_r7 = \u0275\u0275restoreView(_r6).$implicit;
       const ctx_r1 = \u0275\u0275nextContext(2);
       return \u0275\u0275resetView(ctx_r1.quickMarkStudentStatus(s_r7, "LATE"));
     });
     \u0275\u0275text(21, "Late");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(22, "button", 107);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_108_Template_button_click_22_listener() {
+    \u0275\u0275elementStart(22, "button", 96);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_tr_107_Template_button_click_22_listener() {
       const s_r7 = \u0275\u0275restoreView(_r6).$implicit;
       const ctx_r1 = \u0275\u0275nextContext(2);
       return \u0275\u0275resetView(ctx_r1.quickMarkStudentStatus(s_r7, "EXCUSED"));
     });
     \u0275\u0275text(23, "Permission / Excused");
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(24, "td", 67)(25, "input", 108);
-    \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_8_tr_108_Template_input_ngModelChange_25_listener($event) {
+    \u0275\u0275elementStart(24, "td", 66)(25, "input", 97);
+    \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_8_tr_107_Template_input_ngModelChange_25_listener($event) {
       const s_r7 = \u0275\u0275restoreView(_r6).$implicit;
       \u0275\u0275twoWayBindingSet(s_r7.note, $event) || (s_r7.note = $event);
       return \u0275\u0275resetView($event);
     });
-    \u0275\u0275listener("change", function AttendanceMarkComponent_div_8_tr_108_Template_input_change_25_listener() {
+    \u0275\u0275listener("change", function AttendanceMarkComponent_div_8_tr_107_Template_input_change_25_listener() {
       \u0275\u0275restoreView(_r6);
       const ctx_r1 = \u0275\u0275nextContext(2);
       return \u0275\u0275resetView(ctx_r1.saveAttendance());
@@ -54754,16 +54696,16 @@ function AttendanceMarkComponent_div_8_tr_108_Template(rf, ctx) {
     \u0275\u0275twoWayProperty("ngModel", s_r7.note);
   }
 }
-function AttendanceMarkComponent_div_8_tr_109_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_tr_108_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "tr")(1, "td", 117);
+    \u0275\u0275elementStart(0, "tr")(1, "td", 106);
     \u0275\u0275text(2, "No class student records found for attendance marking.");
     \u0275\u0275elementEnd()();
   }
 }
-function AttendanceMarkComponent_div_8_option_127_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_option_126_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -54774,11 +54716,11 @@ function AttendanceMarkComponent_div_8_option_127_Template(rf, ctx) {
     \u0275\u0275textInterpolate(opt_r9);
   }
 }
-function AttendanceMarkComponent_div_8_button_134_Template(rf, ctx) {
+function AttendanceMarkComponent_div_8_button_133_Template(rf, ctx) {
   if (rf & 1) {
     const _r10 = \u0275\u0275getCurrentView();
-    \u0275\u0275elementStart(0, "button", 118);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_button_134_Template_button_click_0_listener() {
+    \u0275\u0275elementStart(0, "button", 107);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_button_133_Template_button_click_0_listener() {
       const p_r11 = \u0275\u0275restoreView(_r10).$implicit;
       const ctx_r1 = \u0275\u0275nextContext(2);
       return \u0275\u0275resetView(ctx_r1.setPage(p_r11));
@@ -54943,132 +54885,130 @@ function AttendanceMarkComponent_div_8_Template(rf, ctx) {
     });
     \u0275\u0275text(70, "Excused");
     \u0275\u0275elementEnd()()()()();
-    \u0275\u0275elementStart(71, "div", 49);
-    \u0275\u0275template(72, AttendanceMarkComponent_div_8_div_72_Template, 21, 14, "div", 50);
-    \u0275\u0275elementStart(73, "div", 51)(74, "h3", 52);
-    \u0275\u0275text(75, " Class Roster Attendance Sheet \xB7 ");
-    \u0275\u0275elementStart(76, "span", 53);
-    \u0275\u0275text(77);
-    \u0275\u0275pipe(78, "date");
+    \u0275\u0275elementStart(71, "div", 49)(72, "div", 50)(73, "h3", 51);
+    \u0275\u0275text(74, " Class Roster Attendance Sheet \xB7 ");
+    \u0275\u0275elementStart(75, "span", 52);
+    \u0275\u0275text(76);
+    \u0275\u0275pipe(77, "date");
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(79, "div", 54);
-    \u0275\u0275element(80, "i", 55);
-    \u0275\u0275elementStart(81, "input", 56);
-    \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_8_Template_input_ngModelChange_81_listener($event) {
+    \u0275\u0275elementStart(78, "div", 53);
+    \u0275\u0275element(79, "i", 54);
+    \u0275\u0275elementStart(80, "input", 55);
+    \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_8_Template_input_ngModelChange_80_listener($event) {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       \u0275\u0275twoWayBindingSet(ctx_r1.studentSearchQuery, $event) || (ctx_r1.studentSearchQuery = $event);
       return \u0275\u0275resetView($event);
     });
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(82, "div", 57)(83, "span", 58);
-    \u0275\u0275text(84);
+    \u0275\u0275elementStart(81, "div", 56)(82, "span", 57);
+    \u0275\u0275text(83);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(85, "span", 59);
-    \u0275\u0275text(86);
+    \u0275\u0275elementStart(84, "span", 58);
+    \u0275\u0275text(85);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(87, "span", 60);
-    \u0275\u0275text(88);
+    \u0275\u0275elementStart(86, "span", 59);
+    \u0275\u0275text(87);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(89, "span", 61);
-    \u0275\u0275text(90);
+    \u0275\u0275elementStart(88, "span", 60);
+    \u0275\u0275text(89);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(91, "div", 62)(92, "table", 63)(93, "thead", 64)(94, "tr", 65)(95, "th", 66);
-    \u0275\u0275text(96, "#");
+    \u0275\u0275elementStart(90, "div", 61)(91, "table", 62)(92, "thead", 63)(93, "tr", 64)(94, "th", 65);
+    \u0275\u0275text(95, "#");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(97, "th", 67);
-    \u0275\u0275text(98, "STUDENT ID");
+    \u0275\u0275elementStart(96, "th", 66);
+    \u0275\u0275text(97, "STUDENT ID");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(99, "th", 67);
-    \u0275\u0275text(100, "STUDENT NAME");
+    \u0275\u0275elementStart(98, "th", 66);
+    \u0275\u0275text(99, "STUDENT NAME");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(101, "th", 67);
-    \u0275\u0275text(102, "SUBJECT & TEACHER");
+    \u0275\u0275elementStart(100, "th", 66);
+    \u0275\u0275text(101, "SUBJECT & TEACHER");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(103, "th", 67);
-    \u0275\u0275text(104, "ATTENDANCE STATUS");
+    \u0275\u0275elementStart(102, "th", 66);
+    \u0275\u0275text(103, "ATTENDANCE STATUS");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(105, "th", 67);
-    \u0275\u0275text(106, "REMARKS / NOTE");
+    \u0275\u0275elementStart(104, "th", 66);
+    \u0275\u0275text(105, "REMARKS / NOTE");
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(107, "tbody", 68);
-    \u0275\u0275template(108, AttendanceMarkComponent_div_8_tr_108_Template, 26, 13, "tr", 69)(109, AttendanceMarkComponent_div_8_tr_109_Template, 3, 0, "tr", 70);
+    \u0275\u0275elementStart(106, "tbody", 67);
+    \u0275\u0275template(107, AttendanceMarkComponent_div_8_tr_107_Template, 26, 13, "tr", 68)(108, AttendanceMarkComponent_div_8_tr_108_Template, 3, 0, "tr", 69);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(110, "div", 71)(111, "div", 72)(112, "span");
-    \u0275\u0275text(113, " Showing ");
-    \u0275\u0275elementStart(114, "strong", 73);
-    \u0275\u0275text(115);
+    \u0275\u0275elementStart(109, "div", 70)(110, "div", 71)(111, "span");
+    \u0275\u0275text(112, " Showing ");
+    \u0275\u0275elementStart(113, "strong", 72);
+    \u0275\u0275text(114);
     \u0275\u0275elementEnd();
-    \u0275\u0275text(116, " to ");
-    \u0275\u0275elementStart(117, "strong", 73);
-    \u0275\u0275text(118);
+    \u0275\u0275text(115, " to ");
+    \u0275\u0275elementStart(116, "strong", 72);
+    \u0275\u0275text(117);
     \u0275\u0275elementEnd();
-    \u0275\u0275text(119, " of ");
-    \u0275\u0275elementStart(120, "strong", 53);
-    \u0275\u0275text(121);
+    \u0275\u0275text(118, " of ");
+    \u0275\u0275elementStart(119, "strong", 52);
+    \u0275\u0275text(120);
     \u0275\u0275elementEnd();
-    \u0275\u0275text(122, " class students ");
+    \u0275\u0275text(121, " class students ");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(123, "div", 74)(124, "span");
-    \u0275\u0275text(125, "Per page:");
+    \u0275\u0275elementStart(122, "div", 73)(123, "span");
+    \u0275\u0275text(124, "Per page:");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(126, "select", 75);
-    \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_8_Template_select_ngModelChange_126_listener($event) {
+    \u0275\u0275elementStart(125, "select", 74);
+    \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_8_Template_select_ngModelChange_125_listener($event) {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       \u0275\u0275twoWayBindingSet(ctx_r1.pageSize, $event) || (ctx_r1.pageSize = $event);
       return \u0275\u0275resetView($event);
     });
-    \u0275\u0275listener("change", function AttendanceMarkComponent_div_8_Template_select_change_126_listener() {
+    \u0275\u0275listener("change", function AttendanceMarkComponent_div_8_Template_select_change_125_listener() {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.onPageSizeChange());
     });
-    \u0275\u0275template(127, AttendanceMarkComponent_div_8_option_127_Template, 2, 2, "option", 36);
+    \u0275\u0275template(126, AttendanceMarkComponent_div_8_option_126_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(128, "div", 76)(129, "button", 77);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_129_listener() {
+    \u0275\u0275elementStart(127, "div", 75)(128, "button", 76);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_128_listener() {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.setPage(1));
     });
-    \u0275\u0275element(130, "i", 78);
+    \u0275\u0275element(129, "i", 77);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(131, "button", 79);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_131_listener() {
+    \u0275\u0275elementStart(130, "button", 78);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_130_listener() {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.setPage(ctx_r1.currentPage - 1));
     });
-    \u0275\u0275element(132, "i", 80);
-    \u0275\u0275text(133, " Prev ");
+    \u0275\u0275element(131, "i", 79);
+    \u0275\u0275text(132, " Prev ");
     \u0275\u0275elementEnd();
-    \u0275\u0275template(134, AttendanceMarkComponent_div_8_button_134_Template, 2, 2, "button", 81);
-    \u0275\u0275elementStart(135, "button", 79);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_135_listener() {
+    \u0275\u0275template(133, AttendanceMarkComponent_div_8_button_133_Template, 2, 2, "button", 80);
+    \u0275\u0275elementStart(134, "button", 78);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_134_listener() {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.setPage(ctx_r1.currentPage + 1));
     });
-    \u0275\u0275text(136, " Next ");
-    \u0275\u0275element(137, "i", 82);
+    \u0275\u0275text(135, " Next ");
+    \u0275\u0275element(136, "i", 81);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(138, "button", 77);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_138_listener() {
+    \u0275\u0275elementStart(137, "button", 76);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_137_listener() {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.setPage(ctx_r1.totalPages));
     });
-    \u0275\u0275element(139, "i", 83);
+    \u0275\u0275element(138, "i", 82);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(140, "div", 84)(141, "button", 85);
-    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_141_listener() {
+    \u0275\u0275elementStart(139, "div", 83)(140, "button", 84);
+    \u0275\u0275listener("click", function AttendanceMarkComponent_div_8_Template_button_click_140_listener() {
       \u0275\u0275restoreView(_r3);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.saveAttendance());
     });
-    \u0275\u0275element(142, "i", 86);
-    \u0275\u0275text(143, " Save Daily Attendance ");
+    \u0275\u0275element(141, "i", 85);
+    \u0275\u0275text(142, " Save Daily Attendance ");
     \u0275\u0275elementEnd()()()();
   }
   if (rf & 2) {
@@ -55095,10 +55035,8 @@ function AttendanceMarkComponent_div_8_Template(rf, ctx) {
     \u0275\u0275property("ngForOf", ctx_r1.availableClassSubjects);
     \u0275\u0275advance(4);
     \u0275\u0275twoWayProperty("ngModel", ctx_r1.selectedDate);
-    \u0275\u0275advance(14);
-    \u0275\u0275property("ngIf", ctx_r1.assignedTeacherLeaveNotice);
-    \u0275\u0275advance(5);
-    \u0275\u0275textInterpolate(\u0275\u0275pipeBind2(78, 31, ctx_r1.selectedDate, "mediumDate"));
+    \u0275\u0275advance(18);
+    \u0275\u0275textInterpolate(\u0275\u0275pipeBind2(77, 30, ctx_r1.selectedDate, "mediumDate"));
     \u0275\u0275advance(4);
     \u0275\u0275twoWayProperty("ngModel", ctx_r1.studentSearchQuery);
     \u0275\u0275advance(3);
@@ -55137,7 +55075,7 @@ function AttendanceMarkComponent_div_8_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_option_45_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55150,7 +55088,7 @@ function AttendanceMarkComponent_div_9_option_45_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_option_67_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55164,7 +55102,7 @@ function AttendanceMarkComponent_div_9_option_67_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_option_69_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55178,7 +55116,7 @@ function AttendanceMarkComponent_div_9_option_69_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_option_71_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55192,7 +55130,7 @@ function AttendanceMarkComponent_div_9_option_71_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_tr_122_img_7_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275element(0, "img", 109);
+    \u0275\u0275element(0, "img", 98);
   }
   if (rf & 2) {
     const t_r18 = \u0275\u0275nextContext().$implicit;
@@ -55214,7 +55152,7 @@ function AttendanceMarkComponent_div_9_tr_122_span_8_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_tr_122_option_29_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55228,7 +55166,7 @@ function AttendanceMarkComponent_div_9_tr_122_option_29_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_tr_122_option_31_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55242,7 +55180,7 @@ function AttendanceMarkComponent_div_9_tr_122_option_31_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_tr_122_option_33_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55256,8 +55194,8 @@ function AttendanceMarkComponent_div_9_tr_122_option_33_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_tr_122_div_35_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "div")(1, "span", 162);
-    \u0275\u0275element(2, "i", 163);
+    \u0275\u0275elementStart(0, "div")(1, "span", 151);
+    \u0275\u0275element(2, "i", 152);
     \u0275\u0275text(3);
     \u0275\u0275elementEnd()();
   }
@@ -55270,7 +55208,7 @@ function AttendanceMarkComponent_div_9_tr_122_div_35_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_tr_122_span_36_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "span", 164);
+    \u0275\u0275elementStart(0, "span", 153);
     \u0275\u0275text(1, " - ");
     \u0275\u0275elementEnd();
   }
@@ -55278,71 +55216,71 @@ function AttendanceMarkComponent_div_9_tr_122_span_36_Template(rf, ctx) {
 function AttendanceMarkComponent_div_9_tr_122_Template(rf, ctx) {
   if (rf & 1) {
     const _r17 = \u0275\u0275getCurrentView();
-    \u0275\u0275elementStart(0, "tr", 98)(1, "td", 146);
+    \u0275\u0275elementStart(0, "tr", 87)(1, "td", 135);
     \u0275\u0275text(2);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(3, "td", 147);
+    \u0275\u0275elementStart(3, "td", 136);
     \u0275\u0275text(4);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(5, "td", 148)(6, "div", 149);
-    \u0275\u0275template(7, AttendanceMarkComponent_div_9_tr_122_img_7_Template, 1, 1, "img", 103)(8, AttendanceMarkComponent_div_9_tr_122_span_8_Template, 2, 2, "span", 70);
+    \u0275\u0275elementStart(5, "td", 137)(6, "div", 138);
+    \u0275\u0275template(7, AttendanceMarkComponent_div_9_tr_122_img_7_Template, 1, 1, "img", 92)(8, AttendanceMarkComponent_div_9_tr_122_span_8_Template, 2, 2, "span", 69);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(9, "div")(10, "p", 150);
+    \u0275\u0275elementStart(9, "div")(10, "p", 139);
     \u0275\u0275text(11);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(12, "p", 151);
+    \u0275\u0275elementStart(12, "p", 140);
     \u0275\u0275text(13);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(14, "td", 152)(15, "div", 76)(16, "button", 153);
+    \u0275\u0275elementStart(14, "td", 141)(15, "div", 75)(16, "button", 142);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_tr_122_Template_button_click_16_listener() {
       const t_r18 = \u0275\u0275restoreView(_r17).$implicit;
       return \u0275\u0275resetView(t_r18.status = "PRESENT");
     });
     \u0275\u0275text(17, "Present");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(18, "button", 153);
+    \u0275\u0275elementStart(18, "button", 142);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_tr_122_Template_button_click_18_listener() {
       const t_r18 = \u0275\u0275restoreView(_r17).$implicit;
       return \u0275\u0275resetView(t_r18.status = "LATE");
     });
     \u0275\u0275text(19, "Late");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(20, "button", 153);
+    \u0275\u0275elementStart(20, "button", 142);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_tr_122_Template_button_click_20_listener() {
       const t_r18 = \u0275\u0275restoreView(_r17).$implicit;
       return \u0275\u0275resetView(t_r18.status = "LEAVE");
     });
     \u0275\u0275text(21, "Leave");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(22, "button", 153);
+    \u0275\u0275elementStart(22, "button", 142);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_tr_122_Template_button_click_22_listener() {
       const t_r18 = \u0275\u0275restoreView(_r17).$implicit;
       return \u0275\u0275resetView(t_r18.status = "ABSENT");
     });
     \u0275\u0275text(23, "Absent");
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(24, "td", 154)(25, "select", 155);
+    \u0275\u0275elementStart(24, "td", 143)(25, "select", 144);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_9_tr_122_Template_select_ngModelChange_25_listener($event) {
       const t_r18 = \u0275\u0275restoreView(_r17).$implicit;
       \u0275\u0275twoWayBindingSet(t_r18.time_slot, $event) || (t_r18.time_slot = $event);
       return \u0275\u0275resetView($event);
     });
-    \u0275\u0275elementStart(26, "option", 131);
+    \u0275\u0275elementStart(26, "option", 120);
     \u0275\u0275text(27, "All Day");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(28, "optgroup", 156);
+    \u0275\u0275elementStart(28, "optgroup", 145);
     \u0275\u0275template(29, AttendanceMarkComponent_div_9_tr_122_option_29_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(30, "optgroup", 157);
+    \u0275\u0275elementStart(30, "optgroup", 146);
     \u0275\u0275template(31, AttendanceMarkComponent_div_9_tr_122_option_31_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(32, "optgroup", 158);
+    \u0275\u0275elementStart(32, "optgroup", 147);
     \u0275\u0275template(33, AttendanceMarkComponent_div_9_tr_122_option_33_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(34, "td", 159);
-    \u0275\u0275template(35, AttendanceMarkComponent_div_9_tr_122_div_35_Template, 4, 1, "div", 70)(36, AttendanceMarkComponent_div_9_tr_122_span_36_Template, 2, 0, "span", 160);
+    \u0275\u0275elementStart(34, "td", 148);
+    \u0275\u0275template(35, AttendanceMarkComponent_div_9_tr_122_div_35_Template, 4, 1, "div", 69)(36, AttendanceMarkComponent_div_9_tr_122_span_36_Template, 2, 0, "span", 149);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(37, "td", 152)(38, "input", 161);
+    \u0275\u0275elementStart(37, "td", 141)(38, "input", 150);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_9_tr_122_Template_input_ngModelChange_38_listener($event) {
       const t_r18 = \u0275\u0275restoreView(_r17).$implicit;
       \u0275\u0275twoWayBindingSet(t_r18.note, $event) || (t_r18.note = $event);
@@ -55392,7 +55330,7 @@ function AttendanceMarkComponent_div_9_tr_122_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_9_tr_123_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "tr")(1, "td", 165);
+    \u0275\u0275elementStart(0, "tr")(1, "td", 154);
     \u0275\u0275text(2, "No faculty teachers found for selected filters");
     \u0275\u0275elementEnd()();
   }
@@ -55400,7 +55338,7 @@ function AttendanceMarkComponent_div_9_tr_123_Template(rf, ctx) {
 function AttendanceMarkComponent_div_9_Template(rf, ctx) {
   if (rf & 1) {
     const _r12 = \u0275\u0275getCurrentView();
-    \u0275\u0275elementStart(0, "div", 119)(1, "div", 12)(2, "div", 13)(3, "span", 14);
+    \u0275\u0275elementStart(0, "div", 108)(1, "div", 12)(2, "div", 13)(3, "span", 14);
     \u0275\u0275text(4, "TEACHERS PRESENT TODAY");
     \u0275\u0275elementEnd();
     \u0275\u0275elementStart(5, "h3", 15);
@@ -55421,10 +55359,10 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     \u0275\u0275elementStart(16, "div", 13)(17, "span", 14);
     \u0275\u0275text(18, "TEACHERS ON LEAVE TODAY");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(19, "h3", 120);
+    \u0275\u0275elementStart(19, "h3", 109);
     \u0275\u0275text(20);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(21, "p", 121);
+    \u0275\u0275elementStart(21, "p", 110);
     \u0275\u0275text(22, "Approved official leave");
     \u0275\u0275elementEnd()();
     \u0275\u0275elementStart(23, "div", 13)(24, "span", 14);
@@ -55437,7 +55375,7 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     \u0275\u0275text(29, "Unexcused absence");
     \u0275\u0275elementEnd()()();
     \u0275\u0275elementStart(30, "div", 23)(31, "div", 24)(32, "h3", 25);
-    \u0275\u0275element(33, "i", 122);
+    \u0275\u0275element(33, "i", 111);
     \u0275\u0275text(34, " Faculty Attendance Form ");
     \u0275\u0275elementEnd();
     \u0275\u0275elementStart(35, "button", 30);
@@ -55449,10 +55387,10 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     \u0275\u0275element(36, "i", 31);
     \u0275\u0275text(37, " Today ");
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(38, "div", 123)(39, "div")(40, "label", 124);
+    \u0275\u0275elementStart(38, "div", 112)(39, "div")(40, "label", 113);
     \u0275\u0275text(41, "FACULTY / DEPARTMENT *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(42, "select", 125);
+    \u0275\u0275elementStart(42, "select", 114);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_9_Template_select_ngModelChange_42_listener($event) {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55464,15 +55402,15 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.filterTeacherList());
     });
-    \u0275\u0275elementStart(43, "option", 126);
+    \u0275\u0275elementStart(43, "option", 115);
     \u0275\u0275text(44, "All Faculties & Departments");
     \u0275\u0275elementEnd();
     \u0275\u0275template(45, AttendanceMarkComponent_div_9_option_45_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(46, "div")(47, "label", 124);
+    \u0275\u0275elementStart(46, "div")(47, "label", 113);
     \u0275\u0275text(48, "EMPLOYMENT TYPE *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(49, "select", 125);
+    \u0275\u0275elementStart(49, "select", 114);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_9_Template_select_ngModelChange_49_listener($event) {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55484,19 +55422,19 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.filterTeacherList());
     });
-    \u0275\u0275elementStart(50, "option", 126);
+    \u0275\u0275elementStart(50, "option", 115);
     \u0275\u0275text(51, "All Employment Types");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(52, "option", 127);
+    \u0275\u0275elementStart(52, "option", 116);
     \u0275\u0275text(53, "Full-time Faculty");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(54, "option", 128);
+    \u0275\u0275elementStart(54, "option", 117);
     \u0275\u0275text(55, "Part-time Lecturer");
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(56, "div")(57, "label", 124);
+    \u0275\u0275elementStart(56, "div")(57, "label", 113);
     \u0275\u0275text(58, "ATTENDANCE DATE *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(59, "input", 129);
+    \u0275\u0275elementStart(59, "input", 118);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_9_Template_input_ngModelChange_59_listener($event) {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55512,7 +55450,7 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     \u0275\u0275elementStart(60, "div")(61, "label", 37);
     \u0275\u0275text(62, "TIME SLOT *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(63, "select", 130);
+    \u0275\u0275elementStart(63, "select", 119);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_9_Template_select_ngModelChange_63_listener($event) {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55524,22 +55462,22 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.onTimeSlotChange());
     });
-    \u0275\u0275elementStart(64, "option", 131);
+    \u0275\u0275elementStart(64, "option", 120);
     \u0275\u0275text(65, "All Day (\u1796\u17C1\u1789\u1798\u17BD\u1799\u1790\u17D2\u1784\u17C3)");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(66, "optgroup", 132);
+    \u0275\u0275elementStart(66, "optgroup", 121);
     \u0275\u0275template(67, AttendanceMarkComponent_div_9_option_67_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(68, "optgroup", 133);
+    \u0275\u0275elementStart(68, "optgroup", 122);
     \u0275\u0275template(69, AttendanceMarkComponent_div_9_option_69_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(70, "optgroup", 134);
+    \u0275\u0275elementStart(70, "optgroup", 123);
     \u0275\u0275template(71, AttendanceMarkComponent_div_9_option_71_Template, 2, 2, "option", 36);
     \u0275\u0275elementEnd()()();
     \u0275\u0275elementStart(72, "div")(73, "label", 43);
     \u0275\u0275text(74, "BATCH MARK TEACHERS");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(75, "div", 44)(76, "button", 135);
+    \u0275\u0275elementStart(75, "div", 44)(76, "button", 124);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_Template_button_click_76_listener() {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55547,7 +55485,7 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     });
     \u0275\u0275text(77, "Present");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(78, "button", 136);
+    \u0275\u0275elementStart(78, "button", 125);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_Template_button_click_78_listener() {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55555,7 +55493,7 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     });
     \u0275\u0275text(79, "Late");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(80, "button", 137);
+    \u0275\u0275elementStart(80, "button", 126);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_Template_button_click_80_listener() {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55563,7 +55501,7 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     });
     \u0275\u0275text(81, "Leave");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(82, "button", 138);
+    \u0275\u0275elementStart(82, "button", 127);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_Template_button_click_82_listener() {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55571,15 +55509,15 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
     });
     \u0275\u0275text(83, "Absent");
     \u0275\u0275elementEnd()()()()();
-    \u0275\u0275elementStart(84, "div", 139)(85, "div", 140)(86, "h3", 52);
+    \u0275\u0275elementStart(84, "div", 128)(85, "div", 129)(86, "h3", 51);
     \u0275\u0275text(87, " Faculty Teachers Attendance Roster Sheet \xB7 ");
-    \u0275\u0275elementStart(88, "span", 53);
+    \u0275\u0275elementStart(88, "span", 52);
     \u0275\u0275text(89);
     \u0275\u0275pipe(90, "date");
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(91, "div", 54);
-    \u0275\u0275element(92, "i", 55);
-    \u0275\u0275elementStart(93, "input", 141);
+    \u0275\u0275elementStart(91, "div", 53);
+    \u0275\u0275element(92, "i", 54);
+    \u0275\u0275elementStart(93, "input", 130);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_9_Template_input_ngModelChange_93_listener($event) {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55587,49 +55525,49 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
       return \u0275\u0275resetView($event);
     });
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(94, "div", 57)(95, "span", 58);
+    \u0275\u0275elementStart(94, "div", 56)(95, "span", 57);
     \u0275\u0275text(96);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(97, "span", 60);
+    \u0275\u0275elementStart(97, "span", 59);
     \u0275\u0275text(98);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(99, "span", 61);
+    \u0275\u0275elementStart(99, "span", 60);
     \u0275\u0275text(100);
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(101, "span", 59);
+    \u0275\u0275elementStart(101, "span", 58);
     \u0275\u0275text(102);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(103, "div", 142)(104, "table", 63)(105, "thead")(106, "tr", 65)(107, "th", 143);
+    \u0275\u0275elementStart(103, "div", 131)(104, "table", 62)(105, "thead")(106, "tr", 64)(107, "th", 132);
     \u0275\u0275text(108, "#");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(109, "th", 144);
+    \u0275\u0275elementStart(109, "th", 133);
     \u0275\u0275text(110, "TEACHER ID");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(111, "th", 144);
+    \u0275\u0275elementStart(111, "th", 133);
     \u0275\u0275text(112, "FACULTY TEACHER");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(113, "th", 144);
+    \u0275\u0275elementStart(113, "th", 133);
     \u0275\u0275text(114, "ATTENDANCE STATUS");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(115, "th", 144);
+    \u0275\u0275elementStart(115, "th", 133);
     \u0275\u0275text(116, "TIME SLOT");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(117, "th", 144);
+    \u0275\u0275elementStart(117, "th", 133);
     \u0275\u0275text(118, "AFFECTED CLASS GROUPS");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(119, "th", 144);
+    \u0275\u0275elementStart(119, "th", 133);
     \u0275\u0275text(120, "REMARKS / NOTE");
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(121, "tbody", 68);
-    \u0275\u0275template(122, AttendanceMarkComponent_div_9_tr_122_Template, 39, 46, "tr", 69)(123, AttendanceMarkComponent_div_9_tr_123_Template, 3, 0, "tr", 70);
+    \u0275\u0275elementStart(121, "tbody", 67);
+    \u0275\u0275template(122, AttendanceMarkComponent_div_9_tr_122_Template, 39, 46, "tr", 68)(123, AttendanceMarkComponent_div_9_tr_123_Template, 3, 0, "tr", 69);
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(124, "div", 145)(125, "button", 85);
+    \u0275\u0275elementStart(124, "div", 134)(125, "button", 84);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_9_Template_button_click_125_listener() {
       \u0275\u0275restoreView(_r12);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.saveTeacherDailyAttendance());
     });
-    \u0275\u0275element(126, "i", 86);
+    \u0275\u0275element(126, "i", 85);
     \u0275\u0275text(127, " Save Faculty Teacher Attendance ");
     \u0275\u0275elementEnd()()()();
   }
@@ -55679,7 +55617,7 @@ function AttendanceMarkComponent_div_9_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_10_option_16_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55692,7 +55630,7 @@ function AttendanceMarkComponent_div_10_option_16_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_10_option_30_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 87);
+    \u0275\u0275elementStart(0, "option", 86);
     \u0275\u0275text(1);
     \u0275\u0275elementEnd();
   }
@@ -55705,7 +55643,7 @@ function AttendanceMarkComponent_div_10_option_30_Template(rf, ctx) {
 }
 function AttendanceMarkComponent_div_10_option_31_Template(rf, ctx) {
   if (rf & 1) {
-    \u0275\u0275elementStart(0, "option", 193);
+    \u0275\u0275elementStart(0, "option", 182);
     \u0275\u0275text(1, " -- No matching students found -- ");
     \u0275\u0275elementEnd();
   }
@@ -55716,28 +55654,28 @@ function AttendanceMarkComponent_div_10_option_31_Template(rf, ctx) {
 function AttendanceMarkComponent_div_10_Template(rf, ctx) {
   if (rf & 1) {
     const _r23 = \u0275\u0275getCurrentView();
-    \u0275\u0275elementStart(0, "div", 166)(1, "div", 167)(2, "div", 24)(3, "h3", 168);
-    \u0275\u0275element(4, "i", 169);
+    \u0275\u0275elementStart(0, "div", 155)(1, "div", 156)(2, "div", 24)(3, "h3", 157);
+    \u0275\u0275element(4, "i", 158);
     \u0275\u0275text(5, " Student Multi-Day Leave Request ");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(6, "button", 170);
+    \u0275\u0275elementStart(6, "button", 159);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_10_Template_button_click_6_listener() {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.showMultiDayLeaveModal = false);
     });
-    \u0275\u0275element(7, "i", 171);
+    \u0275\u0275element(7, "i", 160);
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(8, "form", 172);
+    \u0275\u0275elementStart(8, "form", 161);
     \u0275\u0275listener("ngSubmit", function AttendanceMarkComponent_div_10_Template_form_ngSubmit_8_listener() {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.submitMultiDayLeave());
     });
-    \u0275\u0275elementStart(9, "div", 173)(10, "div")(11, "label", 124);
+    \u0275\u0275elementStart(9, "div", 162)(10, "div")(11, "label", 113);
     \u0275\u0275text(12, "FILTER CLASS GROUP");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(13, "select", 174);
+    \u0275\u0275elementStart(13, "select", 163);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_10_Template_select_ngModelChange_13_listener($event) {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55749,17 +55687,17 @@ function AttendanceMarkComponent_div_10_Template(rf, ctx) {
       const ctx_r1 = \u0275\u0275nextContext();
       return \u0275\u0275resetView(ctx_r1.onMultiDayFilterChange());
     });
-    \u0275\u0275elementStart(14, "option", 126);
+    \u0275\u0275elementStart(14, "option", 115);
     \u0275\u0275text(15, "All Class Groups");
     \u0275\u0275elementEnd();
     \u0275\u0275template(16, AttendanceMarkComponent_div_10_option_16_Template, 2, 3, "option", 36);
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(17, "div")(18, "label", 124);
+    \u0275\u0275elementStart(17, "div")(18, "label", 113);
     \u0275\u0275text(19, "SEARCH NAME / PHONE");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(20, "div", 175);
-    \u0275\u0275element(21, "i", 55);
-    \u0275\u0275elementStart(22, "input", 176);
+    \u0275\u0275elementStart(20, "div", 164);
+    \u0275\u0275element(21, "i", 54);
+    \u0275\u0275elementStart(22, "input", 165);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_10_Template_input_ngModelChange_22_listener($event) {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55772,25 +55710,25 @@ function AttendanceMarkComponent_div_10_Template(rf, ctx) {
       return \u0275\u0275resetView(ctx_r1.onMultiDayFilterChange());
     });
     \u0275\u0275elementEnd()()()();
-    \u0275\u0275elementStart(23, "div")(24, "div", 177)(25, "label", 178);
+    \u0275\u0275elementStart(23, "div")(24, "div", 166)(25, "label", 167);
     \u0275\u0275text(26, "SELECT STUDENT *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(27, "span", 179);
+    \u0275\u0275elementStart(27, "span", 168);
     \u0275\u0275text(28);
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(29, "select", 180);
+    \u0275\u0275elementStart(29, "select", 169);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_10_Template_select_ngModelChange_29_listener($event) {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
       \u0275\u0275twoWayBindingSet(ctx_r1.multiDayForm.student_id, $event) || (ctx_r1.multiDayForm.student_id = $event);
       return \u0275\u0275resetView($event);
     });
-    \u0275\u0275template(30, AttendanceMarkComponent_div_10_option_30_Template, 2, 6, "option", 36)(31, AttendanceMarkComponent_div_10_option_31_Template, 2, 1, "option", 181);
+    \u0275\u0275template(30, AttendanceMarkComponent_div_10_option_30_Template, 2, 6, "option", 36)(31, AttendanceMarkComponent_div_10_option_31_Template, 2, 1, "option", 170);
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(32, "div", 182)(33, "div")(34, "label", 124);
+    \u0275\u0275elementStart(32, "div", 171)(33, "div")(34, "label", 113);
     \u0275\u0275text(35, "START DATE *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(36, "input", 183);
+    \u0275\u0275elementStart(36, "input", 172);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_10_Template_input_ngModelChange_36_listener($event) {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55798,10 +55736,10 @@ function AttendanceMarkComponent_div_10_Template(rf, ctx) {
       return \u0275\u0275resetView($event);
     });
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(37, "div")(38, "label", 124);
+    \u0275\u0275elementStart(37, "div")(38, "label", 113);
     \u0275\u0275text(39, "END DATE *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(40, "input", 184);
+    \u0275\u0275elementStart(40, "input", 173);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_10_Template_input_ngModelChange_40_listener($event) {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55809,26 +55747,26 @@ function AttendanceMarkComponent_div_10_Template(rf, ctx) {
       return \u0275\u0275resetView($event);
     });
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(41, "div")(42, "label", 124);
+    \u0275\u0275elementStart(41, "div")(42, "label", 113);
     \u0275\u0275text(43, "LEAVE STATUS *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(44, "select", 185);
+    \u0275\u0275elementStart(44, "select", 174);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_10_Template_select_ngModelChange_44_listener($event) {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
       \u0275\u0275twoWayBindingSet(ctx_r1.multiDayForm.status, $event) || (ctx_r1.multiDayForm.status = $event);
       return \u0275\u0275resetView($event);
     });
-    \u0275\u0275elementStart(45, "option", 186);
+    \u0275\u0275elementStart(45, "option", 175);
     \u0275\u0275text(46, "EXCUSED (Approved Leave)");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(47, "option", 187);
+    \u0275\u0275elementStart(47, "option", 176);
     \u0275\u0275text(48, "ABSENT (Unexcused)");
     \u0275\u0275elementEnd()()();
-    \u0275\u0275elementStart(49, "div")(50, "label", 124);
+    \u0275\u0275elementStart(49, "div")(50, "label", 113);
     \u0275\u0275text(51, "REASON / NOTE *");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(52, "input", 188);
+    \u0275\u0275elementStart(52, "input", 177);
     \u0275\u0275twoWayListener("ngModelChange", function AttendanceMarkComponent_div_10_Template_input_ngModelChange_52_listener($event) {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55836,7 +55774,7 @@ function AttendanceMarkComponent_div_10_Template(rf, ctx) {
       return \u0275\u0275resetView($event);
     });
     \u0275\u0275elementEnd()();
-    \u0275\u0275elementStart(53, "div", 189)(54, "button", 190);
+    \u0275\u0275elementStart(53, "div", 178)(54, "button", 179);
     \u0275\u0275listener("click", function AttendanceMarkComponent_div_10_Template_button_click_54_listener() {
       \u0275\u0275restoreView(_r23);
       const ctx_r1 = \u0275\u0275nextContext();
@@ -55844,8 +55782,8 @@ function AttendanceMarkComponent_div_10_Template(rf, ctx) {
     });
     \u0275\u0275text(55, " Cancel ");
     \u0275\u0275elementEnd();
-    \u0275\u0275elementStart(56, "button", 191);
-    \u0275\u0275element(57, "i", 192);
+    \u0275\u0275elementStart(56, "button", 180);
+    \u0275\u0275element(57, "i", 181);
     \u0275\u0275text(58, " Save Multi-Day Leave ");
     \u0275\u0275elementEnd()()()()();
   }
@@ -56720,7 +56658,7 @@ var AttendanceMarkComponent = class _AttendanceMarkComponent {
     };
   }
   static {
-    this.\u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _AttendanceMarkComponent, selectors: [["app-attendance-mark"]], standalone: true, features: [\u0275\u0275StandaloneFeature], decls: 11, vars: 16, consts: [[3, "actionClicked", "title", "subtitle", "actionLabel", "actionIcon"], [1, "px-8", "pt-4"], [1, "flex", "items-center", "gap-2", "border-b", "border-[#1f2937]", "pb-3", "overflow-x-auto"], [1, "px-4", "py-2.5", "rounded-xl", "text-xs", "font-extrabold", "transition-all", "flex", "items-center", "gap-2", "border", "border-[#1f2937]", 3, "click"], [1, "fa-solid", "fa-user-graduate"], ["class", "px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 border border-[#1f2937]", 3, "bg-emerald-600", "text-white", "bg-[#1e293b]", "text-gray-400", "click", 4, "ngIf"], [1, "p-8", "space-y-6", "overflow-y-auto"], ["class", "space-y-6", 4, "ngIf"], ["class", "space-y-6 pt-0 p-5", 4, "ngIf"], ["class", "fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn", 4, "ngIf"], [1, "fa-solid", "fa-chalkboard-user"], [1, "space-y-6"], [1, "grid", "grid-cols-1", "md:grid-cols-4", "gap-5"], [1, "bg-[#1e293b]/70", "border", "border-[#1f2937]", "rounded-2xl", "p-5"], [1, "text-[11px]", "font-bold", "text-gray-400", "uppercase", "tracking-wider"], [1, "text-2xl", "font-extrabold", "text-emerald-400", "mt-2"], [1, "w-full", "bg-[#111827]", "h-2", "rounded-full", "mt-2", "overflow-hidden", "border", "border-[#1f2937]"], [1, "bg-emerald-500", "h-full", "rounded-full", "transition-all", "duration-500"], [1, "text-xs", "text-emerald-400", "mt-1", "font-semibold"], [1, "text-2xl", "font-extrabold", "text-rose-400", "mt-2"], [1, "text-xs", "text-rose-400", "mt-1", "font-semibold"], [1, "text-2xl", "font-extrabold", "text-amber-400", "mt-2"], [1, "text-xs", "text-amber-400", "mt-1", "font-semibold"], [1, "bg-[#1e293b]/80", "border", "border-[#1f2937]", "rounded-2xl", "p-5", "space-y-4", "text-xs", "shadow-lg"], [1, "flex", "items-center", "justify-between", "border-b", "border-[#1f2937]", "pb-3"], [1, "text-base", "font-bold", "text-white", "tracking-tight", "flex", "items-center", "gap-2"], [1, "fa-solid", "fa-layer-group", "text-emerald-400"], [1, "flex", "items-center", "gap-2"], [1, "px-3", "py-1.5", "rounded-xl", "bg-purple-950", "text-purple-300", "border", "border-purple-800", "font-bold", "hover:bg-purple-900", "transition-all", "flex", "items-center", "gap-1.5", 3, "click"], [1, "fa-solid", "fa-calendar-minus"], [1, "px-3", "py-1.5", "rounded-xl", "bg-emerald-950", "text-emerald-400", "border", "border-emerald-800", "font-bold", "hover:bg-emerald-900", "transition-all", "flex", "items-center", "gap-1.5", 3, "click"], [1, "fa-solid", "fa-calendar-day"], [1, "grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-7", "gap-4", "items-end"], [1, "lg:col-span-2"], [1, "block", "font-bold", "text-emerald-400", "mb-1"], [1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-bold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [3, "value", 4, "ngFor", "ngForOf"], [1, "block", "font-bold", "text-amber-400", "mb-1"], [1, "w-full", "bg-[#111827]", "border", "border-amber-500/40", "text-xs", "text-amber-300", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-amber-400", "font-bold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [3, "ngValue"], [3, "ngValue", 4, "ngFor", "ngForOf"], [1, "block", "font-bold", "text-cyan-400", "mb-1"], ["type", "date", 1, "w-full", "bg-[#111827]", "border", "border-cyan-500/40", "text-xs", "text-cyan-300", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-cyan-400", "font-mono", "font-extrabold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [1, "block", "font-bold", "text-gray-400", "mb-1", "uppercase", "tracking-wider", "text-[10px]"], [1, "grid", "grid-cols-4", "gap-1.5"], [1, "py-2.5", "px-1", "rounded-xl", "bg-emerald-950/80", "hover:bg-emerald-900", "border", "border-emerald-800", "text-emerald-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "py-2.5", "px-1", "rounded-xl", "bg-rose-950/80", "hover:bg-rose-900", "border", "border-rose-800", "text-rose-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "py-2.5", "px-1", "rounded-xl", "bg-amber-950/80", "hover:bg-amber-900", "border", "border-amber-800", "text-amber-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "py-2.5", "px-1", "rounded-xl", "bg-indigo-950/80", "hover:bg-indigo-900", "border", "border-indigo-800", "text-indigo-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "bg-[#1e293b]/70", "border", "border-[#1f2937]", "rounded-2xl", "p-6", "space-y-4"], ["class", "bg-amber-950/90 border-2 border-amber-500 rounded-2xl p-4 flex items-center justify-between gap-4 text-amber-200 shadow-xl", 4, "ngIf"], [1, "flex", "flex-col", "md:flex-row", "md:items-center", "justify-between", "gap-4", "mb-4"], [1, "text-base", "font-bold", "text-white", "tracking-tight"], [1, "text-emerald-400", "font-mono"], [1, "relative", "min-w-[260px]"], [1, "fa-solid", "fa-magnifying-glass", "absolute", "left-3", "top-1/2", "-translate-y-1/2", "text-gray-400", "text-xs"], ["type", "text", "placeholder", "Search Name, ID, or Phone...", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "pl-9", "pr-4", "py-2", "focus:outline-none", "focus:border-emerald-500", "font-bold", "shadow-sm", "placeholder:text-gray-500", 3, "ngModelChange", "ngModel"], [1, "flex", "items-center", "gap-2", "text-xs", "flex-wrap"], [1, "status-badge", "status-badge-present"], [1, "status-badge", "status-badge-absent"], [1, "status-badge", "status-badge-pending"], [1, "status-badge", "status-badge-active"], [1, "overflow-x-auto", "overflow-y-auto", "max-h-[620px]", "rounded-xl", "border", "border-[#1f2937]/50"], [1, "w-full", "text-left", "border-collapse", "text-xs"], [1, "sticky", "top-0", "z-10", "bg-[#111827]", "shadow-md"], [1, "border-b", "border-[#1f2937]", "font-bold", "text-gray-400", "uppercase", "tracking-wider"], [1, "py-3", "px-3", "w-8"], [1, "py-3", "px-3"], [1, "divide-y", "divide-[#1f2937]/50"], ["class", "hover:bg-gray-800/40 transition-colors", 4, "ngFor", "ngForOf"], [4, "ngIf"], [1, "mt-4", "pt-4", "border-t", "border-[#1f2937]", "flex", "flex-col", "sm:flex-row", "items-center", "justify-between", "gap-4", "text-xs", "text-gray-400"], [1, "flex", "items-center", "gap-3"], [1, "text-white", "font-mono"], [1, "flex", "items-center", "gap-1.5", "ml-2", "border-l", "border-[#1f2937]", "pl-3"], [1, "bg-[#111827]", "border", "border-[#1f2937]", "text-emerald-400", "font-bold", "rounded-lg", "px-2", "py-1", "focus:outline-none", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [1, "flex", "items-center", "gap-1.5"], [1, "px-2.5", "py-1.5", "rounded-lg", "bg-[#111827]", "border", "border-[#1f2937]", "hover:border-emerald-500/50", "disabled:opacity-40", "disabled:hover:border-[#1f2937]", "text-white", "font-bold", "transition-all", 3, "click", "disabled"], [1, "fa-solid", "fa-angles-left"], [1, "px-3", "py-1.5", "rounded-lg", "bg-[#111827]", "border", "border-[#1f2937]", "hover:border-emerald-500/50", "disabled:opacity-40", "disabled:hover:border-[#1f2937]", "text-white", "font-bold", "transition-all", "flex", "items-center", "gap-1", 3, "click", "disabled"], [1, "fa-solid", "fa-angle-left"], ["class", "w-8 h-8 rounded-lg border font-mono text-xs flex items-center justify-center transition-all cursor-pointer", 3, "ngClass", "click", 4, "ngFor", "ngForOf"], [1, "fa-solid", "fa-angle-right"], [1, "fa-solid", "fa-angles-right"], [1, "mt-4", "flex", "justify-end"], [1, "px-6", "py-3", "rounded-xl", "bg-emerald-500", "hover:bg-emerald-600", "text-white", "font-bold", "text-xs", "shadow-lg", "shadow-emerald-500/20", "transition-all", "flex", "items-center", "gap-2", 3, "click"], [1, "fa-solid", "fa-check"], [3, "value"], [1, "bg-amber-950/90", "border-2", "border-amber-500", "rounded-2xl", "p-4", "flex", "items-center", "justify-between", "gap-4", "text-amber-200", "shadow-xl"], [1, "w-10", "h-10", "rounded-xl", "bg-amber-900/90", "text-amber-400", "font-bold", "flex", "items-center", "justify-center", "text-lg", "shrink-0", "border", "border-amber-700"], [1, "fa-solid", "fa-triangle-exclamation"], [1, "font-extrabold", "text-sm", "text-white", "flex", "items-center", "gap-2"], [1, "text-xs", "text-amber-200", "mt-0.5"], [1, "px-2", "py-0.5", "rounded", "text-[10px]", "font-extrabold", "uppercase"], [1, "font-bold", "text-amber-300", "font-mono"], ["class", "italic font-semibold text-amber-100", 4, "ngIf"], [1, "px-3", "py-1", "rounded-full", "text-[11px]", "font-bold", "bg-amber-900", "text-amber-300", "border", "border-amber-700", "shrink-0"], [1, "italic", "font-semibold", "text-amber-100"], [1, "hover:bg-gray-800/40", "transition-colors"], [1, "py-3", "px-3", "font-mono", "text-gray-500"], [1, "py-3", "px-3", "font-mono", "text-emerald-400", "font-bold"], [1, "py-3", "px-3", "flex", "items-center", "gap-3", "font-bold", "text-white"], [1, "w-9", "h-9", "rounded-full", "overflow-hidden", "bg-emerald-600/30", "border", "border-emerald-500/30", "text-emerald-400", "font-bold", "flex", "items-center", "justify-center", "text-xs", "shrink-0", "shadow-sm"], ["class", "w-full h-full object-cover", 3, "src", 4, "ngIf"], [1, "py-3", "px-3", "font-sans"], ["class", "space-y-0.5", 4, "ngIf"], ["class", "text-xs text-amber-300 font-extrabold", 4, "ngIf"], ["type", "button", 1, "px-2.5", "py-1", "rounded-lg", "text-[10px]", "font-bold", "transition-all", 3, "click", "ngClass"], ["type", "text", "placeholder", "Add note...", 1, "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-gray-300", "rounded-lg", "px-2.5", "py-1.5", "w-full", "focus:outline-none", "focus:border-emerald-500", 3, "ngModelChange", "change", "ngModel"], [1, "w-full", "h-full", "object-cover", 3, "src"], [1, "space-y-0.5"], [1, "font-extrabold", "text-amber-300", "block", "text-xs"], [1, "fa-solid", "fa-book", "text-amber-400", "mr-1"], ["class", "text-[10px] text-emerald-400 font-bold block", 4, "ngIf"], [1, "text-[10px]", "text-emerald-400", "font-bold", "block"], [1, "fa-solid", "fa-chalkboard-user", "text-emerald-400", "mr-1"], [1, "text-xs", "text-amber-300", "font-extrabold"], ["colspan", "6", 1, "py-8", "text-center", "text-gray-500", "italic"], [1, "w-8", "h-8", "rounded-lg", "border", "font-mono", "text-xs", "flex", "items-center", "justify-center", "transition-all", "cursor-pointer", 3, "click", "ngClass"], [1, "space-y-6", "pt-0", "p-5"], [1, "text-2xl", "font-extrabold", "text-indigo-400", "mt-2"], [1, "text-xs", "text-indigo-400", "mt-1", "font-semibold"], [1, "fa-solid", "fa-chalkboard-user", "text-emerald-400"], [1, "grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-5", "gap-4", "items-end"], [1, "block", "font-bold", "text-gray-300", "mb-1"], [1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-bold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], ["value", ""], ["value", "Full-time"], ["value", "Part-time"], ["type", "date", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-mono", 3, "ngModelChange", "change", "ngModel"], [1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-amber-300", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-bold", "font-mono", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], ["value", "All Day"], ["label", "\u{1F305} MORNING SHIFT"], ["label", "\u2600\uFE0F AFTERNOON SHIFT"], ["label", "\u{1F319} EVENING SHIFT"], [1, "py-2.5", "rounded-xl", "bg-emerald-950/80", "hover:bg-emerald-900", "border", "border-emerald-800", "text-emerald-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "py-2.5", "rounded-xl", "bg-amber-950/80", "hover:bg-amber-900", "border", "border-amber-800", "text-amber-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "py-2.5", "rounded-xl", "bg-indigo-950/80", "hover:bg-indigo-900", "border", "border-indigo-800", "text-indigo-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "py-2.5", "rounded-xl", "bg-rose-950/80", "hover:bg-rose-900", "border", "border-rose-800", "text-rose-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "bg-[#1e293b]/70", "border", "border-[#1f2937]", "rounded-2xl", "p-6"], [1, "flex", "flex-col", "md:flex-row", "md:items-center", "justify-between", "gap-4", "mb-6"], ["type", "text", "placeholder", "\u{1F50D} Search Teacher Name, ID, or Phone...", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "pl-9", "pr-4", "py-2", "focus:outline-none", "focus:border-emerald-500", "font-bold", "shadow-sm", "placeholder:text-gray-500", 3, "ngModelChange", "ngModel"], [1, "overflow-x-auto"], [1, "pb-3", "w-8"], [1, "pb-3"], [1, "mt-6", "flex", "justify-end"], [1, "py-3", "font-mono", "text-gray-500"], [1, "py-3", "font-mono", "text-emerald-400", "font-bold"], [1, "py-3", "flex", "items-center", "gap-3", "font-bold", "text-white"], [1, "w-8", "h-8", "rounded-full", "overflow-hidden", "bg-emerald-600/30", "border", "border-emerald-500/30", "text-emerald-400", "font-bold", "flex", "items-center", "justify-center", "text-xs", "shrink-0"], [1, "font-bold", "text-white"], [1, "text-[10px]", "text-gray-400"], [1, "py-3"], ["type", "button", 1, "px-2.5", "py-1", "rounded-lg", "text-[10px]", "font-bold", "transition-all", 3, "click"], [1, "py-3", "font-mono"], [1, "bg-[#111827]", "border", "border-[#1f2937]", "text-[10px]", "text-amber-300", "rounded-lg", "px-2", "py-1", "focus:outline-none", "focus:border-emerald-500", "font-bold", "cursor-pointer", 3, "ngModelChange", "ngModel"], ["label", "MORNING"], ["label", "AFTERNOON"], ["label", "EVENING"], [1, "py-3", "font-mono", "font-bold"], ["class", "text-gray-500 text-[11px] font-normal", 4, "ngIf"], ["type", "text", "placeholder", "Add note / leave reason...", 1, "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-gray-300", "rounded-lg", "px-2.5", "py-1.5", "w-full", "focus:outline-none", "focus:border-emerald-500", 3, "ngModelChange", "ngModel"], [1, "px-2", "py-1", "rounded-lg", "bg-rose-950/80", "border", "border-rose-800", "text-rose-300", "text-[10px]", "inline-flex", "items-center", "gap-1", "font-bold"], [1, "fa-solid", "fa-bell"], [1, "text-gray-500", "text-[11px]", "font-normal"], ["colspan", "7", 1, "py-8", "text-center", "text-gray-500", "font-bold"], [1, "fixed", "inset-0", "bg-black/80", "backdrop-blur-md", "flex", "items-center", "justify-center", "p-4", "z-50", "animate-fadeIn"], [1, "bg-[#1e293b]", "border", "border-[#1f2937]", "rounded-3xl", "p-6", "w-full", "max-w-lg", "space-y-5", "shadow-2xl", "text-xs", "text-white"], [1, "text-base", "font-extrabold", "text-white", "flex", "items-center", "gap-2"], [1, "fa-solid", "fa-calendar-plus", "text-purple-400"], [1, "text-gray-400", "hover:text-white", "text-lg", 3, "click"], [1, "fa-solid", "fa-xmark"], [1, "space-y-4", 3, "ngSubmit"], [1, "grid", "grid-cols-1", "md:grid-cols-2", "gap-3", "bg-[#111827]/80", "p-3.5", "rounded-2xl", "border", "border-[#1f2937]"], ["name", "multi_group_id", 1, "w-full", "bg-[#1e293b]", "border", "border-[#1f2937]", "text-white", "font-bold", "rounded-xl", "px-3", "py-2", "text-xs", "focus:outline-none", "focus:border-purple-500", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [1, "relative"], ["type", "text", "name", "multi_search", "placeholder", "Name, ID, or Phone...", 1, "w-full", "bg-[#1e293b]", "border", "border-[#1f2937]", "text-white", "rounded-xl", "pl-8", "pr-3", "py-2", "text-xs", "focus:outline-none", "focus:border-purple-500", "font-bold", 3, "ngModelChange", "input", "ngModel"], [1, "flex", "items-center", "justify-between", "mb-1"], [1, "block", "font-bold", "text-gray-300"], [1, "text-[10px]", "text-purple-400", "font-mono", "font-bold"], ["name", "multi_student_id", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-bold", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-purple-500", "cursor-pointer", 3, "ngModelChange", "ngModel"], ["disabled", "", 3, "value", 4, "ngIf"], [1, "grid", "grid-cols-2", "gap-3"], ["type", "date", "name", "multi_start_date", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-mono", "rounded-xl", "px-3", "py-2.5", "focus:outline-none", "focus:border-purple-500", 3, "ngModelChange", "ngModel"], ["type", "date", "name", "multi_end_date", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-mono", "rounded-xl", "px-3", "py-2.5", "focus:outline-none", "focus:border-purple-500", 3, "ngModelChange", "ngModel"], ["name", "multi_status", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-bold", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-purple-500", 3, "ngModelChange", "ngModel"], ["value", "EXCUSED"], ["value", "ABSENT"], ["type", "text", "placeholder", "e.g. Sick leave, official family business...", "name", "multi_reason", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-purple-500", "font-bold", 3, "ngModelChange", "ngModel"], [1, "pt-3", "flex", "items-center", "justify-end", "gap-2", "border-t", "border-[#1f2937]"], ["type", "button", 1, "px-4", "py-2.5", "rounded-xl", "bg-gray-800", "hover:bg-gray-700", "text-gray-300", "font-bold", 3, "click"], ["type", "submit", 1, "px-5", "py-2.5", "rounded-xl", "bg-purple-600", "hover:bg-purple-500", "disabled:opacity-50", "text-white", "font-bold", "shadow-lg", "shadow-purple-600/20", "flex", "items-center", "gap-1.5", "transition-all", 3, "disabled"], [1, "fa-solid", "fa-paper-plane"], ["disabled", "", 3, "value"]], template: function AttendanceMarkComponent_Template(rf, ctx) {
+    this.\u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _AttendanceMarkComponent, selectors: [["app-attendance-mark"]], standalone: true, features: [\u0275\u0275StandaloneFeature], decls: 11, vars: 16, consts: [[3, "actionClicked", "title", "subtitle", "actionLabel", "actionIcon"], [1, "px-8", "pt-4"], [1, "flex", "items-center", "gap-2", "border-b", "border-[#1f2937]", "pb-3", "overflow-x-auto"], [1, "px-4", "py-2.5", "rounded-xl", "text-xs", "font-extrabold", "transition-all", "flex", "items-center", "gap-2", "border", "border-[#1f2937]", 3, "click"], [1, "fa-solid", "fa-user-graduate"], ["class", "px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 border border-[#1f2937]", 3, "bg-emerald-600", "text-white", "bg-[#1e293b]", "text-gray-400", "click", 4, "ngIf"], [1, "p-8", "space-y-6", "overflow-y-auto"], ["class", "space-y-6", 4, "ngIf"], ["class", "space-y-6 pt-0 p-5", 4, "ngIf"], ["class", "fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn", 4, "ngIf"], [1, "fa-solid", "fa-chalkboard-user"], [1, "space-y-6"], [1, "grid", "grid-cols-1", "md:grid-cols-4", "gap-5"], [1, "bg-[#1e293b]/70", "border", "border-[#1f2937]", "rounded-2xl", "p-5"], [1, "text-[11px]", "font-bold", "text-gray-400", "uppercase", "tracking-wider"], [1, "text-2xl", "font-extrabold", "text-emerald-400", "mt-2"], [1, "w-full", "bg-[#111827]", "h-2", "rounded-full", "mt-2", "overflow-hidden", "border", "border-[#1f2937]"], [1, "bg-emerald-500", "h-full", "rounded-full", "transition-all", "duration-500"], [1, "text-xs", "text-emerald-400", "mt-1", "font-semibold"], [1, "text-2xl", "font-extrabold", "text-rose-400", "mt-2"], [1, "text-xs", "text-rose-400", "mt-1", "font-semibold"], [1, "text-2xl", "font-extrabold", "text-amber-400", "mt-2"], [1, "text-xs", "text-amber-400", "mt-1", "font-semibold"], [1, "bg-[#1e293b]/80", "border", "border-[#1f2937]", "rounded-2xl", "p-5", "space-y-4", "text-xs", "shadow-lg"], [1, "flex", "items-center", "justify-between", "border-b", "border-[#1f2937]", "pb-3"], [1, "text-base", "font-bold", "text-white", "tracking-tight", "flex", "items-center", "gap-2"], [1, "fa-solid", "fa-layer-group", "text-emerald-400"], [1, "flex", "items-center", "gap-2"], [1, "px-3", "py-1.5", "rounded-xl", "bg-purple-950", "text-purple-300", "border", "border-purple-800", "font-bold", "hover:bg-purple-900", "transition-all", "flex", "items-center", "gap-1.5", 3, "click"], [1, "fa-solid", "fa-calendar-minus"], [1, "px-3", "py-1.5", "rounded-xl", "bg-emerald-950", "text-emerald-400", "border", "border-emerald-800", "font-bold", "hover:bg-emerald-900", "transition-all", "flex", "items-center", "gap-1.5", 3, "click"], [1, "fa-solid", "fa-calendar-day"], [1, "grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-7", "gap-4", "items-end"], [1, "lg:col-span-2"], [1, "block", "font-bold", "text-emerald-400", "mb-1"], [1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-bold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [3, "value", 4, "ngFor", "ngForOf"], [1, "block", "font-bold", "text-amber-400", "mb-1"], [1, "w-full", "bg-[#111827]", "border", "border-amber-500/40", "text-xs", "text-amber-300", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-amber-400", "font-bold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [3, "ngValue"], [3, "ngValue", 4, "ngFor", "ngForOf"], [1, "block", "font-bold", "text-cyan-400", "mb-1"], ["type", "date", 1, "w-full", "bg-[#111827]", "border", "border-cyan-500/40", "text-xs", "text-cyan-300", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-cyan-400", "font-mono", "font-extrabold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [1, "block", "font-bold", "text-gray-400", "mb-1", "uppercase", "tracking-wider", "text-[10px]"], [1, "grid", "grid-cols-4", "gap-1.5"], [1, "py-2.5", "px-1", "rounded-xl", "bg-emerald-950/80", "hover:bg-emerald-900", "border", "border-emerald-800", "text-emerald-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "py-2.5", "px-1", "rounded-xl", "bg-rose-950/80", "hover:bg-rose-900", "border", "border-rose-800", "text-rose-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "py-2.5", "px-1", "rounded-xl", "bg-amber-950/80", "hover:bg-amber-900", "border", "border-amber-800", "text-amber-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "py-2.5", "px-1", "rounded-xl", "bg-indigo-950/80", "hover:bg-indigo-900", "border", "border-indigo-800", "text-indigo-400", "font-bold", "text-[11px]", "transition-all", "text-center", 3, "click"], [1, "bg-[#1e293b]/70", "border", "border-[#1f2937]", "rounded-2xl", "p-6", "space-y-4"], [1, "flex", "flex-col", "md:flex-row", "md:items-center", "justify-between", "gap-4", "mb-4"], [1, "text-base", "font-bold", "text-white", "tracking-tight"], [1, "text-emerald-400", "font-mono"], [1, "relative", "min-w-[260px]"], [1, "fa-solid", "fa-magnifying-glass", "absolute", "left-3", "top-1/2", "-translate-y-1/2", "text-gray-400", "text-xs"], ["type", "text", "placeholder", "Search Name, ID, or Phone...", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "pl-9", "pr-4", "py-2", "focus:outline-none", "focus:border-emerald-500", "font-bold", "shadow-sm", "placeholder:text-gray-500", 3, "ngModelChange", "ngModel"], [1, "flex", "items-center", "gap-2", "text-xs", "flex-wrap"], [1, "status-badge", "status-badge-present"], [1, "status-badge", "status-badge-absent"], [1, "status-badge", "status-badge-pending"], [1, "status-badge", "status-badge-active"], [1, "overflow-x-auto", "overflow-y-auto", "max-h-[620px]", "rounded-xl", "border", "border-[#1f2937]/50"], [1, "w-full", "text-left", "border-collapse", "text-xs"], [1, "sticky", "top-0", "z-10", "bg-[#111827]", "shadow-md"], [1, "border-b", "border-[#1f2937]", "font-bold", "text-gray-400", "uppercase", "tracking-wider"], [1, "py-3", "px-3", "w-8"], [1, "py-3", "px-3"], [1, "divide-y", "divide-[#1f2937]/50"], ["class", "hover:bg-gray-800/40 transition-colors", 4, "ngFor", "ngForOf"], [4, "ngIf"], [1, "mt-4", "pt-4", "border-t", "border-[#1f2937]", "flex", "flex-col", "sm:flex-row", "items-center", "justify-between", "gap-4", "text-xs", "text-gray-400"], [1, "flex", "items-center", "gap-3"], [1, "text-white", "font-mono"], [1, "flex", "items-center", "gap-1.5", "ml-2", "border-l", "border-[#1f2937]", "pl-3"], [1, "bg-[#111827]", "border", "border-[#1f2937]", "text-emerald-400", "font-bold", "rounded-lg", "px-2", "py-1", "focus:outline-none", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [1, "flex", "items-center", "gap-1.5"], [1, "px-2.5", "py-1.5", "rounded-lg", "bg-[#111827]", "border", "border-[#1f2937]", "hover:border-emerald-500/50", "disabled:opacity-40", "disabled:hover:border-[#1f2937]", "text-white", "font-bold", "transition-all", 3, "click", "disabled"], [1, "fa-solid", "fa-angles-left"], [1, "px-3", "py-1.5", "rounded-lg", "bg-[#111827]", "border", "border-[#1f2937]", "hover:border-emerald-500/50", "disabled:opacity-40", "disabled:hover:border-[#1f2937]", "text-white", "font-bold", "transition-all", "flex", "items-center", "gap-1", 3, "click", "disabled"], [1, "fa-solid", "fa-angle-left"], ["class", "w-8 h-8 rounded-lg border font-mono text-xs flex items-center justify-center transition-all cursor-pointer", 3, "ngClass", "click", 4, "ngFor", "ngForOf"], [1, "fa-solid", "fa-angle-right"], [1, "fa-solid", "fa-angles-right"], [1, "mt-4", "flex", "justify-end"], [1, "px-6", "py-3", "rounded-xl", "bg-emerald-500", "hover:bg-emerald-600", "text-white", "font-bold", "text-xs", "shadow-lg", "shadow-emerald-500/20", "transition-all", "flex", "items-center", "gap-2", 3, "click"], [1, "fa-solid", "fa-check"], [3, "value"], [1, "hover:bg-gray-800/40", "transition-colors"], [1, "py-3", "px-3", "font-mono", "text-gray-500"], [1, "py-3", "px-3", "font-mono", "text-emerald-400", "font-bold"], [1, "py-3", "px-3", "flex", "items-center", "gap-3", "font-bold", "text-white"], [1, "w-9", "h-9", "rounded-full", "overflow-hidden", "bg-emerald-600/30", "border", "border-emerald-500/30", "text-emerald-400", "font-bold", "flex", "items-center", "justify-center", "text-xs", "shrink-0", "shadow-sm"], ["class", "w-full h-full object-cover", 3, "src", 4, "ngIf"], [1, "py-3", "px-3", "font-sans"], ["class", "space-y-0.5", 4, "ngIf"], ["class", "text-xs text-amber-300 font-extrabold", 4, "ngIf"], ["type", "button", 1, "px-2.5", "py-1", "rounded-lg", "text-[10px]", "font-bold", "transition-all", 3, "click", "ngClass"], ["type", "text", "placeholder", "Add note...", 1, "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-gray-300", "rounded-lg", "px-2.5", "py-1.5", "w-full", "focus:outline-none", "focus:border-emerald-500", 3, "ngModelChange", "change", "ngModel"], [1, "w-full", "h-full", "object-cover", 3, "src"], [1, "space-y-0.5"], [1, "font-extrabold", "text-amber-300", "block", "text-xs"], [1, "fa-solid", "fa-book", "text-amber-400", "mr-1"], ["class", "text-[10px] text-emerald-400 font-bold block", 4, "ngIf"], [1, "text-[10px]", "text-emerald-400", "font-bold", "block"], [1, "fa-solid", "fa-chalkboard-user", "text-emerald-400", "mr-1"], [1, "text-xs", "text-amber-300", "font-extrabold"], ["colspan", "6", 1, "py-8", "text-center", "text-gray-500", "italic"], [1, "w-8", "h-8", "rounded-lg", "border", "font-mono", "text-xs", "flex", "items-center", "justify-center", "transition-all", "cursor-pointer", 3, "click", "ngClass"], [1, "space-y-6", "pt-0", "p-5"], [1, "text-2xl", "font-extrabold", "text-indigo-400", "mt-2"], [1, "text-xs", "text-indigo-400", "mt-1", "font-semibold"], [1, "fa-solid", "fa-chalkboard-user", "text-emerald-400"], [1, "grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-5", "gap-4", "items-end"], [1, "block", "font-bold", "text-gray-300", "mb-1"], [1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-bold", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], ["value", ""], ["value", "Full-time"], ["value", "Part-time"], ["type", "date", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-mono", 3, "ngModelChange", "change", "ngModel"], [1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-amber-300", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-emerald-500", "font-bold", "font-mono", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], ["value", "All Day"], ["label", "\u{1F305} MORNING SHIFT"], ["label", "\u2600\uFE0F AFTERNOON SHIFT"], ["label", "\u{1F319} EVENING SHIFT"], [1, "py-2.5", "rounded-xl", "bg-emerald-950/80", "hover:bg-emerald-900", "border", "border-emerald-800", "text-emerald-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "py-2.5", "rounded-xl", "bg-amber-950/80", "hover:bg-amber-900", "border", "border-amber-800", "text-amber-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "py-2.5", "rounded-xl", "bg-indigo-950/80", "hover:bg-indigo-900", "border", "border-indigo-800", "text-indigo-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "py-2.5", "rounded-xl", "bg-rose-950/80", "hover:bg-rose-900", "border", "border-rose-800", "text-rose-400", "font-bold", "text-xs", "transition-all", "flex", "items-center", "justify-center", 3, "click"], [1, "bg-[#1e293b]/70", "border", "border-[#1f2937]", "rounded-2xl", "p-6"], [1, "flex", "flex-col", "md:flex-row", "md:items-center", "justify-between", "gap-4", "mb-6"], ["type", "text", "placeholder", "\u{1F50D} Search Teacher Name, ID, or Phone...", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-white", "rounded-xl", "pl-9", "pr-4", "py-2", "focus:outline-none", "focus:border-emerald-500", "font-bold", "shadow-sm", "placeholder:text-gray-500", 3, "ngModelChange", "ngModel"], [1, "overflow-x-auto"], [1, "pb-3", "w-8"], [1, "pb-3"], [1, "mt-6", "flex", "justify-end"], [1, "py-3", "font-mono", "text-gray-500"], [1, "py-3", "font-mono", "text-emerald-400", "font-bold"], [1, "py-3", "flex", "items-center", "gap-3", "font-bold", "text-white"], [1, "w-8", "h-8", "rounded-full", "overflow-hidden", "bg-emerald-600/30", "border", "border-emerald-500/30", "text-emerald-400", "font-bold", "flex", "items-center", "justify-center", "text-xs", "shrink-0"], [1, "font-bold", "text-white"], [1, "text-[10px]", "text-gray-400"], [1, "py-3"], ["type", "button", 1, "px-2.5", "py-1", "rounded-lg", "text-[10px]", "font-bold", "transition-all", 3, "click"], [1, "py-3", "font-mono"], [1, "bg-[#111827]", "border", "border-[#1f2937]", "text-[10px]", "text-amber-300", "rounded-lg", "px-2", "py-1", "focus:outline-none", "focus:border-emerald-500", "font-bold", "cursor-pointer", 3, "ngModelChange", "ngModel"], ["label", "MORNING"], ["label", "AFTERNOON"], ["label", "EVENING"], [1, "py-3", "font-mono", "font-bold"], ["class", "text-gray-500 text-[11px] font-normal", 4, "ngIf"], ["type", "text", "placeholder", "Add note / leave reason...", 1, "bg-[#111827]", "border", "border-[#1f2937]", "text-xs", "text-gray-300", "rounded-lg", "px-2.5", "py-1.5", "w-full", "focus:outline-none", "focus:border-emerald-500", 3, "ngModelChange", "ngModel"], [1, "px-2", "py-1", "rounded-lg", "bg-rose-950/80", "border", "border-rose-800", "text-rose-300", "text-[10px]", "inline-flex", "items-center", "gap-1", "font-bold"], [1, "fa-solid", "fa-bell"], [1, "text-gray-500", "text-[11px]", "font-normal"], ["colspan", "7", 1, "py-8", "text-center", "text-gray-500", "font-bold"], [1, "fixed", "inset-0", "bg-black/80", "backdrop-blur-md", "flex", "items-center", "justify-center", "p-4", "z-50", "animate-fadeIn"], [1, "bg-[#1e293b]", "border", "border-[#1f2937]", "rounded-3xl", "p-6", "w-full", "max-w-lg", "space-y-5", "shadow-2xl", "text-xs", "text-white"], [1, "text-base", "font-extrabold", "text-white", "flex", "items-center", "gap-2"], [1, "fa-solid", "fa-calendar-plus", "text-purple-400"], [1, "text-gray-400", "hover:text-white", "text-lg", 3, "click"], [1, "fa-solid", "fa-xmark"], [1, "space-y-4", 3, "ngSubmit"], [1, "grid", "grid-cols-1", "md:grid-cols-2", "gap-3", "bg-[#111827]/80", "p-3.5", "rounded-2xl", "border", "border-[#1f2937]"], ["name", "multi_group_id", 1, "w-full", "bg-[#1e293b]", "border", "border-[#1f2937]", "text-white", "font-bold", "rounded-xl", "px-3", "py-2", "text-xs", "focus:outline-none", "focus:border-purple-500", "cursor-pointer", 3, "ngModelChange", "change", "ngModel"], [1, "relative"], ["type", "text", "name", "multi_search", "placeholder", "Name, ID, or Phone...", 1, "w-full", "bg-[#1e293b]", "border", "border-[#1f2937]", "text-white", "rounded-xl", "pl-8", "pr-3", "py-2", "text-xs", "focus:outline-none", "focus:border-purple-500", "font-bold", 3, "ngModelChange", "input", "ngModel"], [1, "flex", "items-center", "justify-between", "mb-1"], [1, "block", "font-bold", "text-gray-300"], [1, "text-[10px]", "text-purple-400", "font-mono", "font-bold"], ["name", "multi_student_id", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-bold", "rounded-xl", "px-3.5", "py-2.5", "focus:outline-none", "focus:border-purple-500", "cursor-pointer", 3, "ngModelChange", "ngModel"], ["disabled", "", 3, "value", 4, "ngIf"], [1, "grid", "grid-cols-2", "gap-3"], ["type", "date", "name", "multi_start_date", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-mono", "rounded-xl", "px-3", "py-2.5", "focus:outline-none", "focus:border-purple-500", 3, "ngModelChange", "ngModel"], ["type", "date", "name", "multi_end_date", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-mono", "rounded-xl", "px-3", "py-2.5", "focus:outline-none", "focus:border-purple-500", 3, "ngModelChange", "ngModel"], ["name", "multi_status", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "font-bold", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-purple-500", 3, "ngModelChange", "ngModel"], ["value", "EXCUSED"], ["value", "ABSENT"], ["type", "text", "placeholder", "e.g. Sick leave, official family business...", "name", "multi_reason", "required", "", 1, "w-full", "bg-[#111827]", "border", "border-[#1f2937]", "text-white", "rounded-xl", "px-4", "py-2.5", "focus:outline-none", "focus:border-purple-500", "font-bold", 3, "ngModelChange", "ngModel"], [1, "pt-3", "flex", "items-center", "justify-end", "gap-2", "border-t", "border-[#1f2937]"], ["type", "button", 1, "px-4", "py-2.5", "rounded-xl", "bg-gray-800", "hover:bg-gray-700", "text-gray-300", "font-bold", 3, "click"], ["type", "submit", 1, "px-5", "py-2.5", "rounded-xl", "bg-purple-600", "hover:bg-purple-500", "disabled:opacity-50", "text-white", "font-bold", "shadow-lg", "shadow-purple-600/20", "flex", "items-center", "gap-1.5", "transition-all", 3, "disabled"], [1, "fa-solid", "fa-paper-plane"], ["disabled", "", 3, "value"]], template: function AttendanceMarkComponent_Template(rf, ctx) {
       if (rf & 1) {
         \u0275\u0275elementStart(0, "app-navbar", 0);
         \u0275\u0275listener("actionClicked", function AttendanceMarkComponent_Template_app_navbar_actionClicked_0_listener() {
@@ -56737,7 +56675,7 @@ var AttendanceMarkComponent = class _AttendanceMarkComponent {
         \u0275\u0275template(6, AttendanceMarkComponent_button_6_Template, 3, 8, "button", 5);
         \u0275\u0275elementEnd()();
         \u0275\u0275elementStart(7, "div", 6);
-        \u0275\u0275template(8, AttendanceMarkComponent_div_8_Template, 144, 34, "div", 7);
+        \u0275\u0275template(8, AttendanceMarkComponent_div_8_Template, 143, 33, "div", 7);
         \u0275\u0275elementEnd();
         \u0275\u0275template(9, AttendanceMarkComponent_div_9_Template, 128, 23, "div", 8)(10, AttendanceMarkComponent_div_10_Template, 59, 12, "div", 9);
       }

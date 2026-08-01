@@ -134,7 +134,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
       <div *ngIf="isTeacherView" class="bg-[#1e293b]/80 border border-[#1f2937] rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg">
         <div>
           <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
-            <i class="fa-solid fa-calendar-days text-emerald-400"></i> My Master Personal Timetable
+            <i class="fa-solid fa-calendar-days text-emerald-400"></i> My Schedule
           </h3>
           <p class="text-xs text-gray-400 mt-1">Consolidated weekly schedule across all your assigned class groups</p>
         </div>
@@ -157,7 +157,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
               <i class="fa-solid fa-users-rectangle"></i> Class Filter:
             </label>
             <select [(ngModel)]="selectedTeacherGroupId" (change)="loadTimetables()" class="bg-[#111827] border border-emerald-500/50 text-xs text-white rounded-xl px-3.5 py-2 font-bold focus:outline-none focus:border-emerald-400 cursor-pointer">
-              <option value="ALL">All My Taught Class Groups</option>
+              <option value="ALL">All Class Groups</option>
               <option *ngFor="let g of groups" [value]="g.group_id">
                 {{ g.group_code }} — {{ g.group_name }}
               </option>

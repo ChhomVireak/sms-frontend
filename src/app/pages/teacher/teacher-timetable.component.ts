@@ -20,7 +20,7 @@ import { SocketService } from '../../core/services/socket.service';
       <div class="bg-[#1e293b]/80 border border-[#1f2937] rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg">
         <div>
           <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
-            <i class="fa-solid fa-calendar-days text-emerald-400"></i> My Master Personal Timetable
+            <i class="fa-solid fa-calendar-days text-emerald-400"></i> My Schedule
           </h3>
           <p class="text-xs text-gray-400 mt-1">Consolidated weekly schedule across all your assigned class groups</p>
         </div>
@@ -45,7 +45,7 @@ import { SocketService } from '../../core/services/socket.service';
               <i class="fa-solid fa-users-rectangle text-emerald-400"></i> Class Filter:
             </label>
             <select [(ngModel)]="selectedTeacherGroupId" (change)="loadTimetables()" class="bg-[#111827] border border-emerald-500/50 text-xs text-white rounded-xl px-3.5 py-2 font-bold focus:outline-none focus:border-emerald-400 cursor-pointer shadow-md">
-              <option value="ALL" class="bg-[#111827] text-white font-bold">All My Taught Class Groups</option>
+              <option value="ALL" class="bg-[#111827] text-white font-bold">All Class Groups</option>
               <option *ngFor="let g of groups" [value]="g.group_id" class="bg-[#111827] text-white font-bold">
                 {{ g.group_code }} — {{ g.group_name }}
               </option>
