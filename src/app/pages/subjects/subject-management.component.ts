@@ -527,6 +527,8 @@ export class SubjectManagementComponent implements OnInit, OnDestroy {
     } else {
       this.api.post('subjects', this.formSubject).subscribe({
         next: () => {
+          this.toast.success('Subject created successfully!');
+          this.showModal = false;
           this.loadSubjects();
         },
         error: (err) => this.toast.error(err.error?.message || 'Create failed')
