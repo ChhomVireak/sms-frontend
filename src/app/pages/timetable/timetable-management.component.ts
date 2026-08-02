@@ -16,7 +16,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
   template: `
     <app-navbar [title]="isTeacherView ? 'My Teaching Timetable' : 'Timetable Management'" 
                 [subtitle]="isTeacherView ? 'Teacher Portal / Schedule' : 'Admin / Timetable'"
-                [actionLabel]="isTeacherView ? '' : '+ New Time Slot'"
+                [actionLabel]="isTeacherView ? '' : 'New Time Slot'"
                 [actionIcon]="'fa-solid fa-clock-rotate-left'"
                 (actionClicked)="showSlotModal = true"></app-navbar>
 

@@ -118,7 +118,7 @@ import { environment } from '../../../environments/environment';
             <!-- Create New Academic Year Card -->
             <div class="bg-[#111827] border border-[#1f2937] rounded-xl p-4 space-y-3">
               <h4 class="font-extrabold text-emerald-400 text-xs flex items-center gap-1.5">
-                <i class="fa-solid fa-plus-circle"></i> + Create New Academic Year
+                <i class="fa-solid fa-plus-circle"></i> Create New Academic Year
               </h4>
               <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
                 <div>

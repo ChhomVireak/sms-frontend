@@ -13,7 +13,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
   template: `
     <app-navbar [title]="'Exam Schedule & Exam Group Management'" 
                 [subtitle]="'Admin / Exams'"
-                [actionLabel]="activeSubTab === 'schedules' ? '+ Schedule New Exam' : '+ Create Exam Group'"
+                [actionLabel]="activeSubTab === 'schedules' ? 'Schedule New Exam' : '+ Create Exam Group'"
                 [actionIcon]="activeSubTab === 'schedules' ? 'fa-solid fa-calendar-plus' : 'fa-solid fa-layer-group'"
                 (actionClicked)="onHeaderActionClicked()"></app-navbar>
 

@@ -13,7 +13,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
   template: `
     <app-navbar [title]="'Faculty Management'" 
                 [subtitle]="'Admin / Academic / Faculties'"
-                [actionLabel]="'+ Create Faculty'"
+                [actionLabel]="'Create Faculty'"
                 (actionClicked)="openModal()"></app-navbar>
 
     <div class="p-8 space-y-6 overflow-y-auto">

@@ -225,73 +225,47 @@ export class StudentFormComponent implements OnInit {
     private route: ActivatedRoute
   ) { }
 
-  formatDateForInput(dateStr: any): string {
-    if (!dateStr) return '';
-    const str = String(dateStr).trim();
-    if (str.length >= 10 && /^\d{4}-\d{2}-\d{2}/.test(str)) {
-      return str.slice(0, 10);
-    }
-    try {
-      const d = new Date(dateStr);
-      if (!isNaN(d.getTime())) {
-        return d.toISOString().slice(0, 10);
-      }
-    } catch (e) {}
-    return '';
-  }
-
   ngOnInit(): void {
+    this.loadDropdowns();
+
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEdit = true;
         this.studentId = +params['id'];
-        this.loadDropdowns(() => {
-          if (this.studentId) {
-            this.loadStudent(this.studentId);
-          }
-        });
-      } else {
-        this.isEdit = false;
-        this.loadDropdowns();
+        this.loadStudent(this.studentId);
       }
     });
   }
 
-  loadDropdowns(callback?: () => void): void {
-    this.api.get<any>('groups').subscribe({
-      next: (res) => {
-        this.groups = res.data?.groups || res.data || [];
-        this.academicService.getPrograms().subscribe({
-          next: (progRes) => {
-            this.programs = progRes.data?.programs || progRes.data || [];
-            if (!this.isEdit) {
-              if (this.programs.length > 0) {
-                if (!this.form.program_id || !this.programs.some(p => p.program_id == this.form.program_id)) {
-                  this.form.program_id = this.programs[0].program_id;
-                }
-              }
-              const matching = this.filteredGroups;
-              if (matching.length > 0) {
-                this.form.group_id = matching[0].group_id;
-                this.onGroupSelectChange();
-              } else {
-                this.form.group_id = null;
-              }
-            }
-            if (callback) callback();
-          },
-          error: () => { if (callback) callback(); }
-        });
-      },
-      error: () => { if (callback) callback(); }
+  loadDropdowns(): void {
+    this.api.get<any>('groups').subscribe(res => {
+      this.groups = res.data?.groups || res.data || [];
+      this.academicService.getPrograms().subscribe(progRes => {
+        this.programs = progRes.data?.programs || [];
+        if (this.programs.length > 0) {
+          if (!this.form.program_id || !this.programs.some(p => p.program_id == this.form.program_id)) {
+            this.form.program_id = this.programs[0].program_id;
+          }
+        }
+        if (!this.isEdit) {
+          const matching = this.filteredGroups;
+          if (matching.length > 0) {
+            this.form.group_id = matching[0].group_id;
+            this.onGroupSelectChange();
+          } else {
+            this.form.group_id = null;
+          }
+        }
+      });
     });
   }
 
   loadStudent(id: number): void {
     this.api.get<any>(`students/${id}`).subscribe({
       next: (res) => {
-        const s = res.data?.student || res.data || res.student || res;
-        if (s && (s.student_id || s.first_name)) {
+        if (res.success && res.data.student) {
+          const s = res.data.student;
+
           let assignedGroupId = s.group_id ? Number(s.group_id) : null;
           let assignedProgramId = s.program_id ? Number(s.program_id) : null;
 
@@ -301,24 +275,22 @@ export class StudentFormComponent implements OnInit {
               assignedProgramId = Number(foundG.program_id);
             }
           }
-          if (!assignedProgramId && this.programs.length > 0) {
-            assignedProgramId = Number(this.programs[0].program_id);
-          }
+          if (!assignedProgramId && this.programs.length > 0) assignedProgramId = this.programs[0].program_id;
 
           this.originalGroupId = assignedGroupId;
           this.form = {
             first_name: s.first_name || '',
             last_name: s.last_name || '',
-            gender: (s.gender || 'MALE').toUpperCase(),
-            dob: this.formatDateForInput(s.dob),
+            gender: s.gender || 'MALE',
+            dob: s.dob ? s.dob.slice(0, 10) : '',
             phone: s.phone || '',
             program_id: assignedProgramId,
             group_id: assignedGroupId,
             parent_name: s.parent_name || '',
             parent_phone: s.parent_phone || '',
             previous_school: s.previous_school || '',
-            enrollment_date: this.formatDateForInput(s.enrollment_date),
-            status: (s.status || 'ACTIVE').toUpperCase()
+            enrollment_date: s.enrollment_date ? s.enrollment_date.slice(0, 10) : '',
+            status: s.status || 'ACTIVE'
           };
 
           if (s.image) {
@@ -326,9 +298,6 @@ export class StudentFormComponent implements OnInit {
             this.imagePreview = s.image.startsWith('http') ? s.image : `${baseUrl}${s.image.startsWith('/') ? '' : '/'}${s.image}`;
           }
         }
-      },
-      error: () => {
-        this.toast.error('Failed to load student details');
       }
     });
   }
@@ -407,15 +376,15 @@ export class StudentFormComponent implements OnInit {
       return;
     }
     const formData = new FormData();
-    formData.append('first_name', this.form.first_name || '');
-    formData.append('last_name', this.form.last_name || '');
-    formData.append('gender', this.form.gender || 'MALE');
-    formData.append('dob', this.form.dob ? String(this.form.dob).slice(0, 10) : '');
-    formData.append('enrollment_date', this.form.enrollment_date ? String(this.form.enrollment_date).slice(0, 10) : '');
-    formData.append('status', this.form.status || 'ACTIVE');
+    formData.append('first_name', this.form.first_name);
+    formData.append('last_name', this.form.last_name);
+    formData.append('gender', this.form.gender);
+    formData.append('dob', this.form.dob);
+    formData.append('program_id', this.form.program_id);
+    formData.append('group_id', this.form.group_id);
+    formData.append('enrollment_date', this.form.enrollment_date);
+    formData.append('status', this.form.status);
 
-    if (this.form.program_id) formData.append('program_id', String(this.form.program_id));
-    if (this.form.group_id) formData.append('group_id', String(this.form.group_id));
     if (this.form.phone) formData.append('phone', this.form.phone);
     if (this.form.parent_name) formData.append('parent_name', this.form.parent_name);
     if (this.form.parent_phone) formData.append('parent_phone', this.form.parent_phone);

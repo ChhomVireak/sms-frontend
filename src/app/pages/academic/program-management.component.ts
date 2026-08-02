@@ -14,7 +14,7 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
   template: `
     <app-navbar [title]="'Program (Major) Management'" 
                 [subtitle]="'Admin / Academic / Programs'"
-                [actionLabel]="'+ Create Program'"
+                [actionLabel]="'Create Program'"
                 (actionClicked)="openModal()"></app-navbar>
 
     <div class="p-8 space-y-6 overflow-y-auto">
