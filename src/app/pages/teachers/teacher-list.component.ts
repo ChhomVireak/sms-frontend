@@ -1108,7 +1108,7 @@ export class TeacherListComponent implements OnInit {
       const targetProg = Number(this.selectedAssignProgramId);
       list = list.filter(sub => {
         const subProg = Number(sub.program_id);
-        return !sub.program_id || subProg === targetProg;
+        return subProg === targetProg;
       });
     }
 
