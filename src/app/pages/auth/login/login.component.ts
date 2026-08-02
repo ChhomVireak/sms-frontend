@@ -103,17 +103,7 @@ import { ToastService } from '../../../core/services/toast.service';
         <!-- Quick Demo Account Switcher -->
         <div class="mt-8 pt-6 border-t border-[#1f2937]/80">
           <div class="text-[11px] font-bold text-gray-500 text-center uppercase tracking-widest mb-3">SIGN IN AS</div>
-          <div class="grid grid-cols-3 gap-2">
-            <button (click)="quickLogin('admin@school.edu', 'admin123')" class="px-2 py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 text-xs font-semibold transition-all">
-              Admin
-            </button>
-            <button (click)="quickLogin('teacher123@gmail.com', 'teacher123')" class="px-2 py-1.5 rounded-lg border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 text-xs font-semibold transition-all">
-              Teacher
-            </button>
-            <button (click)="quickLogin('SV34-2026-0001', '08022000')" class="px-2 py-1.5 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 text-xs font-semibold transition-all">
-              Student
-            </button>
-          </div>
+          
           <p class="text-[11px] text-gray-500 text-center mt-4">
             Need access? <a href="javascript:void(0)" class="text-emerald-400">Contact Administrator</a>
           </p>

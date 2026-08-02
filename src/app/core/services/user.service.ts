@@ -6,7 +6,7 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class UserService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   getUsers(params?: { role?: string; search?: string }): Observable<any> {
     return this.api.get<any>('users', params);
