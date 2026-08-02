@@ -225,47 +225,73 @@ export class StudentFormComponent implements OnInit {
     private route: ActivatedRoute
   ) { }
 
-  ngOnInit(): void {
-    this.loadDropdowns();
+  formatDateForInput(dateStr: any): string {
+    if (!dateStr) return '';
+    const str = String(dateStr).trim();
+    if (str.length >= 10 && /^\d{4}-\d{2}-\d{2}/.test(str)) {
+      return str.slice(0, 10);
+    }
+    try {
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().slice(0, 10);
+      }
+    } catch (e) {}
+    return '';
+  }
 
+  ngOnInit(): void {
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEdit = true;
         this.studentId = +params['id'];
-        this.loadStudent(this.studentId);
+        this.loadDropdowns(() => {
+          if (this.studentId) {
+            this.loadStudent(this.studentId);
+          }
+        });
+      } else {
+        this.isEdit = false;
+        this.loadDropdowns();
       }
     });
   }
 
-  loadDropdowns(): void {
-    this.api.get<any>('groups').subscribe(res => {
-      this.groups = res.data?.groups || res.data || [];
-      this.academicService.getPrograms().subscribe(progRes => {
-        this.programs = progRes.data?.programs || [];
-        if (this.programs.length > 0) {
-          if (!this.form.program_id || !this.programs.some(p => p.program_id == this.form.program_id)) {
-            this.form.program_id = this.programs[0].program_id;
-          }
-        }
-        if (!this.isEdit) {
-          const matching = this.filteredGroups;
-          if (matching.length > 0) {
-            this.form.group_id = matching[0].group_id;
-            this.onGroupSelectChange();
-          } else {
-            this.form.group_id = null;
-          }
-        }
-      });
+  loadDropdowns(callback?: () => void): void {
+    this.api.get<any>('groups').subscribe({
+      next: (res) => {
+        this.groups = res.data?.groups || res.data || [];
+        this.academicService.getPrograms().subscribe({
+          next: (progRes) => {
+            this.programs = progRes.data?.programs || progRes.data || [];
+            if (!this.isEdit) {
+              if (this.programs.length > 0) {
+                if (!this.form.program_id || !this.programs.some(p => p.program_id == this.form.program_id)) {
+                  this.form.program_id = this.programs[0].program_id;
+                }
+              }
+              const matching = this.filteredGroups;
+              if (matching.length > 0) {
+                this.form.group_id = matching[0].group_id;
+                this.onGroupSelectChange();
+              } else {
+                this.form.group_id = null;
+              }
+            }
+            if (callback) callback();
+          },
+          error: () => { if (callback) callback(); }
+        });
+      },
+      error: () => { if (callback) callback(); }
     });
   }
 
   loadStudent(id: number): void {
     this.api.get<any>(`students/${id}`).subscribe({
       next: (res) => {
-        if (res.success && res.data.student) {
-          const s = res.data.student;
-
+        const s = res.data?.student || res.data || res.student || res;
+        if (s && (s.student_id || s.first_name)) {
           let assignedGroupId = s.group_id ? Number(s.group_id) : null;
           let assignedProgramId = s.program_id ? Number(s.program_id) : null;
 
@@ -275,22 +301,24 @@ export class StudentFormComponent implements OnInit {
               assignedProgramId = Number(foundG.program_id);
             }
           }
-          if (!assignedProgramId && this.programs.length > 0) assignedProgramId = this.programs[0].program_id;
+          if (!assignedProgramId && this.programs.length > 0) {
+            assignedProgramId = Number(this.programs[0].program_id);
+          }
 
           this.originalGroupId = assignedGroupId;
           this.form = {
             first_name: s.first_name || '',
             last_name: s.last_name || '',
-            gender: s.gender || 'MALE',
-            dob: s.dob ? s.dob.slice(0, 10) : '',
+            gender: (s.gender || 'MALE').toUpperCase(),
+            dob: this.formatDateForInput(s.dob),
             phone: s.phone || '',
             program_id: assignedProgramId,
             group_id: assignedGroupId,
             parent_name: s.parent_name || '',
             parent_phone: s.parent_phone || '',
             previous_school: s.previous_school || '',
-            enrollment_date: s.enrollment_date ? s.enrollment_date.slice(0, 10) : '',
-            status: s.status || 'ACTIVE'
+            enrollment_date: this.formatDateForInput(s.enrollment_date),
+            status: (s.status || 'ACTIVE').toUpperCase()
           };
 
           if (s.image) {
@@ -298,6 +326,9 @@ export class StudentFormComponent implements OnInit {
             this.imagePreview = s.image.startsWith('http') ? s.image : `${baseUrl}${s.image.startsWith('/') ? '' : '/'}${s.image}`;
           }
         }
+      },
+      error: () => {
+        this.toast.error('Failed to load student details');
       }
     });
   }
