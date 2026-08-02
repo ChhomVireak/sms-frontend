@@ -788,8 +788,9 @@ export class AttendanceMarkComponent implements OnInit {
   loadTimeSlots(): void {
     this.api.get<any>('time-slots').subscribe({
       next: (res) => {
-        const slots = res.data?.time_slots || res.data || [];
-        this.masterTimeSlots = slots.filter((s: any) => s.slot_name !== 'Breack' && s.slot_name !== 'Break');
+        const rawSlots = res.data?.slots || res.data?.time_slots || (Array.isArray(res.data) ? res.data : []);
+        const slots = Array.isArray(rawSlots) ? rawSlots : [];
+        this.masterTimeSlots = slots.filter((s: any) => s && s.slot_name !== 'Breack' && s.slot_name !== 'Break');
       },
       error: () => { }
     });
@@ -1273,23 +1274,42 @@ export class AttendanceMarkComponent implements OnInit {
     this.api.get<any>('timetables', { group_id: this.selectedClass }).subscribe({
       next: (res) => {
         const ttList = res.data?.timetables || res.data || [];
-        const dayTT = ttList.filter((t: any) => t.day_of_week && t.day_of_week.trim().toUpperCase() === dayName);
+        const subMap = new Map<number, any>();
 
-        if (dayTT.length > 0) {
-          const subMap = new Map<number, any>();
-          dayTT.forEach((t: any) => {
-            if (!subMap.has(Number(t.subject_id))) {
+        if (ttList.length > 0) {
+          ttList.forEach((t: any) => {
+            if (t.subject_id && !subMap.has(Number(t.subject_id))) {
+              const tName = `${t.teacher_fname || ''} ${t.teacher_lname || ''}`.trim();
+              const isToday = t.day_of_week && t.day_of_week.trim().toUpperCase() === dayName;
               subMap.set(Number(t.subject_id), {
                 subject_id: t.subject_id,
                 subject_code: t.subject_code,
                 subject_name: t.subject_name,
-                teacher_name: `${t.teacher_fname || ''} ${t.teacher_lname || ''}`.trim() || 'Lecturer'
+                teacher_name: tName && tName !== 'Lecturer' ? tName : 'Assigned Teacher',
+                is_today: isToday
               });
             }
           });
-          this.todayScheduledSubjects = Array.from(subMap.values());
+
+          const resultList = Array.from(subMap.values());
+          resultList.sort((a, b) => (b.is_today ? 1 : 0) - (a.is_today ? 1 : 0));
+          this.todayScheduledSubjects = resultList;
         } else {
-          this.todayScheduledSubjects = this.subjects || [];
+          const selectedGroupObj = this.groups.find(g => Number(g.group_id) === Number(this.selectedClass));
+          const progId = selectedGroupObj?.program_id ? Number(selectedGroupObj.program_id) : null;
+          const currSem = selectedGroupObj?.current_semester ? Number(selectedGroupObj.current_semester) : null;
+
+          const groupFiltered = (this.allMasterSubjects || []).filter(sub => {
+            const matchProg = !progId || !sub.program_id || Number(sub.program_id) === progId;
+            const matchSem = !currSem || !sub.semester || Number(sub.semester) === currSem;
+            return matchProg && matchSem;
+          });
+
+          this.todayScheduledSubjects = groupFiltered.length > 0 ? groupFiltered : (this.subjects || []);
+        }
+
+        if (this.selectedSubjectId && !this.todayScheduledSubjects.some(s => Number(s.subject_id) === Number(this.selectedSubjectId))) {
+          this.selectedSubjectId = null;
         }
       },
       error: () => {
