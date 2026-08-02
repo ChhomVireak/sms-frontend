@@ -9,6 +9,7 @@ import { AcademicService, Program } from '../../core/services/academic.service';
 import { ToastService } from '../../core/services/toast.service';
 import { SocketService } from '../../core/services/socket.service';
 import { ConfirmModalService } from '../../core/services/confirm-modal.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-class-management',
@@ -1001,7 +1002,8 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
     if (!cleanPath.startsWith('uploads/')) {
       cleanPath = 'uploads/' + cleanPath;
     }
-    return `http://localhost:5000/${cleanPath}`;
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+    return `${baseUrl}/${cleanPath}`;
   }
 
   saveClassGroup(): void {

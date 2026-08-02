@@ -294,7 +294,8 @@ export class StudentFormComponent implements OnInit {
           };
 
           if (s.image) {
-            this.imagePreview = s.image.startsWith('http') ? s.image : `http://localhost:5000${s.image}`;
+            const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+            this.imagePreview = s.image.startsWith('http') ? s.image : `${baseUrl}${s.image.startsWith('/') ? '' : '/'}${s.image}`;
           }
         }
       }

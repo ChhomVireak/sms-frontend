@@ -6,6 +6,7 @@ import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmModalService } from '../../core/services/confirm-modal.service';
 import { Teacher } from '../../core/models/teacher.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-teacher-list',
@@ -1649,7 +1650,8 @@ export class TeacherListComponent implements OnInit {
     if (!cleanPath.startsWith('uploads/')) {
       cleanPath = 'uploads/' + cleanPath;
     }
-    return `http://localhost:5000/${cleanPath}`;
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+    return `${baseUrl}/${cleanPath}`;
   }
 
   filterTeachers(): void {

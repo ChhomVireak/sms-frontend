@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable, Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class SocketService {
   }
 
   private connect(): void {
-    const url = 'https://sms-backend-6b23.onrender.com';
+    const url = environment.apiUrl ? environment.apiUrl.replace(/\/api\/?$/, '') : 'https://sms-backend-6b23.onrender.com';
     this.socket = io(url, {
       transports: ['websocket', 'polling'],
       reconnection: true,

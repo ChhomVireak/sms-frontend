@@ -6,6 +6,7 @@ import { NavbarComponent } from '../../shared/components/navbar.component';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { SocketService } from '../../core/services/socket.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-attendance-mark',
@@ -858,7 +859,8 @@ export class AttendanceMarkComponent implements OnInit {
   getPhotoUrl(path: string): string {
     if (!path) return '';
     if (path.startsWith('http')) return path;
-    return `http://localhost:5000${path}`;
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+    return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
   }
 
   loadTeachers(): void {

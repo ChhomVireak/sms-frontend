@@ -5,6 +5,7 @@ import { NavbarComponent } from '../../shared/components/navbar.component';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmModalService } from '../../core/services/confirm-modal.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-system-settings',
@@ -408,7 +409,7 @@ export class SystemSettingsComponent implements OnInit {
     this.toast.info('Generating real MySQL database dump (.sql)...');
     const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || '';
 
-    fetch('http://localhost:5000/api/settings/backup', {
+    fetch(`${environment.apiUrl}/settings/backup`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

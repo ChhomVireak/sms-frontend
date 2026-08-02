@@ -7,6 +7,7 @@ import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmModalService } from '../../core/services/confirm-modal.service';
 import { Student } from '../../core/models/student.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-student-list',
@@ -981,7 +982,8 @@ export class StudentListComponent implements OnInit {
     if (!cleanPath.startsWith('uploads/')) {
       cleanPath = 'uploads/' + cleanPath;
     }
-    return `http://localhost:5000/${cleanPath}`;
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+    return `${baseUrl}/${cleanPath}`;
   }
 
   loadPrograms(): void {
