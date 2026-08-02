@@ -351,14 +351,60 @@ import { environment } from '../../../environments/environment';
           <!-- Checkbox Subjects Selection -->
           <div class="md:col-span-2 bg-[#111827] p-4 rounded-xl border border-[#1f2937] space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1f2937] pb-3">
-              <h4 class="font-bold text-purple-400 uppercase">2. Select Teaching Subjects ({{ assignedSubjectIds.size }} Selected)</h4>
+              <h4 class="font-bold text-purple-400 uppercase flex items-center gap-2">
+                <i class="fa-solid fa-book-bookmark text-purple-400"></i>
+                2. Select Teaching Subjects ({{ assignedSubjectIds.size }} Selected)
+              </h4>
               <span class="text-[11px] font-mono text-gray-400">Showing <strong class="text-emerald-400 font-bold">{{ filteredAvailableSubjects.length }}</strong> of {{ availableSubjects.length }} subjects</span>
             </div>
 
-            <!-- Live Search Bar for Teaching Subjects -->
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-              <input type="text" [(ngModel)]="subjectSearchQuery" placeholder="Search subject code or name (e.g. CPP-101, C++, Web)..." class="w-full bg-[#1e293b] border border-[#1f2937] text-white rounded-xl pl-9 pr-4 py-2.5 text-xs focus:outline-none focus:border-purple-500 font-bold">
+            <!-- Program & Semester Dual Filter Controls + Search Bar -->
+            <div class="space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Select Program (Major) Filter -->
+                <div>
+                  <label class="block font-bold text-emerald-400 mb-1 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-graduation-cap"></i> Filter Program / Major:
+                  </label>
+                  <select [(ngModel)]="selectedAssignProgramId" class="w-full bg-[#1e293b] border border-emerald-500/40 text-white rounded-xl px-3 py-2 text-xs font-bold cursor-pointer focus:outline-none focus:border-emerald-500">
+                    <option value="ALL">-- All Academic Programs / Majors --</option>
+                    <option *ngFor="let p of programs" [value]="p.program_id">
+                      {{ p.program_code }} — {{ p.program_name }} ({{ p.degree }})
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Live Search Bar for Teaching Subjects -->
+                <div>
+                  <label class="block font-bold text-purple-400 mb-1 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search Subject:
+                  </label>
+                  <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" [(ngModel)]="subjectSearchQuery" placeholder="Search subject code or name..." class="w-full bg-[#1e293b] border border-[#1f2937] text-white rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-purple-500 font-bold">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Filter by Semester Tabs -->
+              <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                <span class="text-gray-400 font-bold text-[11px] uppercase mr-1 whitespace-nowrap flex items-center gap-1">
+                  <i class="fa-solid fa-layer-group text-purple-400"></i> Semester:
+                </span>
+                <button type="button" 
+                        (click)="selectedAssignSemester = 'ALL'"
+                        [ngClass]="selectedAssignSemester === 'ALL' ? 'bg-purple-600 text-white font-extrabold shadow-md border-purple-500' : 'bg-[#1e293b] text-gray-300 border-[#1f2937] hover:border-purple-500/50'"
+                        class="px-2.5 py-1 rounded-lg border font-mono text-[11px] transition-all cursor-pointer whitespace-nowrap">
+                  All Semesters
+                </button>
+                <button type="button" 
+                        *ngFor="let sem of [1, 2, 3, 4, 5, 6, 7, 8]"
+                        (click)="selectedAssignSemester = sem"
+                        [ngClass]="selectedAssignSemester === sem ? 'bg-purple-600 text-white font-extrabold shadow-md border-purple-500' : 'bg-[#1e293b] text-gray-300 border-[#1f2937] hover:border-purple-500/50'"
+                        class="px-2 py-1 rounded-lg border font-mono text-[11px] transition-all cursor-pointer whitespace-nowrap">
+                  Sem {{ sem }}
+                </button>
+              </div>
             </div>
 
             <!-- Scrollable Subjects Grid -->
@@ -371,7 +417,7 @@ import { environment } from '../../../environments/environment';
                   <div class="flex items-center gap-2">
                     <span class="font-mono text-emerald-400 font-bold block text-xs">{{ sub.subject_code }}</span>
                     <span class="text-[10px] bg-purple-950 text-purple-300 px-1.5 py-0.5 rounded font-mono font-bold border border-purple-800">
-                      Sem {{ sub.semester || sub.semester_id || sub.semester_number || 1 }}
+                      Semester {{ sub.semester || sub.semester_id || sub.semester_number || 1 }}
                     </span>
                   </div>
                   <span class="font-bold text-white text-xs block mt-0.5">{{ sub.subject_name }}</span>
@@ -380,7 +426,7 @@ import { environment } from '../../../environments/environment';
               </div>
 
               <div *ngIf="filteredAvailableSubjects.length === 0" class="col-span-2 py-8 text-center text-gray-500 italic font-bold">
-                No matching subjects found for selected semester / search term.
+                No matching subjects found for selected program / semester / search term.
               </div>
             </div>
 
@@ -1051,10 +1097,29 @@ export class TeacherListComponent implements OnInit {
     return list;
   }
 
+  selectedAssignProgramId: number | string = 'ALL';
+  selectedAssignSemester: number | string = 'ALL';
   subjectSearchQuery: string = '';
 
   get filteredAvailableSubjects(): any[] {
     let list = this.availableSubjects || [];
+
+    if (this.selectedAssignProgramId && this.selectedAssignProgramId !== 'ALL') {
+      const targetProg = Number(this.selectedAssignProgramId);
+      list = list.filter(sub => {
+        const subProg = Number(sub.program_id);
+        return !sub.program_id || subProg === targetProg;
+      });
+    }
+
+    if (this.selectedAssignSemester && this.selectedAssignSemester !== 'ALL') {
+      const targetSem = Number(this.selectedAssignSemester);
+      list = list.filter(sub => {
+        const subSem = Number(sub.semester || sub.semester_id || sub.semester_number || 1);
+        return subSem === targetSem;
+      });
+    }
+
     if (this.subjectSearchQuery && this.subjectSearchQuery.trim()) {
       const q = this.subjectSearchQuery.toLowerCase().trim();
       list = list.filter(sub => {
