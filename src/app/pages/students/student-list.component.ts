@@ -1056,20 +1056,21 @@ export class StudentListComponent implements OnInit {
     const q = this.searchQuery ? this.searchQuery.toString().trim().toLowerCase() : '';
 
     this.filteredStudents = this.students.filter(s => {
-      const full = `${s.first_name} ${s.last_name}`.toLowerCase();
+      const full = `${s.first_name || ''} ${s.last_name || ''}`.toLowerCase();
       const customId = (s.custom_student_id || '').toLowerCase();
-      const matchSearch = !q || full.includes(q) || customId.includes(q);
+      const email = (s.email || '').toLowerCase();
+      const matchSearch = !q || full.includes(q) || customId.includes(q) || email.includes(q);
 
       const sGroupCode = (s.group_code || '').toString().trim().toLowerCase();
       const sGroupName = (s.group_name || '').toString().trim().toLowerCase();
-      const sGroupId = s.group_id ? s.group_id.toString() : '';
+      const sGroupId = s.group_id ? s.group_id.toString().trim().toLowerCase() : '';
 
       const groupMatch = !sel ||
         sGroupCode === sel ||
         sGroupName === sel ||
         sGroupId === sel ||
-        (sGroupCode && sGroupCode.includes(sel)) ||
-        (customId && customId.startsWith(sel));
+        (sGroupCode && (sGroupCode.includes(sel) || sel.includes(sGroupCode))) ||
+        (sGroupName && (sGroupName.includes(sel) || sel.includes(sGroupName)));
 
       return matchSearch && groupMatch;
     });
