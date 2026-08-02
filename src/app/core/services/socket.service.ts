@@ -14,7 +14,7 @@ export class SocketService {
   }
 
   private connect(): void {
-    const url = 'http://localhost:5000';
+    const url = 'https://sms-backend-6b23.onrender.com';
     this.socket = io(url, {
       transports: ['websocket', 'polling'],
       reconnection: true,
