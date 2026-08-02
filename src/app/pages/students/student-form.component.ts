@@ -376,15 +376,15 @@ export class StudentFormComponent implements OnInit {
       return;
     }
     const formData = new FormData();
-    formData.append('first_name', this.form.first_name);
-    formData.append('last_name', this.form.last_name);
-    formData.append('gender', this.form.gender);
-    formData.append('dob', this.form.dob);
-    formData.append('program_id', this.form.program_id);
-    formData.append('group_id', this.form.group_id);
-    formData.append('enrollment_date', this.form.enrollment_date);
-    formData.append('status', this.form.status);
+    formData.append('first_name', this.form.first_name || '');
+    formData.append('last_name', this.form.last_name || '');
+    formData.append('gender', this.form.gender || 'MALE');
+    formData.append('dob', this.form.dob ? String(this.form.dob).slice(0, 10) : '');
+    formData.append('enrollment_date', this.form.enrollment_date ? String(this.form.enrollment_date).slice(0, 10) : '');
+    formData.append('status', this.form.status || 'ACTIVE');
 
+    if (this.form.program_id) formData.append('program_id', String(this.form.program_id));
+    if (this.form.group_id) formData.append('group_id', String(this.form.group_id));
     if (this.form.phone) formData.append('phone', this.form.phone);
     if (this.form.parent_name) formData.append('parent_name', this.form.parent_name);
     if (this.form.parent_phone) formData.append('parent_phone', this.form.parent_phone);
