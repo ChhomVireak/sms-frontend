@@ -1,55 +1,55 @@
 {
-  "hash": "ab074468",
-  "configHash": "1f5b872c",
-  "lockfileHash": "97a1553a",
-  "browserHash": "848e47b0",
+  "hash": "5156cab5",
+  "configHash": "2bae3d97",
+  "lockfileHash": "0d8575e7",
+  "browserHash": "8b97e31c",
   "optimized": {
     "@angular/common": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
       "file": "@angular_common.js",
-      "fileHash": "32a87c7c",
+      "fileHash": "6add6840",
       "needsInterop": false
     },
     "@angular/common/http": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
       "file": "@angular_common_http.js",
-      "fileHash": "020e3f42",
+      "fileHash": "4f8d6728",
       "needsInterop": false
     },
     "@angular/core": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
       "file": "@angular_core.js",
-      "fileHash": "4e5dc326",
+      "fileHash": "a612e32c",
       "needsInterop": false
     },
     "@angular/forms": {
       "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
       "file": "@angular_forms.js",
-      "fileHash": "99f240dc",
+      "fileHash": "d022de4f",
       "needsInterop": false
     },
     "@angular/platform-browser": {
       "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
       "file": "@angular_platform-browser.js",
-      "fileHash": "e93058f6",
+      "fileHash": "50bbbf9d",
       "needsInterop": false
     },
     "@angular/router": {
       "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
       "file": "@angular_router.js",
-      "fileHash": "4003efd1",
+      "fileHash": "1ef93dde",
       "needsInterop": false
     },
     "rxjs": {
       "src": "../../../../../../node_modules/rxjs/dist/esm5/index.js",
       "file": "rxjs.js",
-      "fileHash": "a27eb09f",
+      "fileHash": "fb2b55c4",
       "needsInterop": false
     },
     "socket.io-client": {
       "src": "../../../../../../node_modules/socket.io-client/build/esm/index.js",
       "file": "socket__io-client.js",
-      "fileHash": "bdc43142",
+      "fileHash": "1f8a792b",
       "needsInterop": false
     }
   },
