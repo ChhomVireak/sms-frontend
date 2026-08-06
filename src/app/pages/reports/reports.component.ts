@@ -143,32 +143,92 @@ import { ToastService } from '../../core/services/toast.service';
           <div>No records found matching the current filters.</div>
         </div>
 
-        <div *ngIf="!loading && reportData.length > 0" class="overflow-x-auto">
+        <div *ngIf="!loading && reportData.length > 0" class="overflow-x-auto overflow-y-auto max-h-[550px] custom-scrollbar border-b border-[#1f2937]">
           <table class="w-full text-left border-collapse">
-            <thead class="bg-[#111827] text-gray-400 uppercase text-[10px] tracking-wider">
+            <thead class="bg-[#111827] text-gray-400 uppercase text-[10px] tracking-wider sticky top-0 z-10 shadow-md">
               <tr>
-                <th *ngFor="let k of getHeaders()" class="p-3 border-b border-[#1f2937]">
+                <th class="p-3 border-b border-[#1f2937] text-center w-12 bg-[#111827]">#</th>
+                <th *ngFor="let k of getHeaders()" class="p-3 border-b border-[#1f2937] bg-[#111827]">
                   {{ formatHeader(k) }}
                 </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]">
-              <tr *ngFor="let row of reportData" class="hover:bg-[#111827]/50 transition-colors">
+              <tr *ngFor="let row of paginatedReportData; let idx = index" class="hover:bg-[#111827]/50 transition-colors">
+                <td class="p-3 text-center text-gray-400 font-mono text-[11px]">{{ startIndex + idx }}</td>
                 <td *ngFor="let k of getHeaders()" class="p-3 font-mono">
-                  {{ row[k] }}
+                  <ng-container [ngSwitch]="getStatusBadgeType(row[k])">
+                    <span *ngSwitchCase="'success'" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">{{ row[k] }}</span>
+                    <span *ngSwitchCase="'danger'" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-400 border border-rose-800">{{ row[k] }}</span>
+                    <span *ngSwitchCase="'warning'" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-800">{{ row[k] }}</span>
+                    <span *ngSwitchDefault>{{ row[k] }}</span>
+                  </ng-container>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Controls Bar -->
+        <div *ngIf="!loading && reportData.length > 0" class="p-4 bg-[#111827] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#1f2937]">
+          <div class="flex items-center gap-3 text-gray-400 text-xs">
+            <span>Showing <strong class="text-white">{{ startIndex }}</strong> to <strong class="text-white">{{ endIndex }}</strong> of <strong class="text-white">{{ reportData.length }}</strong> entries</span>
+            <div class="flex items-center gap-1.5 ml-2">
+              <span>Per page:</span>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#1e293b] border border-[#1f2937] text-white text-xs rounded px-2 py-1 focus:outline-none focus:border-emerald-500">
+                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button (click)="goToPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold">
+              <i class="fa-solid fa-angles-left"></i>
+            </button>
+            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-3 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold">
+              <i class="fa-solid fa-angle-left mr-1"></i> Prev
+            </button>
+            
+            <span class="px-3 py-1 text-xs font-bold text-emerald-400 bg-[#1e293b] rounded border border-emerald-900/50">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+
+            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-3 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold">
+              Next <i class="fa-solid fa-angle-right ml-1"></i>
+            </button>
+            <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold">
+              <i class="fa-solid fa-angles-right"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #059669;
+    }
+  `]
 })
 export class ReportsComponent implements OnInit {
   activeCategory: 'academic' | 'attendance' | 'financial' | 'enrollment' | 'exam' | 'teacher' = 'academic';
   activeSubReport = 'academic_gpa';
   loading = false;
+
+  currentPage = 1;
+  pageSize = 10;
+  pageSizeOptions = [10, 25, 50, 100];
 
   filters = {
     group_id: 'ALL',
@@ -275,13 +335,51 @@ export class ReportsComponent implements OnInit {
       next: (res) => {
         const raw = res.data?.report || res.data?.results || [];
         this.reportData = Array.isArray(raw) ? raw : [];
+        this.currentPage = 1;
         this.loading = false;
       },
       error: () => {
         this.reportData = [];
+        this.currentPage = 1;
         this.loading = false;
       }
     });
+  }
+
+  get paginatedReportData(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.reportData.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil((this.reportData?.length || 0) / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return this.reportData.length === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.currentPage * this.pageSize, this.reportData.length);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
+
+  getStatusBadgeType(val: any): string {
+    if (val === null || val === undefined) return 'default';
+    const str = String(val).toUpperCase();
+    if (['PAID', 'COMPLETED', 'PRESENT', 'PASSED'].includes(str)) return 'success';
+    if (['UNPAID', 'FAILED', 'ABSENT', 'RETAINED'].includes(str)) return 'danger';
+    if (['PENDING', 'PARTIAL', 'LATE', 'REEXAM'].includes(str)) return 'warning';
+    return 'default';
   }
 
   getHeaders(): string[] {
