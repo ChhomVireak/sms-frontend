@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { NavbarComponent } from '../../shared/components/navbar.component';
 import { ApiService } from '../../core/services/api.service';
 import { AcademicService, Program } from '../../core/services/academic.service';
@@ -628,29 +629,27 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
       confirmText: `Yes, Delete ${count} Section(s)`,
       onConfirm: () => {
         const idsToDelete = Array.from(this.selectedGroupIds);
-        let successCount = 0;
-        let completedCount = 0;
+        const deleteRequests = idsToDelete.map(id =>
+          this.api.delete(`groups/${id}`).pipe(
+            catchError(err => of({ error: true, id, message: err?.error?.message }))
+          )
+        );
 
-        idsToDelete.forEach((id) => {
-          this.api.delete(`groups/${id}`).subscribe({
-            next: () => {
-              successCount++;
-              completedCount++;
-              if (completedCount === idsToDelete.length) {
-                this.toast.success(`Successfully deleted ${successCount} selected class group(s)!`);
-                this.selectedGroupIds.clear();
-                this.loadGroups();
-              }
-            },
-            error: () => {
-              completedCount++;
-              if (completedCount === idsToDelete.length) {
-                this.toast.success(`Successfully deleted ${successCount} selected class group(s)!`);
-                this.selectedGroupIds.clear();
-                this.loadGroups();
-              }
+        forkJoin(deleteRequests).subscribe({
+          next: (results) => {
+            const failures = results.filter((r: any) => r && r.error);
+            const successCount = idsToDelete.length - failures.length;
+
+            if (successCount > 0) {
+              this.toast.success(`Successfully deleted ${successCount} selected class group(s)!`);
             }
-          });
+            if (failures.length > 0) {
+              this.toast.error(`Failed to delete ${failures.length} class group(s).`);
+            }
+
+            this.selectedGroupIds.clear();
+            this.loadGroups();
+          }
         });
       }
     });

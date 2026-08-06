@@ -1,0 +1,14 @@
+# compiled output
+/dist
+/tmp
+/out-tsc
+/.angular
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo

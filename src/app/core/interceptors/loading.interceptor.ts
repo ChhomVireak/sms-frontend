@@ -6,16 +6,18 @@ import { LoadingService } from '../services/loading.service';
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const loadingService = inject(LoadingService);
 
-  // Skip loading overlay for background requests (e.g., notifications / system alerts) or X-Skip-Loading header
-  if (req.headers.has('X-Skip-Loading') || req.url.includes('notifications')) {
-    return next(req);
+  // Only trigger full-screen loading if explicitly requested via 'X-Show-Loading'
+  if (req.headers.has('X-Show-Loading')) {
+    loadingService.show();
+    const cloned = req.clone({
+      headers: req.headers.delete('X-Show-Loading')
+    });
+    return next(cloned).pipe(
+      finalize(() => {
+        loadingService.hide();
+      })
+    );
   }
 
-  loadingService.show();
-
-  return next(req).pipe(
-    finalize(() => {
-      loadingService.hide();
-    })
-  );
+  return next(req);
 };

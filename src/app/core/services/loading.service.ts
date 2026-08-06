@@ -4,26 +4,27 @@ import { Injectable, signal } from '@angular/core';
   providedIn: 'root'
 })
 export class LoadingService {
-  private activeRequests = 0;
   isLoading = signal<boolean>(false);
+  private activeRequests = 0;
 
   show(): void {
     this.activeRequests++;
-    if (this.activeRequests > 0) {
-      this.isLoading.set(true);
-    }
+    this.isLoading.set(true);
   }
 
   hide(): void {
-    if (this.activeRequests > 0) {
-      this.activeRequests--;
-    }
+    this.activeRequests = Math.max(0, this.activeRequests - 1);
     if (this.activeRequests === 0) {
       setTimeout(() => {
         if (this.activeRequests === 0) {
           this.isLoading.set(false);
         }
-      }, 150);
+      }, 200);
     }
+  }
+
+  forceHide(): void {
+    this.activeRequests = 0;
+    this.isLoading.set(false);
   }
 }
