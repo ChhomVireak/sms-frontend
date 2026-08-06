@@ -105,19 +105,19 @@ import { environment } from '../../../environments/environment';
         </div>
 
         <!-- Student Roster Table -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto overflow-y-auto max-h-[520px] custom-scrollbar border border-[#1f2937] rounded-xl">
           <table class="w-full text-left border-collapse text-xs">
-            <thead class="bg-[#111827] text-gray-400 uppercase text-[10px] tracking-wider">
+            <thead class="bg-[#111827] text-gray-400 uppercase text-[10px] tracking-wider sticky top-0 z-10 shadow-md">
               <tr>
-                <th class="p-3">#</th>
-                <th class="p-3">STUDENT</th>
-                <th class="p-3 text-center">SESSION STATUS</th>
-                <th class="p-3">NOTES</th>
+                <th class="p-3 bg-[#111827]">#</th>
+                <th class="p-3 bg-[#111827]">STUDENT</th>
+                <th class="p-3 text-center bg-[#111827]">SESSION STATUS</th>
+                <th class="p-3 bg-[#111827]">NOTES</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#1f2937]">
               <tr *ngFor="let s of paginatedStudents; let idx = index" class="hover:bg-[#111827]/50 transition-colors">
-                <td class="p-3 font-mono text-gray-400">{{ startIndex + idx + 1 }}</td>
+                <td class="p-3 font-mono text-gray-400">{{ startIndex + idx }}</td>
                 <td class="p-3">
                   <div class="flex items-center gap-3">
                     <img *ngIf="getStudentImageUrl(s.image) && !s.imageError" 
@@ -173,9 +173,58 @@ import { environment } from '../../../environments/environment';
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Controls Bar -->
+        <div *ngIf="students.length > 0" class="p-4 bg-[#111827] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#1f2937] rounded-b-xl">
+          <div class="flex items-center gap-3 text-gray-400 text-xs">
+            <span>Showing <strong class="text-white">{{ startIndex }}</strong> to <strong class="text-white">{{ endIndex }}</strong> of <strong class="text-white">{{ students.length }}</strong> students</span>
+            <div class="flex items-center gap-1.5 ml-2">
+              <span>Per page:</span>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#1e293b] border border-[#1f2937] text-white text-xs rounded px-2 py-1 focus:outline-none focus:border-emerald-500 font-bold cursor-pointer">
+                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button (click)="goToPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+              <i class="fa-solid fa-angles-left"></i>
+            </button>
+            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-3 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+              <i class="fa-solid fa-angle-left mr-1"></i> Prev
+            </button>
+            
+            <span class="px-3 py-1 text-xs font-bold text-emerald-400 bg-[#1e293b] rounded border border-emerald-900/50">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+
+            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-3 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+              Next <i class="fa-solid fa-angle-right ml-1"></i>
+            </button>
+            <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+              <i class="fa-solid fa-angles-right"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #059669;
+    }
+  `]
 })
 export class TeacherAttendanceComponent implements OnInit {
   todaySessions: any[] = [];
@@ -202,6 +251,16 @@ export class TeacherAttendanceComponent implements OnInit {
 
   get paginatedStudents(): any[] {
     return this.students.slice(this.startIndex, this.endIndex);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
   }
 
   constructor(private api: ApiService, private toast: ToastService, private socket: SocketService) {}
