@@ -531,14 +531,9 @@ import { environment } from '../../../environments/environment';
                     <span class="text-white text-xs block">{{ s.first_name }} {{ s.last_name }}</span>
                   </td>
                   <td class="p-3 font-mono">
-                    <div *ngIf="s.total_score !== null && s.total_score !== undefined" class="flex flex-col">
-                      <span [class.text-rose-400]="s.total_score < 50" [class.text-emerald-400]="s.total_score >= 50" class="font-bold text-xs">
-                        {{ s.total_score }}/100
-                      </span>
-                      <span class="text-[10px] text-gray-400 font-normal">
-                        (Mid: {{ s.mid_score || 0 }} + Final: {{ s.final_score || 0 }})
-                      </span>
-                    </div>
+                    <span *ngIf="s.total_score !== null && s.total_score !== undefined" [class.text-rose-400]="s.total_score < 50" [class.text-emerald-400]="s.total_score >= 50" class="font-bold text-xs">
+                      {{ s.total_score }}/100
+                    </span>
                     <span *ngIf="s.total_score === null || s.total_score === undefined" class="text-gray-500 italic">No Scores</span>
                   </td>
                   <td class="p-3">
