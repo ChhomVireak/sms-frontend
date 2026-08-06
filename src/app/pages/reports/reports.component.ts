@@ -299,60 +299,235 @@ export class ReportsComponent implements OnInit {
       return;
     }
 
-    const printWindow = window.open('', '_blank', 'width=1100,height=850');
+    const printWindow = window.open('', '_blank', 'width=1150,height=850');
     if (!printWindow) {
       this.toast.error('Pop-up blocked. Please allow pop-ups for printing.');
       return;
     }
 
     const headers = this.getHeaders();
-    const title = this.activeSubReport.replace(/_/g, ' ').toUpperCase() + ' REPORT';
-    const currentDate = new Date().toLocaleDateString();
+    const title = this.activeSubReport.replace(/_/g, ' ').toUpperCase();
+    const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const refNumber = `REF-${Math.floor(100000 + Math.random() * 900000)}`;
 
-    let tableHtml = `<table style="width:100%; border-collapse:collapse; font-size:12px; margin-top:20px;">`;
-    tableHtml += `<thead style="background:#f1f5f9; text-transform:uppercase;"><tr>`;
-    headers.forEach(h => {
-      tableHtml += `<th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">${this.formatHeader(h)}</th>`;
-    });
-    tableHtml += `</tr></thead><tbody>`;
-
-    this.reportData.forEach(row => {
-      tableHtml += `<tr>`;
+    let tableRowsHtml = '';
+    this.reportData.forEach((row, idx) => {
+      const isEven = idx % 2 === 0;
+      tableRowsHtml += `<tr style="background-color: ${isEven ? '#ffffff' : '#f8fafc'};">`;
+      tableRowsHtml += `<td style="border: 1px solid #cbd5e1; padding: 7px 10px; text-align: center; font-weight: 600; color: #64748b;">${idx + 1}</td>`;
       headers.forEach(h => {
-        tableHtml += `<td style="border:1px solid #cbd5e1; padding:8px;">${row[h] ?? ''}</td>`;
+        let val = row[h] ?? '';
+        let cellContent = String(val);
+
+        // Render status badges with clean colors
+        const strVal = String(val).toUpperCase();
+        if (['PAID', 'COMPLETED', 'PRESENT', 'PASSED'].includes(strVal)) {
+          cellContent = `<span style="background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 11px;">${val}</span>`;
+        } else if (['UNPAID', 'FAILED', 'ABSENT', 'RETAINED'].includes(strVal)) {
+          cellContent = `<span style="background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 11px;">${val}</span>`;
+        } else if (['PENDING', 'PARTIAL', 'LATE', 'REEXAM'].includes(strVal)) {
+          cellContent = `<span style="background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 11px;">${val}</span>`;
+        }
+
+        tableRowsHtml += `<td style="border: 1px solid #cbd5e1; padding: 7px 10px;">${cellContent}</td>`;
       });
-      tableHtml += `</tr>`;
+      tableRowsHtml += `</tr>`;
     });
-    tableHtml += `</tbody></table>`;
+
+    let headerColsHtml = `<th style="border: 1px solid #0f172a; padding: 9px 10px; text-align: center; width: 40px;">#</th>`;
+    headers.forEach(h => {
+      headerColsHtml += `<th style="border: 1px solid #0f172a; padding: 9px 10px; text-align: left;">${this.formatHeader(h).toUpperCase()}</th>`;
+    });
 
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>${title}</title>
+          <title>EduTrack SMS — ${title} REPORT</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; color: #1e293b; }
-            .header { text-align: center; border-bottom: 2px solid #0284c7; padding-bottom: 15px; margin-bottom: 20px; }
-            .header h1 { margin: 0; color: #0284c7; font-size: 24px; }
-            .header p { margin: 5px 0 0 0; color: #64748b; font-size: 13px; }
-            .meta { display: flex; justify-content: space-between; font-size: 12px; color: #475569; }
             @media print {
-              body { padding: 0; }
-              @page { size: A4 landscape; margin: 15mm; }
+              body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+              @page { size: A4 landscape; margin: 12mm 10mm; }
+              .no-print { display: none !important; }
+            }
+            body {
+              font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              color: #0f172a;
+              margin: 0;
+              padding: 24px;
+              background-color: #ffffff;
+              font-size: 11.5px;
+            }
+            .report-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 3px double #0284c7;
+              padding-bottom: 14px;
+              margin-bottom: 16px;
+            }
+            .brand {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            }
+            .brand-logo {
+              width: 44px;
+              height: 44px;
+              background: linear-gradient(135deg, #0284c7, #0d9488);
+              color: #ffffff;
+              border-radius: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 22px;
+              font-weight: bold;
+            }
+            .brand-title {
+              font-size: 20px;
+              font-weight: 800;
+              color: #0f172a;
+              letter-spacing: -0.5px;
+              margin: 0;
+            }
+            .brand-subtitle {
+              font-size: 11px;
+              color: #64748b;
+              margin: 2px 0 0 0;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .doc-info {
+              text-align: right;
+              font-size: 11px;
+              color: #475569;
+            }
+            .doc-info strong {
+              color: #0f172a;
+            }
+            .report-title-bar {
+              background: #f1f5f9;
+              border-left: 4px solid #0284c7;
+              padding: 10px 14px;
+              border-radius: 0 6px 6px 0;
+              margin-bottom: 16px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .report-title {
+              font-size: 15px;
+              font-weight: 700;
+              color: #0369a1;
+              margin: 0;
+            }
+            .filter-chips {
+              display: flex;
+              gap: 10px;
+              font-size: 11px;
+            }
+            .chip {
+              background: #ffffff;
+              border: 1px solid #cbd5e1;
+              padding: 3px 8px;
+              border-radius: 4px;
+              color: #334155;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 24px;
+            }
+            thead th {
+              background-color: #0f172a !important;
+              color: #ffffff !important;
+              font-size: 10.5px;
+              letter-spacing: 0.5px;
+            }
+            .signature-section {
+              margin-top: 30px;
+              display: flex;
+              justify-content: space-between;
+              page-break-inside: avoid;
+            }
+            .sig-box {
+              text-align: center;
+              width: 200px;
+            }
+            .sig-line {
+              margin-top: 50px;
+              border-bottom: 1px solid #94a3b8;
+            }
+            .sig-title {
+              font-size: 11px;
+              font-weight: 600;
+              color: #334155;
+              margin-top: 6px;
+            }
+            .footer-notice {
+              margin-top: 24px;
+              padding-top: 10px;
+              border-top: 1px solid #e2e8f0;
+              text-align: center;
+              font-size: 10px;
+              color: #94a3b8;
             }
           </style>
         </head>
         <body>
-          <div class="header">
-            <h1>EduTrack SMS — ${title}</h1>
-            <p>Official Academic & Administrative Management Report</p>
+          <div class="report-header">
+            <div class="brand">
+              <div class="brand-logo">E</div>
+              <div>
+                <h1 class="brand-title">EduTrack SMS</h1>
+                <p class="brand-subtitle">School Management & Academic Information System</p>
+              </div>
+            </div>
+            <div class="doc-info">
+              <div>Ref No: <strong>${refNumber}</strong></div>
+              <div>Date Generated: <strong>${currentDate}</strong></div>
+              <div>Total Records: <strong>${this.reportData.length}</strong></div>
+            </div>
           </div>
-          <div class="meta">
-            <div><strong>Report Category:</strong> ${this.activeCategory.toUpperCase()}</div>
-            <div><strong>Generated On:</strong> ${currentDate}</div>
-            <div><strong>Total Records:</strong> ${this.reportData.length}</div>
+
+          <div class="report-title-bar">
+            <h2 class="report-title">${title} REPORT</h2>
+            <div class="filter-chips">
+              <span class="chip"><strong>Group:</strong> ${this.filters.group_id}</span>
+              <span class="chip"><strong>Program:</strong> ${this.filters.program_id}</span>
+              <span class="chip"><strong>Semester:</strong> ${this.filters.semester}</span>
+              <span class="chip"><strong>Year:</strong> ${this.filters.academic_year}</span>
+            </div>
           </div>
-          ${tableHtml}
+
+          <table>
+            <thead>
+              <tr>${headerColsHtml}</tr>
+            </thead>
+            <tbody>
+              ${tableRowsHtml}
+            </tbody>
+          </table>
+
+          <div class="signature-section">
+            <div class="sig-box">
+              <div class="sig-line"></div>
+              <div class="sig-title">Prepared By (Registrar)</div>
+            </div>
+            <div class="sig-box">
+              <div class="sig-line"></div>
+              <div class="sig-title">Verified By (Department Head)</div>
+            </div>
+            <div class="sig-box">
+              <div class="sig-line"></div>
+              <div class="sig-title">Approved By (School Director)</div>
+            </div>
+          </div>
+
+          <div class="footer-notice">
+            Confidential Document — Generated automatically by EduTrack SMS. Authorized academic copy.
+          </div>
+
           <script>
             window.onload = function() {
               window.print();
