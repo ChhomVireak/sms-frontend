@@ -28,6 +28,7 @@ import { FacultyManagementComponent } from './pages/academic/faculty-management.
 import { ProgramManagementComponent } from './pages/academic/program-management.component';
 import { CurriculumManagementComponent } from './pages/academic/curriculum-management.component';
 import { SystemSettingsComponent } from './pages/settings/system-settings.component';
+import { ReportsComponent } from './pages/reports/reports.component';
 
 import { TeacherClassesComponent } from './pages/teacher/teacher-classes.component';
 import { TeacherTimetableComponent } from './pages/teacher/teacher-timetable.component';
@@ -74,6 +75,7 @@ export const routes: Routes = [
       { path: 'payments', component: PaymentManagementComponent },
       { path: 'users', component: UserManagementComponent },
       { path: 'notifications', component: NotificationsComponent },
+      { path: 'reports', component: ReportsComponent },
       { path: 'settings', component: SystemSettingsComponent }
     ]
   },

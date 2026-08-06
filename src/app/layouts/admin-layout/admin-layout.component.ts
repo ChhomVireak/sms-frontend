@@ -24,6 +24,7 @@ export class AdminLayoutComponent implements OnInit {
       title: 'MAIN',
       items: [
         { label: 'Dashboard', icon: 'fa-solid fa-table-cells-large', route: '/admin/dashboard' },
+        { label: 'Reports', icon: 'fa-solid fa-chart-line', route: '/admin/reports' },
         { label: 'Students', icon: 'fa-solid fa-user-graduate', route: '/admin/students' },
         { label: 'Teachers', icon: 'fa-solid fa-chalkboard-user', route: '/admin/teachers' },
         { label: 'Classes', icon: 'fa-solid fa-users', route: '/admin/groups' },
