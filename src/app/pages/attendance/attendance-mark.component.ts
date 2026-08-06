@@ -156,7 +156,7 @@ import { environment } from '../../../environments/environment';
               </div>
             </div>
 
-            <div class="overflow-x-auto overflow-y-auto max-h-[620px] rounded-xl border border-[#1f2937]/50">
+            <div class="overflow-x-auto overflow-y-auto max-h-[620px] custom-scrollbar rounded-xl border border-[#1f2937]/50">
               <table class="w-full text-left border-collapse text-xs">
                 <thead class="sticky top-0 z-10 bg-[#111827] shadow-md">
                   <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider">
@@ -560,7 +560,23 @@ import { environment } from '../../../environments/environment';
         </form>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #059669;
+    }
+  `]
 })
 export class AttendanceMarkComponent implements OnInit {
   attendanceSubTab: 'class' | 'teacher' | 'student' = 'class';
