@@ -143,31 +143,31 @@ import { environment } from '../../../environments/environment';
               </button>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto overflow-y-auto max-h-[550px] custom-scrollbar border border-[#1f2937]/60 rounded-xl">
               <table class="w-full text-left border-collapse text-xs">
-                <thead>
+                <thead class="sticky top-0 z-10 bg-[#111827] shadow-md">
                   <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider text-center">
-                    <th class="pb-3 text-left w-8">#</th>
-                    <th class="pb-3 text-left">STUDENT</th>
-                    <th class="pb-3 text-left">CLASS</th>
+                    <th class="pb-3 text-left w-8 bg-[#111827]">#</th>
+                    <th class="pb-3 text-left bg-[#111827]">STUDENT</th>
+                    <th class="pb-3 text-left bg-[#111827]">CLASS</th>
                     
                     <!-- Dynamic Subject Header Columns -->
-                    <th *ngFor="let sub of visibleSubjects" class="pb-3 px-2 min-w-[100px]" [title]="sub.subject_name">
+                    <th *ngFor="let sub of visibleSubjects" class="pb-3 px-2 min-w-[100px] bg-[#111827]" [title]="sub.subject_name">
                       <div class="text-purple-400 font-mono text-[11px] font-extrabold"><i class="fa-solid fa-book text-purple-400 mr-1"></i> {{ sub.subject_code || sub.subject_name }}</div>
                       <div class="text-[9px] text-gray-400 font-normal truncate max-w-[110px] mx-auto">{{ sub.subject_name }}</div>
                     </th>
 
                     <!-- Fallback Column if no subjects -->
-                    <th *ngIf="visibleSubjects.length === 0" class="pb-3 px-3 w-32">
+                    <th *ngIf="visibleSubjects.length === 0" class="pb-3 px-3 w-32 bg-[#111827]">
                       {{ assessmentType === 'Mid' ? 'MID (0-50)' : 'FINAL (0-50)' }}
                     </th>
 
-                    <th class="pb-3 text-left">TEACHER REMARKS</th>
+                    <th class="pb-3 text-left bg-[#111827]">TEACHER REMARKS</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-[#1f2937]/50">
-                  <tr *ngFor="let s of students; let i = index" class="hover:bg-gray-800/40 transition-colors">
-                    <td class="py-3 font-mono text-gray-500">{{ (i + 1) < 10 ? '0' + (i + 1) : (i + 1) }}</td>
+                  <tr *ngFor="let s of paginatedStudents; let i = index" class="hover:bg-gray-800/40 transition-colors">
+                    <td class="py-3 font-mono text-gray-500 text-center">{{ startIndex + i }}</td>
                     <td class="py-3">
                       <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-emerald-600 border border-emerald-500/40 text-white font-bold flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-sm">
@@ -264,6 +264,39 @@ import { environment } from '../../../environments/environment';
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Pagination Controls Bar -->
+            <div *ngIf="students.length > 0" class="p-4 bg-[#111827] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#1f2937] rounded-b-xl">
+              <div class="flex items-center gap-3 text-gray-400 text-xs">
+                <span>Showing <strong class="text-white">{{ startIndex }}</strong> to <strong class="text-white">{{ endIndex }}</strong> of <strong class="text-white">{{ students.length }}</strong> students</span>
+                <div class="flex items-center gap-1.5 ml-2">
+                  <span>Per page:</span>
+                  <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#1e293b] border border-[#1f2937] text-white text-xs rounded px-2 py-1 focus:outline-none focus:border-purple-500 font-bold cursor-pointer">
+                    <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{ opt }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button (click)="goToPage(1)" [disabled]="currentPage === 1" class="px-2.5 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+                  <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-3 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+                  <i class="fa-solid fa-angle-left mr-1"></i> Prev
+                </button>
+                
+                <span class="px-3 py-1 text-xs font-bold text-purple-400 bg-[#1e293b] rounded border border-purple-900/50">
+                  Page {{ currentPage }} of {{ totalPages }}
+                </span>
+
+                <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-3 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+                  Next <i class="fa-solid fa-angle-right ml-1"></i>
+                </button>
+                <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages" class="px-2.5 py-1 rounded bg-[#1e293b] hover:bg-[#334155] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-gray-300">
+                  <i class="fa-solid fa-angles-right"></i>
+                </button>
+              </div>
             </div>
 
             <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[#1f2937]">
@@ -427,7 +460,23 @@ import { environment } from '../../../environments/environment';
 
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #9333ea;
+    }
+  `]
 })
 export class ScoreEntryComponent implements OnInit {
   selectedExam = '1';
@@ -446,6 +495,37 @@ export class ScoreEntryComponent implements OnInit {
   pastScoreSearch = '';
   pastScoreYear = 'ALL';
   pastScoreSemester = 'ALL';
+
+  currentPage = 1;
+  pageSize = 10;
+  pageSizeOptions = [10, 25, 50, 100];
+
+  get paginatedStudents(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.students.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil((this.students?.length || 0) / this.pageSize) || 1;
+  }
+
+  get startIndex(): number {
+    return this.students.length === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.currentPage * this.pageSize, this.students.length);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 1;
+  }
 
   openPastScoresModal(): void {
     this.pastScoreSearch = '';
