@@ -109,9 +109,9 @@ import { environment } from '../../../environments/environment';
           <div class="bg-[#1e293b]/70 border border-[#1f2937] rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
               <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
-                <span>{{ assessmentType === 'Mid' ? 'Midterm Score (Mid) Entry Matrix' : 'Final Score (Final) Entry Matrix' }}</span>
+                <span>{{ assessmentType === 'Mid' ? 'Midterm Score (Mid)' : 'Final Score (Final)' }}</span>
                 <span class="px-2.5 py-0.5 rounded-lg bg-purple-950/90 border border-purple-800 text-purple-300 font-mono text-xs font-bold">
-                  {{ selectedSubject === 'ALL' ? ((visibleSubjects.length || 1) + ' Subjects Matrix') : 'Single Subject View' }}
+                  {{ selectedSubject === 'ALL' ? ((visibleSubjects.length || 1) + ' Subjects') : 'Single Subject View' }}
                 </span>
               </h3>
               <div class="flex items-center gap-2">
@@ -122,7 +122,6 @@ import { environment } from '../../../environments/environment';
 
             <!-- Quick Subject Filter Tabs -->
             <div *ngIf="examSubjects.length > 0" class="flex items-center gap-1.5 overflow-x-auto pb-2 text-xs border-b border-[#1f2937] pt-1">
-              <span class="text-[11px] font-bold text-gray-400 shrink-0"><i class="fa-solid fa-filter text-purple-400 mr-1"></i> Select Subject:</span>
               <button (click)="selectedSubject = 'ALL'; onSubjectChange()"
                       [class.bg-emerald-600]="selectedSubject === 'ALL'"
                       [class.text-white]="selectedSubject === 'ALL'"
@@ -147,12 +146,12 @@ import { environment } from '../../../environments/environment';
               <table class="w-full text-left border-collapse text-xs">
                 <thead class="sticky top-0 z-10 bg-[#111827] shadow-md">
                   <tr class="border-b border-[#1f2937] font-bold text-gray-400 uppercase tracking-wider text-center">
-                    <th class="pb-3 text-left w-8 bg-[#111827]">#</th>
-                    <th class="pb-3 text-left bg-[#111827]">STUDENT</th>
-                    <th class="pb-3 text-left bg-[#111827]">CLASS</th>
+                    <th class="p-3 text-left w-8 bg-[#111827]">#</th>
+                    <th class="p-3 text-left bg-[#111827]">STUDENT</th>
+                    <th class="p-3 text-left bg-[#111827]">CLASS</th>
                     
                     <!-- Dynamic Subject Header Columns -->
-                    <th *ngFor="let sub of visibleSubjects" class="pb-3 px-2 min-w-[100px] bg-[#111827]" [title]="sub.subject_name">
+                    <th *ngFor="let sub of visibleSubjects" class="p-3 min-w-[100px] bg-[#111827]" [title]="sub.subject_name">
                       <div class="text-purple-400 font-mono text-[11px] font-extrabold"><i class="fa-solid fa-book text-purple-400 mr-1"></i> {{ sub.subject_code || sub.subject_name }}</div>
                       <div class="text-[9px] text-gray-400 font-normal truncate max-w-[110px] mx-auto">{{ sub.subject_name }}</div>
                     </th>
@@ -475,6 +474,14 @@ import { environment } from '../../../environments/environment';
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #9333ea;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none !important;
+      margin: 0 !important;
+    }
+    input[type=number] {
+      -moz-appearance: textfield !important;
     }
   `]
 })

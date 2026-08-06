@@ -17,6 +17,17 @@
   }
 }
 
+/* Remove Browser Default Spin Buttons (Up/Down arrows) on Number Inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type=number] {
+  -moz-appearance: textfield !important;
+}
+
 /* Global Full Viewport Modal Overlay - Eliminates top/side gaps */
 .fixed.inset-0 {
   top: 0 !important;
