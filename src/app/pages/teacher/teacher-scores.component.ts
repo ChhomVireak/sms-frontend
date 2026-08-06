@@ -372,10 +372,20 @@ export class TeacherScoresComponent implements OnInit {
   }
 
   computeGrade(s: any): void {
-    const sc = Number(s.score);
-    if (isNaN(sc) || s.score === null || s.score === '') {
+    let sc = Number(s.score);
+    if (isNaN(sc) || s.score === null || s.score === undefined || s.score === '') {
       s.grade = 'N/A';
       return;
+    }
+
+    if (sc < 0) {
+      this.toast.error('ពិន្ទុត្រូវតែចាប់ពី ០ ឡើងទៅ! (Negative scores < 0 are not allowed)');
+      s.score = 0;
+      sc = 0;
+    } else if (sc > 50) {
+      this.toast.warning('ពិន្ទុអតិបរមា Midterm/Final គឺត្រឹម ៥០ (Max 50 marks)');
+      s.score = 50;
+      sc = 50;
     }
 
     // Scale out of 50 marks (Midterm 50 / Final 50)

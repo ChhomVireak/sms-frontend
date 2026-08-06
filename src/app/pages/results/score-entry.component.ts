@@ -189,9 +189,11 @@ import { environment } from '../../../environments/environment';
                     <!-- Dynamic Input Box for Each Subject Side-by-Side [ 0 ] [ 0 ] [ 0 ] -->
                     <td *ngFor="let sub of visibleSubjects" class="py-3 px-2 text-center">
                       <input type="number" 
+                             min="0"
+                             max="100"
                              placeholder="0"
                              [(ngModel)]="s.subject_scores[sub.subject_id]" 
-                             (input)="recalculate(s)" 
+                             (input)="validateAndRecalculate(s, sub.subject_id)" 
                              [class.border-rose-500]="(s.subject_scores[sub.subject_id] !== null && s.subject_scores[sub.subject_id] !== undefined && s.subject_scores[sub.subject_id] < 20)"
                              class="w-16 bg-[#111827] border border-[#1f2937] text-xs font-mono font-bold rounded-lg px-2 py-1 text-center focus:outline-none focus:border-purple-500">
                     </td>
@@ -199,9 +201,11 @@ import { environment } from '../../../environments/environment';
                     <!-- Fallback Single Input if no subjects -->
                     <td *ngIf="visibleSubjects.length === 0" class="py-3 px-3 text-center">
                       <input type="number" 
+                             min="0"
+                             max="100"
                              placeholder="0"
                              [(ngModel)]="s.mid_score" 
-                             (input)="recalculate(s)" 
+                             (input)="validateAndRecalculate(s)" 
                              class="w-16 bg-[#111827] border border-[#1f2937] text-xs font-mono font-bold rounded-lg px-2 py-1 text-center focus:outline-none focus:border-emerald-500">
                     </td>
 
@@ -893,6 +897,34 @@ export class ScoreEntryComponent implements OnInit {
         this.emptyStateReason = 'NOT_SCHEDULED_YET';
       }
     });
+  }
+
+  validateAndRecalculate(s: any, subjectId?: any): void {
+    if (subjectId !== undefined && s.subject_scores) {
+      let val = s.subject_scores[subjectId];
+      if (val !== null && val !== undefined && val !== '') {
+        const numVal = Number(val);
+        if (numVal < 0) {
+          this.toast.error('ពិន្ទុត្រូវតែចាប់ពី ០ ឡើងទៅ! (Negative scores < 0 are not allowed)');
+          s.subject_scores[subjectId] = 0;
+        } else if (numVal > 100) {
+          this.toast.warning('ពិន្ទុអតិបរមាត្រឹម ១០០!');
+          s.subject_scores[subjectId] = 100;
+        }
+      }
+    }
+
+    if (s.mid_score !== null && s.mid_score !== undefined && s.mid_score !== '') {
+      const numMid = Number(s.mid_score);
+      if (numMid < 0) {
+        this.toast.error('ពិន្ទុត្រូវតែចាប់ពី ០ ឡើងទៅ! (Negative scores < 0 are not allowed)');
+        s.mid_score = 0;
+      } else if (numMid > 100) {
+        s.mid_score = 100;
+      }
+    }
+
+    this.recalculate(s);
   }
 
   recalculate(s: any): void {
