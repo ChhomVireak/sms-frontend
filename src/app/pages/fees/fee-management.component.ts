@@ -68,11 +68,25 @@ import { ConfirmModalService } from '../../core/services/confirm-modal.service';
             <tbody class="divide-y divide-[#1f2937]/50">
               <tr *ngFor="let fee of paginatedFeeSchedules; let i = index" class="hover:bg-gray-800/40 transition-colors">
                 <td class="py-3.5 px-3 font-mono text-gray-500">{{ (startIndex + i + 1) < 10 ? '0' + (startIndex + i + 1) : (startIndex + i + 1) }}</td>
-                <td class="py-3.5 px-3 font-bold text-white">{{ fee.fee_title }}</td>
+                <td class="py-3.5 px-3">
+                  <div class="font-bold text-white">{{ fee.fee_title }}</div>
+                  <div class="text-[10px] text-gray-400 font-mono">Plan Group: {{ fee.billing_plan_group || 'Default' }}</div>
+                </td>
                 <td class="py-3.5 px-3 font-mono">
-                  <span class="px-2.5 py-1 rounded-lg bg-blue-950 text-blue-400 border border-blue-800 font-bold text-[10px]">
-                    {{ fee.semester_name || 'Semester 2' }} ({{ fee.academic_year || 'Year 3' }})
-                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-2.5 py-1 rounded-lg bg-blue-950 text-blue-400 border border-blue-800 font-bold text-[10px]">
+                      {{ fee.semester_name || 'Semester 1' }} ({{ fee.academic_year || 'Year 1' }})
+                    </span>
+                    <span [class.bg-emerald-950]="fee.plan_type === 'SEMESTER'"
+                          [class.text-emerald-400]="fee.plan_type === 'SEMESTER'"
+                          [class.border-emerald-800]="fee.plan_type === 'SEMESTER'"
+                          [class.bg-purple-950]="fee.plan_type === 'FULL_YEAR'"
+                          [class.text-purple-400]="fee.plan_type === 'FULL_YEAR'"
+                          [class.border-purple-800]="fee.plan_type === 'FULL_YEAR'"
+                          class="px-2 py-0.5 rounded text-[10px] font-extrabold border">
+                      {{ fee.plan_type === 'FULL_YEAR' ? 'FULL YEAR (OPTION)' : 'SEMESTER (OPTION)' }}
+                    </span>
+                  </div>
                 </td>
                 <td class="py-3.5 px-3 text-gray-300 font-mono font-bold">{{ fee.group_code || fee.group_name || 'All Classes' }}</td>
                 <td class="py-3.5 px-3 font-extrabold text-emerald-400 font-mono text-sm">\${{ fee.amount | number:'1.2-2' }}</td>
@@ -290,11 +304,14 @@ export class FeeManagementComponent implements OnInit {
     }
   }
 
+  backendTotalScheduledFees: number = 0;
+
   loadFeeSchedules(): void {
     this.api.get<any>('fees/schedules').subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.feeSchedules = res.data.schedules || res.data.feeSchedules || res.data || [];
+          this.backendTotalScheduledFees = res.data.totalScheduledFees || 0;
         }
       }
     });
@@ -311,7 +328,17 @@ export class FeeManagementComponent implements OnInit {
   }
 
   getTotalExpectedFees(): number {
-    return this.feeSchedules.reduce((acc, f) => acc + (Number(f.amount) || 0), 0);
+    if (this.backendTotalScheduledFees > 0) return this.backendTotalScheduledFees;
+    const planGroupMap = new Map<string, number>();
+    this.feeSchedules.forEach(f => {
+      const key = f.billing_plan_group || f.fee_schedule_id;
+      if (!planGroupMap.has(key)) {
+        planGroupMap.set(key, Number(f.amount) || 0);
+      }
+    });
+    let sum = 0;
+    planGroupMap.forEach(amt => sum += amt);
+    return sum;
   }
 
   openFeeModal(): void {
