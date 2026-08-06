@@ -117,7 +117,7 @@ import { environment } from '../../../environments/environment';
             </thead>
             <tbody class="divide-y divide-[#1f2937]">
               <tr *ngFor="let s of paginatedStudents; let idx = index" class="hover:bg-[#111827]/50 transition-colors">
-                <td class="p-3 font-mono text-gray-400">{{ startIndex + idx }}</td>
+                <td class="p-3 font-mono text-gray-400">{{ startIndex + idx + 1 }}</td>
                 <td class="p-3">
                   <div class="flex items-center gap-3">
                     <img *ngIf="getStudentImageUrl(s.image) && !s.imageError" 
@@ -153,7 +153,7 @@ import { environment } from '../../../environments/environment';
                       LATE
                     </button>
                     <button (click)="s.status = 'EXCUSED'" 
-                            [class]="s.status === 'EXCUSED' ? 'bg-indigo-600 text-white font-extrabold shadow-md' : 'text-gray-400 hover:text-white'" 
+                            [class]="(s.status === 'EXCUSED' || s.status === 'PERMISSION') ? 'bg-indigo-600 text-white font-extrabold shadow-md' : 'text-gray-400 hover:text-white'" 
                             class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                       EXCUSED
                     </button>
@@ -177,7 +177,7 @@ import { environment } from '../../../environments/environment';
         <!-- Pagination Controls Bar -->
         <div *ngIf="students.length > 0" class="p-4 bg-[#111827] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#1f2937] rounded-b-xl">
           <div class="flex items-center gap-3 text-gray-400 text-xs">
-            <span>Showing <strong class="text-white">{{ startIndex }}</strong> to <strong class="text-white">{{ endIndex }}</strong> of <strong class="text-white">{{ students.length }}</strong> students</span>
+            <span>Showing <strong class="text-white">{{ students.length > 0 ? startIndex + 1 : 0 }}</strong> to <strong class="text-white">{{ endIndex }}</strong> of <strong class="text-white">{{ students.length }}</strong> students</span>
             <div class="flex items-center gap-1.5 ml-2">
               <span>Per page:</span>
               <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#1e293b] border border-[#1f2937] text-white text-xs rounded px-2 py-1 focus:outline-none focus:border-emerald-500 font-bold cursor-pointer">
