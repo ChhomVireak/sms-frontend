@@ -95,12 +95,23 @@ import { environment } from '../../../environments/environment';
             <p class="text-xs text-gray-400 mt-0.5">Session: {{ selectedSession?.slot_name }} ({{ selectedSession?.start_time?.slice(0,5) }} - {{ selectedSession?.end_time?.slice(0,5) }})</p>
           </div>
 
-          <!-- Batch Mark Buttons -->
-          <div class="flex flex-wrap items-center gap-2">
-            <button (click)="markAll('PRESENT')" class="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 font-bold text-xs transition-all">All Present</button>
-            <button (click)="markAll('ABSENT')" class="px-3 py-1.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-400 font-bold text-xs transition-all">All Absent</button>
-            <button (click)="markAll('LATE')" class="px-3 py-1.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-800 text-amber-400 font-bold text-xs transition-all">All Late</button>
-            <button (click)="markAll('EXCUSED')" class="px-3 py-1.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-400 font-bold text-xs transition-all">All Excused</button>
+          <!-- Search Input & Batch Mark Buttons -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="relative w-full sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+              <input type="text" 
+                     [(ngModel)]="searchQuery" 
+                     (ngModelChange)="onSearchChange()" 
+                     placeholder="Search student name or ID..." 
+                     class="w-full bg-[#111827] border border-[#1f2937] text-white text-xs rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:border-emerald-500 font-medium placeholder-gray-500 shadow-inner">
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button (click)="markAll('PRESENT')" class="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 font-bold text-xs transition-all">All Present</button>
+              <button (click)="markAll('ABSENT')" class="px-3 py-1.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-400 font-bold text-xs transition-all">All Absent</button>
+              <button (click)="markAll('LATE')" class="px-3 py-1.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-800 text-amber-400 font-bold text-xs transition-all">All Late</button>
+              <button (click)="markAll('EXCUSED')" class="px-3 py-1.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-400 font-bold text-xs transition-all">All Excused</button>
+            </div>
           </div>
         </div>
 
@@ -165,9 +176,9 @@ import { environment } from '../../../environments/environment';
                 </td>
               </tr>
 
-              <tr *ngIf="students.length === 0">
+              <tr *ngIf="filteredStudents.length === 0">
                 <td colspan="4" class="py-8 text-center text-gray-500 italic">
-                  No active students enrolled in this class group.
+                  {{ searchQuery ? 'No matching students found for "' + searchQuery + '"' : 'No active students enrolled in this class group.' }}
                 </td>
               </tr>
             </tbody>
@@ -175,9 +186,9 @@ import { environment } from '../../../environments/environment';
         </div>
 
         <!-- Pagination Controls Bar -->
-        <div *ngIf="students.length > 0" class="p-4 bg-[#111827] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#1f2937] rounded-b-xl">
+        <div *ngIf="filteredStudents.length > 0" class="p-4 bg-[#111827] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#1f2937] rounded-b-xl">
           <div class="flex items-center gap-3 text-gray-400 text-xs">
-            <span>Showing <strong class="text-white">{{ students.length > 0 ? startIndex + 1 : 0 }}</strong> to <strong class="text-white">{{ endIndex }}</strong> of <strong class="text-white">{{ students.length }}</strong> students</span>
+            <span>Showing <strong class="text-white">{{ filteredStudents.length > 0 ? startIndex + 1 : 0 }}</strong> to <strong class="text-white">{{ endIndex }}</strong> of <strong class="text-white">{{ filteredStudents.length }}</strong> students</span>
             <div class="flex items-center gap-1.5 ml-2">
               <span>Per page:</span>
               <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="bg-[#1e293b] border border-[#1f2937] text-white text-xs rounded px-2 py-1 focus:outline-none focus:border-emerald-500 font-bold cursor-pointer">
@@ -236,9 +247,21 @@ export class TeacherAttendanceComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 10;
   pageSizeOptions: number[] = [10, 25, 50, 100];
+  searchQuery: string = '';
+
+  get filteredStudents(): any[] {
+    if (!this.searchQuery.trim()) return this.students;
+    const q = this.searchQuery.toLowerCase().trim();
+    return this.students.filter(s => 
+      (s.first_name || '').toLowerCase().includes(q) ||
+      (s.last_name || '').toLowerCase().includes(q) ||
+      (`${s.first_name} ${s.last_name}`).toLowerCase().includes(q) ||
+      (s.custom_student_id || '').toLowerCase().includes(q)
+    );
+  }
 
   get totalPages(): number {
-    return Math.ceil(this.students.length / this.pageSize) || 1;
+    return Math.ceil(this.filteredStudents.length / this.pageSize) || 1;
   }
 
   get startIndex(): number {
@@ -246,11 +269,15 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   get endIndex(): number {
-    return Math.min(this.startIndex + this.pageSize, this.students.length);
+    return Math.min(this.startIndex + this.pageSize, this.filteredStudents.length);
   }
 
   get paginatedStudents(): any[] {
-    return this.students.slice(this.startIndex, this.endIndex);
+    return this.filteredStudents.slice(this.startIndex, this.endIndex);
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
   }
 
   goToPage(page: number): void {
