@@ -92,7 +92,7 @@ import { environment } from '../../../environments/environment';
             <div class="grid grid-cols-3 gap-3 pt-3 border-t border-[#1f2937] text-center">
               <div class="bg-[#111827] p-2.5 rounded-xl border border-[#1f2937]">
                 <span class="text-gray-400 text-[10px] uppercase font-bold block">Highest Score</span>
-                <span class="text-emerald-400 font-bold font-mono text-sm">{{ highestScore }}/50</span>
+                <span class="text-emerald-400 font-bold font-mono text-sm">{{ highestScore | number:'1.1-2' }}/50</span>
               </div>
               <div class="bg-[#111827] p-2.5 rounded-xl border border-[#1f2937]">
                 <span class="text-gray-400 text-[10px] uppercase font-bold block">Average Class Score</span>
@@ -811,7 +811,8 @@ export class ScoreEntryComponent implements OnInit {
 
   get highestScore(): number {
     if (!this.students || this.students.length === 0) return 0;
-    return Math.max(...this.students.map(s => Number(s.avg_score) || 0));
+    const maxVal = Math.max(...this.students.map(s => Number(s.avg_score) || 0));
+    return Math.round(maxVal * 100) / 100;
   }
 
   get averageScore(): number {
