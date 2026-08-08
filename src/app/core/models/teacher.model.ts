@@ -9,6 +9,7 @@ export interface Teacher {
   dob?: string;
   phone: string;
   image?: string;
+  imageError?: boolean;
   email?: string;
   address?: string;
   nationality?: string;

@@ -169,8 +169,8 @@ import { environment } from '../../../environments/environment';
                 <tr *ngFor="let s of recentStudents" class="hover:bg-gray-800/40 transition-colors">
                   <td class="py-3.5 flex items-center gap-3">
                     <div class="w-9 h-9 rounded-full bg-emerald-600 border border-emerald-500/40 text-white font-bold flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-sm">
-                      <img *ngIf="s.image" [src]="getPhotoUrl(s.image)" class="w-full h-full object-cover">
-                      <span *ngIf="!s.image">{{ (s.first_name || 'S')[0] }}{{ (s.last_name || '')[0] }}</span>
+                      <img *ngIf="s.image && !$any(s).imageError" [src]="getPhotoUrl(s.image)" (error)="$any(s).imageError = true" class="w-full h-full object-cover">
+                      <span *ngIf="!s.image || $any(s).imageError">{{ (s.first_name || 'S')[0] }}{{ (s.last_name || '')[0] }}</span>
                     </div>
                     <div>
                       <span class="font-semibold text-white block">{{ s.first_name }} {{ s.last_name }}</span>
@@ -382,8 +382,15 @@ export class AdminDashboardComponent implements OnInit {
 
   getPhotoUrl(path: string): string {
     if (!path) return '';
-    if (path.startsWith('http')) return path;
-    const baseUrl = environment.apiUrl.replace('/api', '');
-    return path.startsWith('/') ? `${baseUrl}${path}` : `${baseUrl}/${path}`;
+    if (path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) return path;
+    let cleanPath = path.replace(/\\/g, '/');
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+    if (!cleanPath.startsWith('uploads/')) {
+      cleanPath = 'uploads/' + cleanPath;
+    }
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+    return `${baseUrl}/${cleanPath}`;
   }
 }

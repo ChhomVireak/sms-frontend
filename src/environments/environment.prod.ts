@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://sms-backend-6b23.onrender.com/api',
+  apiUrl: 'http://localhost:3000/api',
   appName: 'EduTrack SMS'
 };

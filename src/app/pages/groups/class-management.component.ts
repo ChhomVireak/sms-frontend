@@ -401,8 +401,8 @@ import { environment } from '../../../environments/environment';
 
               <!-- Student Photo (Blue Background) -->
               <div class="w-20 h-28 bg-[#0284c7] rounded-md p-0.5 shadow-sm border border-gray-300 overflow-hidden my-0.5">
-                <img *ngIf="s.image" [src]="getPhotoUrl(s.image)" class="w-full h-full object-cover rounded-xs">
-                <div *ngIf="!s.image" class="w-full h-full bg-[#0284c7] text-white font-bold flex items-center justify-center text-xl">
+                <img *ngIf="s.image && !$any(s).imageError" [src]="getPhotoUrl(s.image)" (error)="$any(s).imageError = true" class="w-full h-full object-cover rounded-xs">
+                <div *ngIf="!s.image || $any(s).imageError" class="w-full h-full bg-[#0284c7] text-white font-bold flex items-center justify-center text-xl">
                   {{ s.first_name[0] }}{{ s.last_name[0] }}
                 </div>
               </div>
@@ -993,7 +993,7 @@ export class ClassManagementComponent implements OnInit, OnDestroy {
 
   getPhotoUrl(path?: string): string {
     if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    if (path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) return path;
     let cleanPath = path.replace(/\\/g, '/');
     if (cleanPath.startsWith('/')) {
       cleanPath = cleanPath.substring(1);

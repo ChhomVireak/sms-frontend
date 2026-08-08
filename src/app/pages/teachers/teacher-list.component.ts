@@ -117,8 +117,8 @@ import { environment } from '../../../environments/environment';
                     <td class="py-3 font-mono font-bold text-emerald-400">{{ t.custom_teacher_id }}</td>
                     <td class="py-3 font-bold text-white flex items-center gap-2">
                       <div class="w-7 h-7 rounded-full overflow-hidden bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center text-[10px] shrink-0">
-                        <img *ngIf="t.image" [src]="getPhotoUrl(t.image)" class="w-full h-full object-cover">
-                        <span *ngIf="!t.image">{{ t.first_name[0] }}{{ t.last_name[0] }}</span>
+                        <img *ngIf="t.image && !$any(t).imageError" [src]="getPhotoUrl(t.image)" (error)="$any(t).imageError = true" class="w-full h-full object-cover">
+                        <span *ngIf="!t.image || $any(t).imageError">{{ t.first_name[0] }}{{ t.last_name[0] }}</span>
                       </div>
                       <span>{{ t.first_name }} {{ t.last_name }}</span>
                     </td>
@@ -225,8 +225,8 @@ import { environment } from '../../../environments/environment';
                   <td class="py-4 px-4">
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 rounded-full overflow-hidden bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
-                        <img *ngIf="t.image" [src]="getPhotoUrl(t.image)" class="w-full h-full object-cover">
-                        <span *ngIf="!t.image">{{ t.first_name ? t.first_name[0] : 'T' }}{{ t.last_name ? t.last_name[0] : '' }}</span>
+                        <img *ngIf="t.image && !$any(t).imageError" [src]="getPhotoUrl(t.image)" (error)="$any(t).imageError = true" class="w-full h-full object-cover">
+                        <span *ngIf="!t.image || $any(t).imageError">{{ t.first_name ? t.first_name[0] : 'T' }}{{ t.last_name ? t.last_name[0] : '' }}</span>
                       </div>
                       <div>
                         <p class="font-bold text-white text-xs">{{ t.first_name }} {{ t.last_name }}</p>

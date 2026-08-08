@@ -174,8 +174,8 @@ import { environment } from '../../../environments/environment';
                     <td class="py-3 px-3 font-mono text-emerald-400 font-bold">{{ s.custom_student_id }}</td>
                     <td class="py-3 px-3 flex items-center gap-3 font-bold text-white">
                       <div class="w-9 h-9 rounded-full overflow-hidden bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
-                        <img *ngIf="s.image || s.photo" [src]="getPhotoUrl(s.image || s.photo)" class="w-full h-full object-cover">
-                        <span *ngIf="!s.image && !s.photo">{{ s.first_name ? s.first_name[0] : 'S' }}{{ s.last_name ? s.last_name[0] : '' }}</span>
+                        <img *ngIf="(s.image || s.photo) && !$any(s).imageError" [src]="getPhotoUrl(s.image || s.photo)" (error)="$any(s).imageError = true" class="w-full h-full object-cover">
+                        <span *ngIf="(!s.image && !s.photo) || $any(s).imageError">{{ s.first_name ? s.first_name[0] : 'S' }}{{ s.last_name ? s.last_name[0] : '' }}</span>
                       </div>
                       <span>{{ s.first_name }} {{ s.last_name }}</span>
                     </td>
@@ -875,9 +875,16 @@ export class AttendanceMarkComponent implements OnInit {
 
   getPhotoUrl(path: string): string {
     if (!path) return '';
-    if (path.startsWith('http')) return path;
+    if (path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) return path;
+    let cleanPath = path.replace(/\\/g, '/');
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+    if (!cleanPath.startsWith('uploads/')) {
+      cleanPath = 'uploads/' + cleanPath;
+    }
     const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
-    return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+    return `${baseUrl}/${cleanPath}`;
   }
 
   loadTeachers(): void {

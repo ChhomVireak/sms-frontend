@@ -42,7 +42,7 @@ import { ToastService } from '../../../core/services/toast.service';
           <div class="text-[11px] text-gray-300 leading-relaxed space-y-1 pt-1">
             <div>• <strong>Admin Login</strong>: Email (<code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">admin&#64;school.edu</code>) &amp; password (<code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">admin123</code>)</div>
             <div>• <strong>Teacher Login</strong>: Email &amp; Email Prefix password (e.g. <code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">teacher123&#64;gmail.com</code> ➔ <code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">teacher123</code>)</div>
-            <div>• <strong>Student Login</strong>: Student ID (<code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">SV34-2026-0001</code>) &amp; DOB password (<code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">08022000</code>)</div>
+            <div>• <strong>Student Login</strong>: Student ID (<code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">SV35-2026-0251</code>) &amp; DOB password (<code class="bg-emerald-900/60 px-1 py-0.5 rounded font-mono text-emerald-200">15042005</code>)</div>
           </div>
         </div>
 
@@ -102,8 +102,6 @@ import { ToastService } from '../../../core/services/toast.service';
 
         <!-- Quick Demo Account Switcher -->
         <div class="mt-8 pt-6 border-t border-[#1f2937]/80">
-          <div class="text-[11px] font-bold text-gray-500 text-center uppercase tracking-widest mb-3">SIGN IN AS</div>
-          
           <p class="text-[11px] text-gray-500 text-center mt-4">
             Need access? <a href="javascript:void(0)" class="text-emerald-400">Contact Administrator</a>
           </p>

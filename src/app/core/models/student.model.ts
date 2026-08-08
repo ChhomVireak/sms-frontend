@@ -9,6 +9,8 @@ export interface Student {
   dob: string;
   phone?: string;
   image?: string;
+  imageError?: boolean;
+  photo?: string;
   parent_name?: string;
   parent_phone?: string;
   previous_school?: string;

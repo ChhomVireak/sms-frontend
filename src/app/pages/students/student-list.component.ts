@@ -121,8 +121,8 @@ import { environment } from '../../../environments/environment';
                 </td>
                 <td class="py-3.5 px-3 font-mono text-gray-300 font-semibold">{{ s.custom_student_id }}</td>
                 <td class="py-3.5 px-3 flex items-center gap-3">
-                  <img *ngIf="s.image" [src]="getPhotoUrl(s.image)" alt="Student Photo" class="w-8 h-8 rounded-full object-cover border border-emerald-500/40">
-                  <div *ngIf="!s.image" class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
+                  <img *ngIf="s.image && !$any(s).imageError" [src]="getPhotoUrl(s.image)" (error)="$any(s).imageError = true" alt="Student Photo" class="w-8 h-8 rounded-full object-cover border border-emerald-500/40">
+                  <div *ngIf="!s.image || $any(s).imageError" class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
                     {{ s.first_name[0] }}{{ s.last_name[0] }}
                   </div>
                   <span class="font-bold text-white">{{ s.first_name }} {{ s.last_name }}</span>
@@ -974,7 +974,7 @@ export class StudentListComponent implements OnInit {
 
   getPhotoUrl(path?: string): string {
     if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    if (path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) return path;
     let cleanPath = path.replace(/\\/g, '/');
     if (cleanPath.startsWith('/')) {
       cleanPath = cleanPath.substring(1);

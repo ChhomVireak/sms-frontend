@@ -1,61 +1,61 @@
 {
-  "hash": "ee249fec",
-  "configHash": "de1e53ae",
+  "hash": "9a8d25e4",
+  "configHash": "54a18cb4",
   "lockfileHash": "0d8575e7",
-  "browserHash": "dbd744a7",
+  "browserHash": "2886365e",
   "optimized": {
     "@angular/common": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
       "file": "@angular_common.js",
-      "fileHash": "9ff1d05d",
+      "fileHash": "ea337e62",
       "needsInterop": false
     },
     "@angular/common/http": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
       "file": "@angular_common_http.js",
-      "fileHash": "b68032ee",
+      "fileHash": "63377959",
       "needsInterop": false
     },
     "@angular/core": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
       "file": "@angular_core.js",
-      "fileHash": "7e107aec",
+      "fileHash": "a04bbcc5",
       "needsInterop": false
     },
     "@angular/forms": {
       "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
       "file": "@angular_forms.js",
-      "fileHash": "67391346",
+      "fileHash": "1404d940",
       "needsInterop": false
     },
     "@angular/platform-browser": {
       "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
       "file": "@angular_platform-browser.js",
-      "fileHash": "132a115c",
+      "fileHash": "d511695c",
       "needsInterop": false
     },
     "@angular/router": {
       "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
       "file": "@angular_router.js",
-      "fileHash": "a3be34fc",
+      "fileHash": "ac29ea91",
       "needsInterop": false
     },
     "rxjs": {
       "src": "../../../../../../node_modules/rxjs/dist/esm5/index.js",
       "file": "rxjs.js",
-      "fileHash": "2a0e1f26",
+      "fileHash": "dbeb9957",
       "needsInterop": false
     },
     "rxjs/operators": {
       "src": "../../../../../../node_modules/rxjs/dist/esm5/operators/index.js",
       "file": "rxjs_operators.js",
-      "fileHash": "fde03734",
+      "fileHash": "44aa5d2b",
       "needsInterop": false
     },
     "socket.io-client": {
       "src": "../../../../../../node_modules/socket.io-client/build/esm/index.js",
       "file": "socket__io-client.js",
-      "fileHash": "72c8f186",
+      "fileHash": "b993b02f",
       "needsInterop": false
     }
   },

@@ -289,9 +289,16 @@ export class StudentProfileComponent implements OnInit {
 
   getPhotoUrl(path: string): string {
     if (!path) return '';
-    if (path.startsWith('http')) return path;
-    const baseUrl = environment.apiUrl.replace('/api', '');
-    return path.startsWith('/') ? `${baseUrl}${path}` : `${baseUrl}/${path}`;
+    if (path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) return path;
+    let cleanPath = path.replace(/\\/g, '/');
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+    if (!cleanPath.startsWith('uploads/')) {
+      cleanPath = 'uploads/' + cleanPath;
+    }
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+    return `${baseUrl}/${cleanPath}`;
   }
 
   printProfileCard(): void {
